@@ -1,0 +1,228 @@
+<div id="character_assets_settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>캐릭터 에셋 확장</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <div class="flex-container flexFlowColumn">
+                <!-- 전역 설정 -->
+                <div class="settings_block">
+                    <h4>전역 설정</h4>
+                    <div class="flex-container alignitemscenter">
+                        <label class="checkbox flex-container">
+                            <input id="character_assets_global_enabled" type="checkbox">
+                            <span>전역 활성화</span>
+                        </label>
+                    </div>
+                    <div class="flex-container flexFlowColumn marginTopBot10">
+                        <label for="character_assets_image_prompt">
+                            <b>이미지 출력 프롬프트</b>
+                            <div class="description">
+                                AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
+                            </div>
+                            <div class="sm-textarea-container">
+                                <textarea id="character_assets_image_prompt" class="text_pole textarea_compact" rows="6"></textarea>
+                            </div>
+                        </label>
+                        <div class="flex-container flexWrap marginTopBot10">
+                            <div class="menu_button" id="character_assets_reset_prompt">
+                                <i class="fa-solid fa-undo"></i>
+                                <span>기본값으로 초기화</span>
+                            </div>
+                            <div class="menu_button" id="replace_keywords_placeholder_btn" title="프롬프트 내 {{img_keywords}} 플레이스홀더를 현재 캐릭터의 에셋 파일명 목록으로 교체합니다.">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>플레이스홀더 교체</span>
+                            </div>
+                            <div class="menu_button" id="copy_image_prompt_btn" title="현재 프롬프트를 클립보드에 복사합니다.">
+                                <i class="fa-solid fa-copy"></i>
+                                <span>프롬프트 복사</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <!-- 캐릭터별 설정 -->
+                <div class="settings_block">
+                    <h4>캐릭터별 설정</h4>
+                    <div class="flex-container alignitemscenter">
+                        <label class="checkbox flex-container">
+                            <input id="character_assets_enabled" type="checkbox">
+                            <span>이 캐릭터에 대해 활성화</span>
+                        </label>
+                    </div>
+
+                    <div id="character_assets_container" style="display: none;">
+                        <!-- 에셋 관리 -->
+                        <h4>사용 가능한 이미지 키워드</h4>
+                         <small class="extensions_info marginBottom10">
+                            <b>이미지 업로드 안내</b><br>
+                            - ZIP 파일에는 이미지 파일이 포함되어야 합니다.<br>
+                            - 이미지 파일명은 키워드로 사용됩니다 (예: <code>joy.png</code>, <code>angry.png</code>).<br>
+                            - 한 키워드에 여러 이미지를 추가하려면 파일명에 접미사를 추가하세요 (예: <code>joy-1.png</code>, <code>joy.expressive.png</code>).
+                        </small>
+                        <div class="upload-buttons marginBottom10">
+                            <input type="file" id="character_assets_upload_zip" accept=".zip" style="display: none;">
+                            <input type="file" id="character_assets_upload_image" accept="image/png, image/webp, image/gif, image/jpeg" multiple style="display: none;">
+                            <div class="menu_button" id="character_assets_upload_zip_btn">
+                                <i class="fa-solid fa-file-zipper"></i>
+                                <span>ZIP 업로드</span>
+                            </div>
+                            <div class="menu_button" id="character_assets_upload_image_btn">
+                                <i class="fa-solid fa-images"></i>
+                                <span>이미지 업로드</span>
+                            </div>
+                        </div>
+                        <div class="asset-controls">
+                            <label class="checkbox flex-container flex1">
+                                <input type="checkbox" id="select_all_keywords">
+                                <span>전체 선택</span>
+                            </label>
+                            <div class="menu_button danger_button" id="delete_selected_keywords">
+                                <i class="fa-solid fa-trash"></i>
+                                <span>선택 삭제</span>
+                            </div>
+                        </div>
+                        <div id="character_assets_list" class="asset-list-container marginTopBot10">
+                            <!-- 키워드 및 파일 목록이 여기에 동적으로 생성됩니다. -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .asset-list-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .keyword-group {
+        border: 1px solid var(--slate-light);
+        border-radius: 5px;
+        padding: 10px;
+        background-color: var(--black15);
+    }
+
+    .keyword-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--slate-dark);
+    }
+
+    .keyword-name {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .file-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+        background-color: var(--black20);
+        border-radius: 3px;
+    }
+
+    .file-name {
+        flex-grow: 1;
+        margin-right: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .delete-asset-button {
+        color: var(--red-light);
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .delete-asset-button:hover {
+        color: var(--red);
+    }
+
+    .no_assets_message {
+        text-align: center;
+        padding: 20px;
+        color: var(--grey70);
+        background-color: var(--black10);
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+    
+    .menu_button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        background-color: var(--black30);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        flex-direction: row;
+        white-space: nowrap;
+    }
+    
+    .menu_button:hover {
+        background-color: var(--black45);
+    }
+    
+    .menu_button i {
+        margin-right: 5px;
+    }
+    
+    .regex_settings_block {
+        margin: 15px 0;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: var(--black10);
+    }
+
+    .asset-controls {
+        padding: 0 10px; /* 키워드 그룹과 패딩 맞춤 */
+    }
+
+    .marginBottom10 {
+        margin-bottom: 10px;
+    }
+
+    .danger_button {
+        background-color: var(--red-dark) !important;
+        color: white !important;
+    }
+
+    .danger_button:hover {
+        background-color: var(--red) !important;
+    }
+
+    .extensions_info {
+        margin-bottom: 10px;
+        background-color: var(--black15);
+        padding: 10px;
+        border-radius: 5px;
+        display: block;
+        width: 100%;
+    }
+    
+    .extensions_info code {
+        background-color: var(--black30);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: monospace;
+        white-space: nowrap;
+    }
+</style> 

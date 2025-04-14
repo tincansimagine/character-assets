@@ -1,4 +1,8 @@
-# 캐릭터 에셋 확장 (Character Assets Extension)
+# 깡피소 캐릭터 에셋 확장 (Character Assets Extension)
+
+> **이 확장은 디시인사이드 비공갤 깡갤 대피소에서 배포됐으며, 다른 곳에 해당 확장에 대해 소개할 때는 반드시 출처를 표기해주시길 바랍니다.**
+> 
+> **깡갤 대피소 주소: https://gall.dcinside.com/mini/tincans**
 
 이 확장은 SillyTavern에서 대화 응답에 맥락에 맞는 이미지를 자동으로 삽입할 수 있게 해주는 기능을 제공합니다.
 

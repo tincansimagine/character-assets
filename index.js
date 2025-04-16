@@ -35,16 +35,26 @@ const ALLOWED_EXTENSIONS = ['png', 'webp', 'gif', 'jpg', 'jpeg'];
 /**
  * 기본 이미지 출력 프롬프트
  */
-const DEFAULT_IMAGE_PROMPT = `Prompt Instruction for Image Tag Insertion:
+const DEFAULT_IMAGE_PROMPT = `### Prompt Instruction for Image Tag Insertion:
 
-When processing the text, insert HTML image tags between paragraphs (i.e., after a full paragraph has ended). For each gap between paragraphs, evaluate the context and, if appropriate, select a matching keyword from the provided list to represent the visual content of that section. Use the following guidelines:
+When processing the text, insert up to 2 HTML image tags per response, placed between paragraphs (i.e., after a full paragraph has ended). Follow these refined guidelines:
 
 1. Tag Format: Always use the format <img src="keyword">.
-2. Context Matching: Choose a keyword from the provided list that fits the context of the text immediately preceding it. If no keyword suitably matches the context, do not insert an image tag.
-3. Avoiding Repetition: Ensure that the same keyword is not repeated too frequently. Aim for a diverse set of image tags throughout the document.
-4. HTML Familiarity: Since HTML is well understood, use these tags within the text to indicate where images should appear.
-5. Flexibility: The instructions should be followed as long as they fit naturally between paragraphs and enrich the content without interrupting the flow of the text.
-6. Keyword List: The available keywords are: {{img_keywords}}. Use these keywords to determine the appropriate image tag.`;
+
+2. Placement Limitation: Insert no more than 2 image tags in total per response. Only include an image if it significantly enhances the reader's understanding or emotional connection to the content.
+
+3. Context Matching: Evaluate each paragraph's content and, if appropriate, choose a keyword from the list that matches the theme, mood, or described scene. If no keyword is clearly relevant, skip image insertion.
+
+4. Avoiding Repetition: Avoid using the same keyword too frequently across multiple responses. Rotate and diversify image tags where applicable.
+
+5. HTML Familiarity: Since HTML is well understood, use these tags directly within the text to indicate where images should appear.
+
+6. Keyword List: The available keywords are: {{img_keywords}}. Use only these for image tag generation.`;
+
+/**
+ * 기본 프리셋 이름
+ */
+const DEFAULT_PRESET_NAME = '기본 프리셋';
 
 /**
  * 정규식 기본값
@@ -73,6 +83,18 @@ function initializeSettings() {
 
     if (!extension_settings[MODULE_NAME].imagePrompt) {
         extension_settings[MODULE_NAME].imagePrompt = DEFAULT_IMAGE_PROMPT;
+    }
+    
+    // 프리셋 데이터 초기화
+    if (!extension_settings[MODULE_NAME].presets) {
+        extension_settings[MODULE_NAME].presets = [
+            {
+                id: uuidv4(),
+                name: DEFAULT_PRESET_NAME,
+                prompt: DEFAULT_IMAGE_PROMPT
+            }
+        ];
+        extension_settings[MODULE_NAME].currentPresetId = extension_settings[MODULE_NAME].presets[0].id;
     }
 
     if (typeof extension_settings[MODULE_NAME].enabled === 'undefined') {
@@ -167,6 +189,188 @@ function isCharacterAssetsEnabled(characterId) {
 
     const assets = getCharacterAssets(characterId);
     return assets && assets.enabled;
+}
+
+/**
+ * 현재 선택된 프리셋 ID를 가져옵니다.
+ * @returns {string} 프리셋 ID
+ */
+function getCurrentPresetId() {
+    return extension_settings[MODULE_NAME].currentPresetId;
+}
+
+/**
+ * 현재 선택된 프리셋 객체를 가져옵니다.
+ * @returns {Object|null} 프리셋 객체 또는 null
+ */
+function getCurrentPreset() {
+    const presetId = getCurrentPresetId();
+    return getPresetById(presetId);
+}
+
+/**
+ * ID로 프리셋을 찾습니다.
+ * @param {string} presetId 프리셋 ID
+ * @returns {Object|null} 프리셋 객체 또는 null
+ */
+function getPresetById(presetId) {
+    const presets = extension_settings[MODULE_NAME].presets || [];
+    return presets.find(preset => preset.id === presetId) || null;
+}
+
+/**
+ * 이름으로 프리셋을 찾습니다.
+ * @param {string} name 프리셋 이름
+ * @returns {Object|null} 프리셋 객체 또는 null
+ */
+function getPresetByName(name) {
+    const presets = extension_settings[MODULE_NAME].presets || [];
+    return presets.find(preset => preset.name === name) || null;
+}
+
+/**
+ * 사용자가 선택한 프리셋 ID를 저장합니다.
+ * @param {string} presetId 프리셋 ID
+ */
+function selectPreset(presetId) {
+    const preset = getPresetById(presetId);
+    if (preset) {
+        extension_settings[MODULE_NAME].currentPresetId = presetId;
+        extension_settings[MODULE_NAME].imagePrompt = preset.prompt;
+        saveSettingsDebounced();
+        updateInterface();
+    }
+}
+
+/**
+ * 현재 에디터의 프롬프트를 선택된 프리셋에 저장합니다.
+ */
+function saveCurrentPromptToPreset() {
+    const preset = getCurrentPreset();
+    if (preset) {
+        const currentPrompt = $('#character_assets_image_prompt').val();
+        preset.prompt = currentPrompt;
+        extension_settings[MODULE_NAME].imagePrompt = currentPrompt;
+        saveSettingsDebounced();
+        showToast('success', `"${preset.name}" 프리셋에 프롬프트가 저장되었습니다.`);
+    }
+}
+
+/**
+ * 새 프리셋을 생성합니다.
+ * @param {string} name 새 프리셋 이름
+ * @returns {Object} 생성된 프리셋 객체
+ */
+async function createPreset(name) {
+    const presets = extension_settings[MODULE_NAME].presets || [];
+    
+    // 중복 이름 체크
+    let uniqueName = name;
+    let counter = 1;
+    while (getPresetByName(uniqueName)) {
+        uniqueName = `${name} (${counter})`;
+        counter++;
+    }
+    
+    const currentPrompt = $('#character_assets_image_prompt').val();
+    const newPreset = {
+        id: uuidv4(),
+        name: uniqueName,
+        prompt: currentPrompt
+    };
+    
+    presets.push(newPreset);
+    extension_settings[MODULE_NAME].presets = presets;
+    extension_settings[MODULE_NAME].currentPresetId = newPreset.id;
+    saveSettingsDebounced();
+    
+    return newPreset;
+}
+
+/**
+ * 프리셋 이름을 변경합니다.
+ * @param {string} presetId 프리셋 ID
+ * @param {string} newName 새 이름
+ * @returns {boolean} 성공 여부
+ */
+function renamePreset(presetId, newName) {
+    const preset = getPresetById(presetId);
+    if (!preset) return false;
+    
+    // 기본 프리셋은 이름 변경 불가
+    if (preset.name === DEFAULT_PRESET_NAME) {
+        showToast('error', '기본 프리셋의 이름은 변경할 수 없습니다.');
+        return false;
+    }
+    
+    // 중복 이름 체크
+    if (getPresetByName(newName)) {
+        showToast('error', `"${newName}" 이름의 프리셋이 이미 존재합니다.`);
+        return false;
+    }
+    
+    preset.name = newName;
+    saveSettingsDebounced();
+    
+    return true;
+}
+
+/**
+ * 프리셋을 삭제합니다.
+ * @param {string} presetId 삭제할 프리셋 ID
+ * @returns {boolean} 성공 여부
+ */
+function deletePreset(presetId) {
+    const presets = extension_settings[MODULE_NAME].presets || [];
+    const presetIndex = presets.findIndex(preset => preset.id === presetId);
+    
+    if (presetIndex === -1) return false;
+    
+    // 기본 프리셋은 삭제 불가
+    if (presets[presetIndex].name === DEFAULT_PRESET_NAME) {
+        showToast('error', '기본 프리셋은 삭제할 수 없습니다.');
+        return false;
+    }
+    
+    // 마지막 프리셋은 삭제 불가
+    if (presets.length <= 1) {
+        showToast('error', '마지막 프리셋은 삭제할 수 없습니다.');
+        return false;
+    }
+    
+    // 현재 선택된 프리셋이 삭제되는 경우, 기본 프리셋으로 전환
+    if (extension_settings[MODULE_NAME].currentPresetId === presetId) {
+        const defaultPreset = presets.find(p => p.name === DEFAULT_PRESET_NAME) || presets[0];
+        extension_settings[MODULE_NAME].currentPresetId = defaultPreset.id;
+        extension_settings[MODULE_NAME].imagePrompt = defaultPreset.prompt;
+    }
+    
+    // 프리셋 삭제
+    presets.splice(presetIndex, 1);
+    saveSettingsDebounced();
+    
+    return true;
+}
+
+/**
+ * 프리셋 목록을 UI에 업데이트합니다.
+ */
+function updatePresetUI() {
+    const presets = extension_settings[MODULE_NAME].presets || [];
+    const currentPresetId = getCurrentPresetId();
+    const $selector = $('#prompt_preset_selector');
+    
+    // 이전 옵션 제거
+    $selector.empty();
+    
+    // 프리셋 옵션 추가
+    presets.forEach(preset => {
+        const $option = $('<option></option>')
+            .val(preset.id)
+            .text(preset.name)
+            .prop('selected', preset.id === currentPresetId);
+        $selector.append($option);
+    });
 }
 
 /**
@@ -394,6 +598,9 @@ function updateInterface() {
 
     // 전역 이미지 프롬프트 업데이트
     $('#character_assets_image_prompt').val(extension_settings[MODULE_NAME].imagePrompt || DEFAULT_IMAGE_PROMPT);
+    
+    // 프리셋 UI 업데이트
+    updatePresetUI();
 
     $('#character_assets_container').show();
 }
@@ -636,6 +843,69 @@ function setupEventHandlers() {
         $('#character_assets_image_prompt').val(DEFAULT_IMAGE_PROMPT);
         extension_settings[MODULE_NAME].imagePrompt = DEFAULT_IMAGE_PROMPT;
         saveSettingsDebounced();
+    });
+
+    // 프리셋 선택 드롭다운 변경 이벤트
+    $('#prompt_preset_selector').on('change', function() {
+        const selectedPresetId = $(this).val();
+        if (selectedPresetId) {
+            selectPreset(selectedPresetId);
+        }
+    });
+    
+    // 프리셋 저장 버튼
+    $('#save_preset_btn').on('click', function() {
+        saveCurrentPromptToPreset();
+        updatePresetUI();
+    });
+    
+    // 새 프리셋 버튼
+    $('#new_preset_btn').on('click', async function() {
+        const name = await callPopup('새 프리셋 이름을 입력하세요:', 'input');
+        if (name && name.trim()) {
+            await createPreset(name.trim());
+            updatePresetUI();
+            showToast('success', `"${name.trim()}" 프리셋이 생성되었습니다.`);
+        }
+    });
+    
+    // 프리셋 이름 변경 버튼
+    $('#rename_preset_btn').on('click', async function() {
+        const preset = getCurrentPreset();
+        if (!preset) return;
+        
+        if (preset.name === DEFAULT_PRESET_NAME) {
+            showToast('error', '기본 프리셋의 이름은 변경할 수 없습니다.');
+            return;
+        }
+        
+        const newName = await callPopup(`"${preset.name}" 프리셋의 새 이름을 입력하세요:`, 'input', preset.name);
+        if (newName && newName.trim() && newName !== preset.name) {
+            if (renamePreset(preset.id, newName.trim())) {
+                updatePresetUI();
+                showToast('success', `프리셋 이름이 "${newName.trim()}"(으)로 변경되었습니다.`);
+            }
+        }
+    });
+    
+    // 프리셋 삭제 버튼
+    $('#delete_preset_btn').on('click', async function() {
+        const preset = getCurrentPreset();
+        if (!preset) return;
+        
+        if (preset.name === DEFAULT_PRESET_NAME) {
+            showToast('error', '기본 프리셋은 삭제할 수 없습니다.');
+            return;
+        }
+        
+        const confirmDelete = await callPopup(`정말로 "${preset.name}" 프리셋을 삭제하시겠습니까?`, 'confirm');
+        if (confirmDelete === true) {
+            if (deletePreset(preset.id)) {
+                updatePresetUI();
+                updateInterface();
+                showToast('success', `"${preset.name}" 프리셋이 삭제되었습니다.`);
+            }
+        }
     });
 
     // 플레이스홀더 교체 버튼
@@ -888,6 +1158,11 @@ async function initializeExtension() {
 
     // 설정 패널에 이벤트 핸들러 연결
     setupEventHandlers();
+    
+    // UI 초기화
+    $('#character_assets_global_enabled').prop('checked', extension_settings[MODULE_NAME].enabled);
+    $('#character_assets_image_prompt').val(extension_settings[MODULE_NAME].imagePrompt || DEFAULT_IMAGE_PROMPT);
+    updatePresetUI();
 
     // 현재 캐릭터 에셋 로드
     onCharacterChanged();

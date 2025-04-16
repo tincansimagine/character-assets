@@ -21,6 +21,36 @@
                             <div class="description">
                                 AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
                             </div>
+                            
+                            <!-- 프리셋 관리 UI 시작 -->
+                            <div class="preset-management-container marginTopBot10">
+                                <div class="preset-selector-container">
+                                    <label for="prompt_preset_selector" class="preset-label">프리셋:</label>
+                                    <select id="prompt_preset_selector" class="text_pole">
+                                        <!-- 프리셋 옵션들이 이곳에 동적으로 추가됩니다 -->
+                                    </select>
+                                </div>
+                                <div class="preset-actions-container">
+                                    <div class="menu_button" id="save_preset_btn" title="현재 프롬프트를 선택된 프리셋에 저장합니다">
+                                        <i class="fa-solid fa-save"></i>
+                                        <span>저장</span>
+                                    </div>
+                                    <div class="menu_button" id="new_preset_btn" title="새 프리셋을 생성합니다">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>새 프리셋</span>
+                                    </div>
+                                    <div class="menu_button" id="rename_preset_btn" title="선택한 프리셋의 이름을 변경합니다">
+                                        <i class="fa-solid fa-pencil"></i>
+                                        <span>이름 변경</span>
+                                    </div>
+                                    <div class="menu_button danger_button" id="delete_preset_btn" title="선택한 프리셋을 삭제합니다">
+                                        <i class="fa-solid fa-trash"></i>
+                                        <span>삭제</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 프리셋 관리 UI 끝 -->
+                            
                             <div class="sm-textarea-container">
                                 <textarea id="character_assets_image_prompt" class="text_pole textarea_compact" rows="6"></textarea>
                             </div>
@@ -194,6 +224,9 @@
 
     .asset-controls {
         padding: 0 10px; /* 키워드 그룹과 패딩 맞춤 */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .marginBottom10 {
@@ -224,5 +257,59 @@
         border-radius: 3px;
         font-family: monospace;
         white-space: nowrap;
+    }
+    
+    /* 프리셋 관리 UI를 위한 스타일 */
+    .preset-management-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: var(--black15);
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .preset-selector-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .preset-label {
+        font-weight: bold;
+        min-width: 60px;
+    }
+    
+    #prompt_preset_selector {
+        flex-grow: 1;
+    }
+    
+    .preset-actions-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    /* 반응형 디자인을 위한 미디어 쿼리 */
+    @media (max-width: 768px) {
+        .preset-selector-container {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        #prompt_preset_selector {
+            width: 100%;
+        }
+        
+        .preset-actions-container {
+            justify-content: space-between;
+        }
+        
+        .preset-actions-container .menu_button {
+            flex: 1 1 calc(50% - 10px); /* 모바일에서 2열로 정렬 */
+            justify-content: center;
+            margin: 2px;
+        }
     }
 </style> 

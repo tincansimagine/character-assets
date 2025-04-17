@@ -124,20 +124,20 @@
 </div>
 
 <style>
-    .asset-list-container {
+    #character_assets_settings .asset-list-container {
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
-    .keyword-group {
+    #character_assets_settings .keyword-group {
         border: 1px solid var(--slate-light);
         border-radius: 5px;
         padding: 10px;
         background-color: var(--black15);
     }
 
-    .keyword-header {
+    #character_assets_settings .keyword-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -146,18 +146,18 @@
         border-bottom: 1px solid var(--slate-dark);
     }
 
-    .keyword-name {
+    #character_assets_settings .keyword-name {
         font-weight: bold;
         font-size: 1.1em;
     }
 
-    .file-list {
+    #character_assets_settings .file-list {
         display: flex;
         flex-direction: column;
         gap: 5px;
     }
 
-    .file-item {
+    #character_assets_settings .file-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -166,7 +166,7 @@
         border-radius: 3px;
     }
 
-    .file-name {
+    #character_assets_settings .file-name {
         flex-grow: 1;
         margin-right: 10px;
         overflow: hidden;
@@ -174,17 +174,17 @@
         white-space: nowrap;
     }
 
-    .delete-asset-button {
+    #character_assets_settings .delete-asset-button {
         color: var(--red-light);
         cursor: pointer;
         transition: color 0.2s ease;
     }
 
-    .delete-asset-button:hover {
+    #character_assets_settings .delete-asset-button:hover {
         color: var(--red);
     }
 
-    .no_assets_message {
+    #character_assets_settings .no_assets_message {
         text-align: center;
         padding: 20px;
         color: var(--grey70);
@@ -193,7 +193,7 @@
         margin: 10px 0;
     }
     
-    .menu_button {
+    #character_assets_settings .menu_button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -207,42 +207,42 @@
         white-space: nowrap;
     }
     
-    .menu_button:hover {
+    #character_assets_settings .menu_button:hover {
         background-color: var(--black45);
     }
     
-    .menu_button i {
+    #character_assets_settings .menu_button i {
         margin-right: 5px;
     }
     
-    .regex_settings_block {
+    #character_assets_settings .regex_settings_block {
         margin: 15px 0;
         padding: 10px;
         border-radius: 5px;
         background-color: var(--black10);
     }
 
-    .asset-controls {
+    #character_assets_settings .asset-controls {
         padding: 0 10px; /* 키워드 그룹과 패딩 맞춤 */
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
 
-    .marginBottom10 {
+    #character_assets_settings .marginBottom10 {
         margin-bottom: 10px;
     }
 
-    .danger_button {
+    #character_assets_settings .danger_button {
         background-color: var(--red-dark) !important;
         color: white !important;
     }
 
-    .danger_button:hover {
+    #character_assets_settings .danger_button:hover {
         background-color: var(--red) !important;
     }
 
-    .extensions_info {
+    #character_assets_settings .extensions_info {
         margin-bottom: 10px;
         background-color: var(--black15);
         padding: 10px;
@@ -251,7 +251,7 @@
         width: 100%;
     }
     
-    .extensions_info code {
+    #character_assets_settings .extensions_info code {
         background-color: var(--black30);
         padding: 2px 4px;
         border-radius: 3px;
@@ -260,7 +260,7 @@
     }
     
     /* 프리셋 관리 UI를 위한 스타일 */
-    .preset-management-container {
+    #character_assets_settings .preset-management-container {
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -270,22 +270,22 @@
         margin-bottom: 15px;
     }
     
-    .preset-selector-container {
+    #character_assets_settings .preset-selector-container {
         display: flex;
         align-items: center;
         gap: 10px;
     }
     
-    .preset-label {
+    #character_assets_settings .preset-label {
         font-weight: bold;
         min-width: 60px;
     }
     
-    #prompt_preset_selector {
+    #character_assets_settings #prompt_preset_selector {
         flex-grow: 1;
     }
     
-    .preset-actions-container {
+    #character_assets_settings .preset-actions-container {
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
@@ -293,20 +293,20 @@
     
     /* 반응형 디자인을 위한 미디어 쿼리 */
     @media (max-width: 768px) {
-        .preset-selector-container {
+        #character_assets_settings .preset-selector-container {
             flex-direction: column;
             align-items: flex-start;
         }
         
-        #prompt_preset_selector {
+        #character_assets_settings #prompt_preset_selector {
             width: 100%;
         }
         
-        .preset-actions-container {
+        #character_assets_settings .preset-actions-container {
             justify-content: space-between;
         }
         
-        .preset-actions-container .menu_button {
+        #character_assets_settings .preset-actions-container .menu_button {
             flex: 1 1 calc(50% - 10px); /* 모바일에서 2열로 정렬 */
             justify-content: center;
             margin: 2px;

@@ -35,21 +35,32 @@ const ALLOWED_EXTENSIONS = ['png', 'webp', 'gif', 'jpg', 'jpeg'];
 /**
  * 기본 이미지 출력 프롬프트
  */
-const DEFAULT_IMAGE_PROMPT = `### Prompt Instruction for Image Tag Insertion:
+const DEFAULT_IMAGE_PROMPT = `### Prompt Instruction for Image Tag Insertion
 
 When processing the text, insert up to 2 HTML image tags per response, placed between paragraphs (i.e., after a full paragraph has ended). Follow these refined guidelines:
 
-1. Tag Format: Always use the format <img src="keyword">.
+1. Tag Format:  
+   Always use the format <img src="keyword.extension">.  
+   - You must include the correct file extension (e.g., \`.jpg\`, \`.png\`, 'webp', etc.) as part of the filename to avoid broken images.
+   - Example: <img src="steampunk_city.jpg">  
+   (Do NOT use just <img src="steampunk_city">— this will cause the image to fail.)
 
-2. Placement Limitation: Insert no more than 2 image tags in total per response. Only include an image if it significantly enhances the reader's understanding or emotional connection to the content.
+2. Placement Limitation:  
+   Insert no more than 2 image tags per response. Only include an image if it significantly enhances the reader's understanding, mood, or emotional engagement with the text.
 
-3. Context Matching: Evaluate each paragraph's content and, if appropriate, choose a keyword from the list that matches the theme, mood, or described scene. If no keyword is clearly relevant, skip image insertion.
+3. Context Matching:  
+   Evaluate each paragraph's content and, if appropriate, choose a keyword from the list that closely matches the theme, atmosphere, or subject of that section.  
+   - If no keyword clearly fits, skip image insertion entirely.
 
-4. Avoiding Repetition: Avoid using the same keyword too frequently across multiple responses. Rotate and diversify image tags where applicable.
+4. Avoiding Repetition:  
+   Do not overuse the same image keyword across responses. Rotate and diversify the image tags whenever possible.
 
-5. HTML Familiarity: Since HTML is well understood, use these tags directly within the text to indicate where images should appear.
+5. HTML Familiarity:  
+   Since HTML syntax is supported, use the \`<img>\` tag directly within the text where the image should appear.
 
-6. Keyword List: The available keywords are: {{img_keywords}}. Use only these for image tag generation.`;
+6. Keyword List:  
+   The available keywords (with extensions) are: {{img_keywords}}  
+   - Use only the exact filenames and extensions provided — do not make up or guess extensions.`;
 
 /**
  * 기본 프리셋 이름

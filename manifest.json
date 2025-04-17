@@ -6,7 +6,7 @@
     "js": "index.js",
     "css": "",
     "author": "tincansimagine",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "homePage": "https://github.com/tincansimagine/character_assets.git",
     "description": "에셋 이미지를 메시지 내용에 맥락에 맞게 표시합니다."
 } 

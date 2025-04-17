@@ -41,7 +41,7 @@ When processing the text, insert up to 2 HTML image tags per response, placed be
 
 1. Tag Format:  
    Always use the format <img src="keyword.extension">.  
-   - You must include the correct file extension (e.g., \`.jpg\`, \`.png\`, 'webp', etc.) as part of the filename to avoid broken images.
+   - You must include the correct file extension (e.g., \`.jpg\`, \`.png\`, \`webp\`, etc.) as part of the filename to avoid broken images.
    - Example: <img src="steampunk_city.jpg">  
    (Do NOT use just <img src="steampunk_city">— this will cause the image to fail.)
 

@@ -46,7 +46,7 @@
                             <div class="description">
                                 AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 교체 버튼을 누를 경우, 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
                             </div>
-                            
+                    </label>
                             <!-- 프리셋 관리 UI 시작 -->
                             <div class="preset-management-container marginTopBot10">
                                 <div class="preset-selector-container">
@@ -91,7 +91,6 @@
                             <div class="sm-textarea-container">
                                 <textarea id="character_assets_image_prompt" class="text_pole textarea_compact" rows="6"></textarea>
                             </div>
-                        </label>
                         <div class="flex-container flexWrap marginTopBot10">
                             <div class="menu_button" id="character_assets_reset_prompt">
                                 <i class="fa-solid fa-undo"></i>
@@ -191,113 +190,115 @@
 </div>
 
 <style>
+    /* 모든 CSS 규칙에 !important 추가하여 우선순위 확보 */
     #character_assets_settings .asset-list-container {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
     }
 
     #character_assets_settings .keyword-group {
-        border: 1px solid var(--slate-light);
-        border-radius: 5px;
-        padding: 10px;
-        background-color: var(--black15);
+        border: 1px solid var(--slate-light) !important;
+        border-radius: 5px !important;
+        padding: 10px !important;
+        background-color: var(--black15) !important;
     }
     
     #character_assets_settings .keyword-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-        border-bottom: 1px solid var(--slate-dark);
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 10px !important;
+        padding-bottom: 5px !important;
+        border-bottom: 1px solid var(--slate-dark) !important;
+        cursor: move !important;
     }
     
     #character_assets_settings .keyword-name {
-        font-weight: bold;
-        font-size: 1.1em;
+        font-weight: bold !important;
+        font-size: 1.1em !important;
     }
 
     #character_assets_settings .file-list {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px !important;
     }
     
     #character_assets_settings .file-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 5px;
-        background-color: var(--black20);
-        border-radius: 3px;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 5px !important;
+        background-color: var(--black20) !important;
+        border-radius: 3px !important;
     }
 
     #character_assets_settings .file-name {
-        flex-grow: 1;
-        margin-right: 10px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        flex-grow: 1 !important;
+        margin-right: 10px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
     }
     
     #character_assets_settings .delete-asset-button {
-        color: var(--red-light);
-        cursor: pointer;
-        transition: color 0.2s ease;
+        color: var(--red-light) !important;
+        cursor: pointer !important;
+        transition: color 0.2s ease !important;
     }
 
     #character_assets_settings .delete-asset-button:hover {
-        color: var(--red);
+        color: var(--red) !important;
     }
     
     #character_assets_settings .no_assets_message {
-        text-align: center;
-        padding: 20px;
-        color: var(--grey70);
-        background-color: var(--black10);
-        border-radius: 5px;
-        margin: 10px 0;
+        text-align: center !important;
+        padding: 20px !important;
+        color: var(--grey70) !important;
+        background-color: var(--black10) !important;
+        border-radius: 5px !important;
+        margin: 10px 0 !important;
     }
     
     #character_assets_settings .menu_button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px 15px;
-        margin: 5px;
-        border-radius: 5px;
-        background-color: var(--black30);
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        flex-direction: row;
-        white-space: nowrap;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 5px 15px !important;
+        margin: 5px !important;
+        border-radius: 5px !important;
+        background-color: var(--black30) !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+        flex-direction: row !important;
+        white-space: nowrap !important;
     }
     
     #character_assets_settings .menu_button:hover {
-        background-color: var(--black45);
+        background-color: var(--black45) !important;
     }
     
     #character_assets_settings .menu_button i {
-        margin-right: 5px;
+        margin-right: 5px !important;
     }
     
     #character_assets_settings .regex_settings_block {
-        margin: 15px 0;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: var(--black10);
+        margin: 15px 0 !important;
+        padding: 10px !important;
+        border-radius: 5px !important;
+        background-color: var(--black10) !important;
     }
 
     #character_assets_settings .asset-controls {
-        padding: 0 10px; /* 키워드 그룹과 패딩 맞춤 */
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        padding: 0 10px !important; /* 키워드 그룹과 패딩 맞춤 */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
     }
 
     #character_assets_settings .marginBottom10 {
-        margin-bottom: 10px;
+        margin-bottom: 10px !important;
     }
 
     #character_assets_settings .danger_button {
@@ -310,402 +311,428 @@
     }
 
     #character_assets_settings .extensions_info {
-        margin-bottom: 10px;
-        background-color: var(--black15);
-        padding: 10px;
-        border-radius: 5px;
-        display: block;
-        width: 100%;
+        margin-bottom: 10px !important;
+        background-color: var(--black15) !important;
+        padding: 10px !important;
+        border-radius: 5px !important;
+        display: block !important;
+        width: 100% !important;
     }
     
     #character_assets_settings .extensions_info code {
-        background-color: var(--black30);
-        padding: 2px 4px;
-        border-radius: 3px;
-        font-family: monospace;
-        white-space: nowrap;
+        background-color: var(--black30) !important;
+        padding: 2px 4px !important;
+        border-radius: 3px !important;
+        font-family: monospace !important;
+        white-space: nowrap !important;
     }
     
-    /* 프리셋 관리 UI를 위한 스타일 */
+    /* === 이미지 출력 프롬프트 섹션 (41-88라인 관련) === */
+    #character_assets_settings label[for="character_assets_image_prompt"] > b {
+        display: block !important;
+        margin-bottom: 5px !important; /* 제목 아래 간격 */
+    }
+    
+    #character_assets_settings .description {
+        font-size: 0.9em !important;
+        color: var(--text-color-secondary) !important; /* 테마 변수 사용 */
+        padding: 10px !important;
+        background-color: var(--black10) !important;
+        border-radius: 5px !important;
+        margin-bottom: 15px !important; /* 아래 요소와 간격 */
+    }
+    
     #character_assets_settings .preset-management-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        background-color: var(--black15);
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 15px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        background-color: var(--black15) !important;
+        padding: 10px !important;
+        border-radius: 5px !important;
+        margin-bottom: 15px !important; /* 아래 요소와 간격 */
     }
     
     #character_assets_settings .preset-selector-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
     }
     
     #character_assets_settings .preset-label {
-        font-weight: bold;
-        min-width: 60px;
+        font-weight: bold !important;
+        min-width: 60px !important;
     }
     
     #character_assets_settings #prompt_preset_selector {
-        flex-grow: 1;
+        flex-grow: 1 !important;
     }
     
     #character_assets_settings .preset-actions-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
     }
+    
+    #character_assets_settings .preset-io-container {
+        display: flex !important;
+        justify-content: space-between !important;
+        margin-top: 10px !important;
+        gap: 10px !important;
+    }
+    
+    #character_assets_settings .preset-io-container .menu_button {
+        flex: 1 !important;
+    }
+    
+    #character_assets_settings .sm-textarea-container {
+        margin-bottom: 10px !important; /* 아래 버튼과 간격 */
+    }
+    
+    #character_assets_settings .flex-container.flexWrap {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+    }
+    
+    /* ============================================== */
     
     /* 반응형 디자인을 위한 미디어 쿼리 */
     @media (max-width: 768px) {
-        /* 레이블 내부 요소 간 간격 조정 */
-        #character_assets_settings label > .description,
-        #character_assets_settings label > .preset-management-container,
-        #character_assets_settings label > .sm-textarea-container {
-            margin-bottom: 15px;
+        /* 이미지 출력 프롬프트 섹션 (41-88라인 관련) 모바일 스타일 */
+        #character_assets_settings label[for="character_assets_image_prompt"] > .description {
+            margin-bottom: 15px !important;
         }
         
-        /* 프리셋 선택기 */
+        #character_assets_settings .preset-management-container {
+            margin-bottom: 15px !important;
+        }
+        
         #character_assets_settings .preset-selector-container {
-            flex-direction: column;
-            align-items: flex-start;
+            flex-direction: column !important;
+            align-items: flex-start !important;
         }
         
         #character_assets_settings #prompt_preset_selector {
-            width: 100%;
+            width: 100% !important;
         }
         
-        /* 프리셋 액션 버튼 (기존 2열 유지) */
         #character_assets_settings .preset-actions-container {
-            justify-content: space-between;
+            justify-content: space-between !important;
         }
         
         #character_assets_settings .preset-actions-container .menu_button {
-            flex: 1 1 calc(50% - 10px);
-            justify-content: center;
-            margin: 2px;
+            flex: 1 1 calc(50% - 10px) !important;
+            justify-content: center !important;
+            margin: 2px !important;
         }
         
-        /* 프리셋 내보내기/불러오기 버튼 세로 정렬 */
         #character_assets_settings .preset-io-container {
-            flex-direction: column;
+            flex-direction: column !important;
         }
         
         #character_assets_settings .preset-io-container .menu_button {
-            flex: auto; /* flex: 1 제거 */
-            width: 100%;
-            margin: 2px 0; /* 상하 마진 조정 */
+            flex: auto !important;
+            width: 100% !important;
+            margin: 2px 0 !important;
         }
         
-        /* 프롬프트 하단 버튼 (초기화, 교체, 복사) 세로 정렬 */
-        #character_assets_settings label + .flex-container.flexWrap {
-            flex-direction: column;
+        #character_assets_settings .sm-textarea-container {
+            margin-bottom: 15px !important;
         }
         
-        #character_assets_settings label + .flex-container.flexWrap .menu_button {
-            width: 100%;
-            margin: 2px 0; /* 상하 마진 조정 */
+        #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap {
+            flex-direction: column !important;
         }
+        
+        #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap .menu_button {
+            width: 100% !important;
+            margin: 2px 0 !important;
+        }
+        
+        /* 나머지 모바일 스타일 */
+        /* (다른 요소들에 대한 모바일 스타일은 여기에 계속 추가될 수 있습니다) */
     }
     
     /* 에셋 링크 스타일 */
     #character_assets_settings .asset-link {
-        color: var(--blue);
-        text-decoration: underline;
-        transition: color 0.2s ease;
+        color: var(--blue) !important;
+        text-decoration: underline !important;
+        transition: color 0.2s ease !important;
     }
     
     #character_assets_settings .asset-link:hover {
-        color: var(--light-blue);
+        color: var(--light-blue) !important;
     }
     
     /* 키워드 검색 필터 스타일 */
     #character_assets_settings .keyword-filter-container {
-        width: 100%;
+        width: 100% !important;
     }
     
     #character_assets_settings .filter-input-container {
-        position: relative;
-        width: 100%;
+        position: relative !important;
+        width: 100% !important;
     }
     
     #character_assets_settings #keyword_filter {
-        width: 100%;
-        padding-right: 30px;
+        width: 100% !important;
+        padding-right: 30px !important;
     }
     
     #character_assets_settings .filter-clear-button {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: var(--grey80);
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        cursor: pointer !important;
+        color: var(--grey80) !important;
     }
     
     #character_assets_settings .filter-clear-button:hover {
-        color: var(--grey30);
+        color: var(--grey30) !important;
     }
     
     /* 가이드 스타일 */
     #character_assets_settings .usage-guide {
-        border: 1px solid var(--slate-light);
-        border-radius: 5px;
-        overflow: hidden;
+        border: 1px solid var(--slate-light) !important;
+        border-radius: 5px !important;
+        overflow: hidden !important;
     }
     
     #character_assets_settings .guide-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px;
-        background-color: var(--black20);
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        background-color: var(--black20) !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
     }
     
     #character_assets_settings .guide-header:hover {
-        background-color: var(--black30);
+        background-color: var(--black30) !important;
     }
     
     #character_assets_settings .guide-header span {
-        flex-grow: 1;
-        font-weight: bold;
+        flex-grow: 1 !important;
+        font-weight: bold !important;
     }
     
     #character_assets_settings .guide-content {
-        padding: 15px;
-        background-color: var(--black10);
+        padding: 15px !important;
+        background-color: var(--black10) !important;
     }
     
     #character_assets_settings .guide-section {
-        margin-bottom: 15px;
+        margin-bottom: 15px !important;
     }
     
     #character_assets_settings .guide-section:last-child {
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
     }
     
     #character_assets_settings .guide-section h5 {
-        margin-top: 0;
-        margin-bottom: 8px;
-        font-size: 1em;
-        color: var(--blue);
+        margin-top: 0 !important;
+        margin-bottom: 8px !important;
+        font-size: 1em !important;
+        color: var(--blue) !important;
     }
     
     #character_assets_settings .guide-section p,
     #character_assets_settings .guide-section ul {
-        margin: 5px 0;
+        margin: 5px 0 !important;
     }
     
     #character_assets_settings .guide-section li {
-        margin-bottom: 5px;
+        margin-bottom: 5px !important;
     }
     
     /* 키워드 드래그 앤 드롭 스타일 */
     #character_assets_settings .keyword-group.dragging {
-        opacity: 0.5;
-        border: 2px dashed var(--blue);
+        opacity: 0.5 !important;
+        border: 2px dashed var(--blue) !important;
     }
     
     #character_assets_settings .keyword-group.drag-over {
-        border: 2px dashed var(--blue);
-    }
-    
-    #character_assets_settings .keyword-header {
-        cursor: move;
-    }
-
-    /* 프리셋 내보내기/불러오기 스타일 */
-    #character_assets_settings .preset-io-container {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-        gap: 10px;
-    }
-    
-    #character_assets_settings .preset-io-container .menu_button {
-        flex: 1;
+        border: 2px dashed var(--blue) !important;
     }
     
     /* 에셋 갤러리 모달 스타일 */
     .asset-modal {
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        overflow: auto;
+        position: fixed !important;
+        z-index: 1000 !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: rgba(0, 0, 0, 0.7) !important;
+        overflow: auto !important;
     }
     
     .asset-modal-content {
-        background-color: var(--black30);
-        border: 1px solid var(--slate-dark);
-        border-radius: 10px;
-        width: 80%;
-        max-width: 1200px;
-        margin: 50px auto;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        background-color: var(--black30) !important;
+        border: 1px solid var(--slate-dark) !important;
+        border-radius: 10px !important;
+        width: 80% !important;
+        max-width: 1200px !important;
+        margin: 50px auto !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
     }
     
     .asset-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 20px;
-        border-bottom: 1px solid var(--slate-dark);
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 15px 20px !important;
+        border-bottom: 1px solid var(--slate-dark) !important;
     }
     
     .asset-modal-close {
-        color: var(--grey70);
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
+        color: var(--grey70) !important;
+        font-size: 28px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
     }
     
     .asset-modal-close:hover {
-        color: var(--grey30);
+        color: var(--grey30) !important;
     }
     
     .asset-gallery-filter {
-        display: flex;
-        padding: 15px 20px;
-        gap: 10px;
+        display: flex !important;
+        padding: 15px 20px !important;
+        gap: 10px !important;
     }
     
     .asset-gallery-filter input {
-        flex-grow: 1;
+        flex-grow: 1 !important;
     }
     
     .asset-gallery-container {
-        display: grid;
-        padding: 20px;
-        max-height: 70vh;
-        overflow-y: auto;
+        display: grid !important;
+        padding: 20px !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
     }
     
     /* 그리드 크기별 스타일 */
     .asset-gallery-container.grid-small {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+        gap: 10px !important;
     }
     
     .asset-gallery-container.grid-medium {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+        gap: 15px !important;
     }
     
     .asset-gallery-container.grid-large {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+        gap: 20px !important;
     }
     
     .asset-gallery-item {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--slate-light);
-        border-radius: 5px;
-        overflow: hidden;
-        background-color: var(--black20);
-        transition: transform 0.2s;
+        display: flex !important;
+        flex-direction: column !important;
+        border: 1px solid var(--slate-light) !important;
+        border-radius: 5px !important;
+        overflow: hidden !important;
+        background-color: var(--black20) !important;
+        transition: transform 0.2s !important;
     }
     
     .asset-gallery-item:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+        transform: scale(1.05) !important;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3) !important;
     }
     
     .asset-gallery-img-container {
-        position: relative;
-        padding-top: 100%; /* 1:1 비율 유지 */
+        position: relative !important;
+        padding-top: 100% !important; /* 1:1 비율 유지 */
     }
     
     .asset-gallery-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        cursor: pointer;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        cursor: pointer !important;
     }
     
     .asset-gallery-caption {
-        padding: 8px;
-        text-align: center;
-        font-size: 0.9em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        padding: 8px !important;
+        text-align: center !important;
+        font-size: 0.9em !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     .asset-gallery-actions {
-        display: flex;
-        justify-content: space-around;
-        padding: 5px;
-        border-top: 1px solid var(--slate-dark);
+        display: flex !important;
+        justify-content: space-around !important;
+        padding: 5px !important;
+        border-top: 1px solid var(--slate-dark) !important;
     }
     
     .asset-gallery-action {
-        color: var(--grey70);
-        cursor: pointer;
-        transition: color 0.2s;
+        color: var(--grey70) !important;
+        cursor: pointer !important;
+        transition: color 0.2s !important;
     }
     
     .asset-gallery-action:hover {
-        color: var(--grey30);
+        color: var(--grey30) !important;
     }
     
     .asset-preview-modal {
-        position: fixed;
-        z-index: 10000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: fixed !important;
+        z-index: 10000 !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: rgba(0, 0, 0, 0.9) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     
     .asset-preview-modal-content {
-        position: relative;
-        max-width: 90%;
-        max-height: 90%;
+        position: relative !important;
+        max-width: 90% !important;
+        max-height: 90% !important;
     }
     
     .asset-preview-close {
-        position: absolute;
-        top: -30px;
-        right: -30px;
-        color: #fff;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        line-height: 30px;
-        background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 50%;
-        z-index: 10001;
+        position: absolute !important;
+        top: -30px !important;
+        right: -30px !important;
+        color: #fff !important;
+        font-size: 28px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        width: 30px !important;
+        height: 30px !important;
+        text-align: center !important;
+        line-height: 30px !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        border-radius: 50% !important;
+        z-index: 10001 !important;
     }
     
     .asset-preview-close:hover {
-        color: #ddd;
-        background-color: rgba(0, 0, 0, 0.8);
+        color: #ddd !important;
+        background-color: rgba(0, 0, 0, 0.8) !important;
     }
     
     .asset-preview-image {
-        max-width: 100%;
-        max-height: 80vh;
-        border: 2px solid var(--slate-light);
-        display: block;
+        max-width: 100% !important;
+        max-height: 80vh !important;
+        border: 2px solid var(--slate-light) !important;
+        display: block !important;
     }
 </style>
 
@@ -817,4 +844,4 @@
             setupDragAndDrop();
         });
     });
-</script> 
+</script>

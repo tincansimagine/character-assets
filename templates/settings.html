@@ -734,24 +734,25 @@
     
     .asset-preview-close {
         position: absolute !important;
-        top: -30px !important;
-        right: -30px !important;
+        top: 10px !important; /* 모달 내용 영역 안쪽 상단 */
+        right: 10px !important; /* 모달 내용 영역 안쪽 우측 */
         color: #fff !important;
-        font-size: 28px !important;
+        font-size: 24px !important; /* 크기 살짝 줄임 */
         font-weight: bold !important;
         cursor: pointer !important;
         width: 30px !important;
         height: 30px !important;
         text-align: center !important;
         line-height: 30px !important;
-        background-color: rgba(0, 0, 0, 0.5) !important;
+        background-color: rgba(0, 0, 0, 0.6) !important; /* 배경 약간 진하게 */
         border-radius: 50% !important;
         z-index: 10001 !important;
+        transition: background-color 0.2s ease !important; /* 호버 효과 추가 */
     }
     
     .asset-preview-close:hover {
         color: #ddd !important;
-        background-color: rgba(0, 0, 0, 0.8) !important;
+        background-color: rgba(0, 0, 0, 0.9) !important;
     }
     
     .asset-preview-image {

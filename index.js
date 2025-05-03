@@ -1505,6 +1505,7 @@ async function openGallery() {
 function showPreviewImage(imgSrc) {
     // 이미 열려있는 프리뷰 모달 제거
     $('.asset-preview-modal').remove();
+    $(document).off('keydown.preview'); // 이전 ESC 리스너 확실히 제거
     
     // 새 프리뷰 모달 생성
     const previewModal = $(`
@@ -1516,38 +1517,38 @@ function showPreviewImage(imgSrc) {
         </div>
     `);
     
-    // 모달 배경 클릭 시 닫기
-    previewModal.on('mousedown mouseup click', function(e) {
-        if (e.target === this) {
+    // 닫기 함수 (중복 방지)
+    const closeModal = (e) => {
+        if (e) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            $(this).remove();
-            $(document).off('keydown.preview'); // ESC 키 리스너 제거
-            return false;
         }
-    });
-    
-    // 닫기 버튼 이벤트
-    previewModal.find('.asset-preview-close').on('mousedown mouseup click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
         previewModal.remove();
         $(document).off('keydown.preview'); // ESC 키 리스너 제거
         return false;
+    };
+
+    // 모달 배경 클릭/터치 시 닫기 (mousedown/touchstart만 사용)
+    previewModal.on('mousedown touchstart', function(e) {
+        if (e.target === this) {
+            closeModal(e);
+        }
     });
     
-    // 이미지 클릭시 이벤트 전파 중단
-    previewModal.find('.asset-preview-image').on('mousedown mouseup click', function(e) {
-        e.preventDefault();
+    // 닫기 버튼 클릭/터치 시 닫기 (mousedown/touchstart만 사용)
+    previewModal.find('.asset-preview-close').on('mousedown touchstart', function(e) {
+        closeModal(e);
+    });
+    
+    // 이미지 클릭/터치시 이벤트 전파 중단
+    previewModal.find('.asset-preview-image').on('mousedown touchstart click', function(e) {
         e.stopPropagation();
         e.stopImmediatePropagation();
-        return false;
     });
     
-    // 모달 내용 클릭시 이벤트 전파 중단
-    previewModal.find('.asset-preview-modal-content').on('mousedown mouseup click', function(e) {
+    // 모달 내용 클릭/터치시 이벤트 전파 중단
+    previewModal.find('.asset-preview-modal-content').on('mousedown touchstart click', function(e) {
         e.stopPropagation();
         e.stopImmediatePropagation();
     });
@@ -1555,11 +1556,7 @@ function showPreviewImage(imgSrc) {
     // ESC 키 누를 때 닫기 이벤트 추가
     $(document).on('keydown.preview', function(e) {
         if (e.key === 'Escape') {
-            e.preventDefault();
-            e.stopPropagation();
-            previewModal.remove();
-            $(document).off('keydown.preview');
-            return false;
+            closeModal(e);
         }
     });
     

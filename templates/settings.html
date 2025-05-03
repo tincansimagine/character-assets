@@ -6,6 +6,37 @@
         </div>
         <div class="inline-drawer-content">
             <div class="flex-container flexFlowColumn">
+                <!-- 에셋 사용법 가이드 - 상단으로 이동 -->
+                <div class="usage-guide marginTopBot10">
+                    <div class="collapsible-guide">
+                        <div class="guide-header" id="toggle_usage_guide">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>에셋 사용법 가이드</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="guide-content" id="usage_guide_content" style="display: none;">
+                            <div class="guide-section">
+                                <h5>기본 사용법</h5>
+                                <ol>
+                                    <li>에셋에 사용할 이미지들을 AI가 쉽게 구분할 수 있도록 파일명을 명확한 키워드로 작성합니다.</li>
+                                    <li>준비된 이미지를 사용할 캐릭터를 고르고 채팅방에 들어갑니다.</li>
+                                    <li>업로드 버튼을 통해 준비된 이미지들을 업로드합니다.</li>
+                                    <li>플레이스홀더 교체 버튼을 통해 자동으로 모든 키워드들을 프롬프트에 삽입합니다.</li>
+                                    <li>최대한 사용 중인 프롬프트 하단 위치에 <code>{{img_inprompt}}</code> 플레이스홀더를 위치해 이미지 출력 프롬프트를 삽입합니다.</li>
+                                    <li>글을 통해 다운 받은 필수 에셋 정규식을 Regex 확장 메뉴에서 Scoped로 Import 해주면 끝입니다.</li>
+                                </ol>
+                            </div>
+                            <div class="guide-section">
+                                <h5>팁</h5>
+                                <ul>
+                                    <li>키워드는 짧고 간단하게 작성하되, 어떤 이미지인지 명확하게 구분이 돼야 합니다.</li>
+                                    <li>같은 이름의 캐릭터가 있을 경우, 캐릭터의 이름이 만들어진 순서대로 A1, A2, A3과 같이 배정되기 때문에 이 경우 정규식에서 Out 결과를 일부 수정해주어야 오류가 나지 않습니다. (e.g., {{char}} -> {{char}}2 로 수정)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- 전역 설정 -->
                 <div class="settings_block">
                     <h4>이미지 출력 설정</h4>
@@ -13,7 +44,7 @@
                     <label for="character_assets_image_prompt">
                         <b>이미지 출력 프롬프트</b>
                             <div class="description">
-                                AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
+                                AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 교체 버튼을 누를 경우, 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
                             </div>
                             
                             <!-- 프리셋 관리 UI 시작 -->
@@ -40,6 +71,18 @@
                                     <div class="menu_button danger_button" id="delete_preset_btn" title="선택한 프리셋을 삭제합니다">
                                         <i class="fa-solid fa-trash"></i>
                                         <span>삭제</span>
+                        </div>
+                    </div>
+                    <!-- 프리셋 내보내기/불러오기 버튼 -->
+                    <div class="preset-io-container">
+                        <div class="menu_button" id="export_presets_btn" title="모든 프리셋을 JSON 파일로 내보냅니다">
+                            <i class="fa-solid fa-file-export"></i>
+                            <span>프리셋 내보내기</span>
+                        </div>
+                        <input type="file" id="import_presets_input" accept=".json" style="display: none;">
+                        <div class="menu_button" id="import_presets_btn" title="JSON 파일에서 프리셋을 불러옵니다">
+                            <i class="fa-solid fa-file-import"></i>
+                            <span>프리셋 불러오기</span>
                         </div>
                     </div>
                 </div>
@@ -79,6 +122,17 @@
                         - 한 키워드에 여러 이미지를 추가하려면 파일명에 접미사를 추가하세요 (예: <code>joy-1.png</code>, <code>joy.expressive.png</code>).<br>
                         - <b>반드시 <a href="https://gall.dcinside.com/mini/tincans/45201" target="_blank" class="asset-link">이 링크</a>에서 에셋 정규식을 다운로드하여 사용하세요.</b>
                     </small>
+                        
+                        <!-- 키워드 검색 필터 -->
+                        <div class="keyword-filter-container marginBottom10">
+                            <div class="filter-input-container">
+                                <input type="text" id="keyword_filter" class="text_pole" placeholder="키워드 검색...">
+                                <div class="filter-clear-button" id="clear_keyword_filter" title="검색 초기화">
+                                    <i class="fa-solid fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="upload-buttons marginBottom10">
                             <input type="file" id="character_assets_upload_zip" accept=".zip" style="display: none;">
                             <input type="file" id="character_assets_upload_image" accept="image/png, image/webp, image/gif, image/jpeg" multiple style="display: none;">
@@ -89,6 +143,10 @@
                             <div class="menu_button" id="character_assets_upload_image_btn">
                                 <i class="fa-solid fa-images"></i>
                                 <span>이미지 업로드</span>
+                            </div>
+                            <div class="menu_button" id="open_asset_gallery_btn" title="모든 에셋 이미지를 갤러리로 미리 봅니다">
+                                <i class="fa-solid fa-image"></i>
+                                <span>미리보기 갤러리</span>
                             </div>
                         </div>
                         <div class="asset-controls">
@@ -107,6 +165,27 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- 에셋 갤러리 모달 -->
+<div id="asset_gallery_modal" class="asset-modal" style="display: none;">
+    <div class="asset-modal-content">
+        <div class="asset-modal-header">
+            <h3>에셋 갤러리</h3>
+            <span class="asset-modal-close">&times;</span>
+        </div>
+        <div class="asset-gallery-filter">
+            <input type="text" id="gallery_search" class="text_pole" placeholder="갤러리 필터...">
+            <select id="gallery_grid_size" class="text_pole">
+                <option value="small">작은 그리드</option>
+                <option value="medium" selected>중간 그리드</option>
+                <option value="large">큰 그리드</option>
+            </select>
+        </div>
+        <div id="asset_gallery_container" class="asset-gallery-container">
+            <!-- 여기에 갤러리 이미지가 동적으로 추가됩니다 -->
         </div>
     </div>
 </div>
@@ -311,4 +390,401 @@
     #character_assets_settings .asset-link:hover {
         color: var(--light-blue);
     }
-</style> 
+    
+    /* 키워드 검색 필터 스타일 */
+    #character_assets_settings .keyword-filter-container {
+        width: 100%;
+    }
+    
+    #character_assets_settings .filter-input-container {
+        position: relative;
+        width: 100%;
+    }
+    
+    #character_assets_settings #keyword_filter {
+        width: 100%;
+        padding-right: 30px;
+    }
+    
+    #character_assets_settings .filter-clear-button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--grey80);
+    }
+    
+    #character_assets_settings .filter-clear-button:hover {
+        color: var(--grey30);
+    }
+    
+    /* 가이드 스타일 */
+    #character_assets_settings .usage-guide {
+        border: 1px solid var(--slate-light);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    #character_assets_settings .guide-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background-color: var(--black20);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    #character_assets_settings .guide-header:hover {
+        background-color: var(--black30);
+    }
+    
+    #character_assets_settings .guide-header span {
+        flex-grow: 1;
+        font-weight: bold;
+    }
+    
+    #character_assets_settings .guide-content {
+        padding: 15px;
+        background-color: var(--black10);
+    }
+    
+    #character_assets_settings .guide-section {
+        margin-bottom: 15px;
+    }
+    
+    #character_assets_settings .guide-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    #character_assets_settings .guide-section h5 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 1em;
+        color: var(--blue);
+    }
+    
+    #character_assets_settings .guide-section p,
+    #character_assets_settings .guide-section ul {
+        margin: 5px 0;
+    }
+    
+    #character_assets_settings .guide-section li {
+        margin-bottom: 5px;
+    }
+    
+    /* 키워드 드래그 앤 드롭 스타일 */
+    #character_assets_settings .keyword-group.dragging {
+        opacity: 0.5;
+        border: 2px dashed var(--blue);
+    }
+    
+    #character_assets_settings .keyword-group.drag-over {
+        border: 2px dashed var(--blue);
+    }
+    
+    #character_assets_settings .keyword-header {
+        cursor: move;
+    }
+
+    /* 프리셋 내보내기/불러오기 스타일 */
+    #character_assets_settings .preset-io-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 10px;
+    }
+    
+    #character_assets_settings .preset-io-container .menu_button {
+        flex: 1;
+    }
+    
+    /* 에셋 갤러리 모달 스타일 */
+    .asset-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        overflow: auto;
+    }
+    
+    .asset-modal-content {
+        background-color: var(--black30);
+        border: 1px solid var(--slate-dark);
+        border-radius: 10px;
+        width: 80%;
+        max-width: 1200px;
+        margin: 50px auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .asset-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--slate-dark);
+    }
+    
+    .asset-modal-close {
+        color: var(--grey70);
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .asset-modal-close:hover {
+        color: var(--grey30);
+    }
+    
+    .asset-gallery-filter {
+        display: flex;
+        padding: 15px 20px;
+        gap: 10px;
+    }
+    
+    .asset-gallery-filter input {
+        flex-grow: 1;
+    }
+    
+    .asset-gallery-container {
+        display: grid;
+        padding: 20px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    /* 그리드 크기별 스타일 */
+    .asset-gallery-container.grid-small {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    
+    .asset-gallery-container.grid-medium {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+    }
+    
+    .asset-gallery-container.grid-large {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .asset-gallery-item {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--slate-light);
+        border-radius: 5px;
+        overflow: hidden;
+        background-color: var(--black20);
+        transition: transform 0.2s;
+    }
+    
+    .asset-gallery-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .asset-gallery-img-container {
+        position: relative;
+        padding-top: 100%; /* 1:1 비율 유지 */
+    }
+    
+    .asset-gallery-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+    }
+    
+    .asset-gallery-caption {
+        padding: 8px;
+        text-align: center;
+        font-size: 0.9em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .asset-gallery-actions {
+        display: flex;
+        justify-content: space-around;
+        padding: 5px;
+        border-top: 1px solid var(--slate-dark);
+    }
+    
+    .asset-gallery-action {
+        color: var(--grey70);
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .asset-gallery-action:hover {
+        color: var(--grey30);
+    }
+    
+    .asset-preview-modal {
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .asset-preview-modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+    }
+    
+    .asset-preview-close {
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        color: #fff;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        line-height: 30px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        z-index: 10001;
+    }
+    
+    .asset-preview-close:hover {
+        color: #ddd;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    
+    .asset-preview-image {
+        max-width: 100%;
+        max-height: 80vh;
+        border: 2px solid var(--slate-light);
+        display: block;
+    }
+</style>
+
+<!-- 드래그 앤 드롭 및 검색 기능을 위한 스크립트 -->
+<script>
+    // 페이지 로드 시 실행될 코드
+    $(document).ready(function() {
+        // 사용법 가이드 토글
+        $('#toggle_usage_guide').on('click', function() {
+            $('#usage_guide_content').slideToggle(200);
+            $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
+        });
+        
+        // 키워드 필터 기능
+        $('#keyword_filter').on('input', function() {
+            const filterValue = $(this).val().toLowerCase();
+            $('.keyword-group').each(function() {
+                const keywordName = $(this).find('.keyword-name').text().toLowerCase();
+                if (keywordName.includes(filterValue)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+        
+        // 필터 초기화 버튼
+        $('#clear_keyword_filter').on('click', function() {
+            $('#keyword_filter').val('');
+            $('.keyword-group').show();
+        });
+        
+        // 키워드 그룹에 드래그 앤 드롭 기능 설정
+        function setupDragAndDrop() {
+            const keywordGroups = document.querySelectorAll('.keyword-group');
+            
+            keywordGroups.forEach(group => {
+                group.setAttribute('draggable', true);
+                
+                group.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', this.dataset.keyword);
+                    this.classList.add('dragging');
+                });
+                
+                group.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                });
+                
+                group.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
+                
+                group.addEventListener('dragleave', function() {
+                    this.classList.remove('drag-over');
+                });
+                
+                group.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    
+                    const draggedKeyword = e.dataTransfer.getData('text/plain');
+                    const draggedElement = document.querySelector(`.keyword-group[data-keyword="${draggedKeyword}"]`);
+                    const dropTarget = this;
+                    
+                    if (draggedElement && dropTarget !== draggedElement) {
+                        const container = document.getElementById('character_assets_list');
+                        const afterElement = getAfterElement(container, e.clientY);
+                        
+                        if (afterElement) {
+                            container.insertBefore(draggedElement, afterElement);
+                        } else {
+                            container.appendChild(draggedElement);
+                        }
+                        
+                        // 여기에 키워드 순서 저장 로직 추가 (확장 개발자가 구현)
+                        saveKeywordOrder();
+                    }
+                });
+            });
+            
+            function getAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.keyword-group:not(.dragging)')];
+                
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+            
+            function saveKeywordOrder() {
+                // 순서 저장 로직 (확장 개발자가 구현)
+                console.log('키워드 순서가 변경되었습니다');
+                
+                // 이벤트 발생
+                const event = new CustomEvent('character-assets-order-changed');
+                document.dispatchEvent(event);
+            }
+        }
+        
+        // 키워드 목록이 로드된 후 드래그 앤 드롭 설정
+        $(document).on('character-assets-loaded', function() {
+            setupDragAndDrop();
+        });
+    });
+</script> 

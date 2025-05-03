@@ -1114,6 +1114,82 @@ function setupEventHandlers() {
             }
         }
     });
+
+    // 프리셋 내보내기 버튼 클릭
+    $('#export_presets_btn').off('click').on('click', function() {
+        exportPresets();
+    });
+
+    // 프리셋 불러오기 버튼 클릭
+    $('#import_presets_btn').off('click').on('click', function() {
+        $('#import_presets_input').trigger('click');
+    });
+
+    // 프리셋 파일 선택 시
+    $('#import_presets_input').off('change').on('change', function(e) {
+        if (e.target.files.length > 0) {
+            importPresets(e.target.files[0]);
+        }
+        $(this).val(''); // 입력 필드 초기화
+    });
+
+    // 갤러리 열기 버튼 클릭
+    $('#open_asset_gallery_btn').off('click').on('click', function() {
+        openGallery();
+    });
+
+    // 갤러리 닫기 버튼 클릭
+    $('.asset-modal-close').off('click').on('click', function(e) {
+        e.stopPropagation(); // 이벤트 전파 방지
+        $('#asset_gallery_modal').hide();
+    });
+
+    // 갤러리 배경 클릭 시 닫기
+    $('#asset_gallery_modal').off('click').on('click', function(e) {
+        if (e.target === this) {
+            $(this).hide();
+        }
+    });
+
+    // 갤러리 검색 필터
+    $('#gallery_search').off('input').on('input', function() {
+        const filterValue = $(this).val().toLowerCase();
+        $('.asset-gallery-item').each(function() {
+            const keyword = $(this).data('keyword').toLowerCase();
+            const filename = $(this).data('filename').toLowerCase();
+            if (keyword.includes(filterValue) || filename.includes(filterValue)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    // 그리드 크기 변경
+    $('#gallery_grid_size').off('change').on('change', function() {
+        applyGridSize($(this).val());
+    });
+}
+
+/**
+ * 갤러리 그리드 크기 적용
+ * @param {string} size 그리드 크기 ('small', 'medium', 'large')
+ */
+function applyGridSize(size) {
+    const container = $('#asset_gallery_container');
+    
+    // 기존 클래스 제거
+    container.removeClass('grid-small grid-medium grid-large');
+    
+    // 새 클래스 추가
+    container.addClass(`grid-${size}`);
+    
+    // 설정 저장
+    if (!extension_settings[MODULE_NAME].gallerySettings) {
+        extension_settings[MODULE_NAME].gallerySettings = {};
+    }
+    extension_settings[MODULE_NAME].gallerySettings.gridSize = size;
+    saveSettingsDebounced();
 }
 
 /**
@@ -1207,6 +1283,291 @@ function uploadAssetCommand(args, url) {
         });
 
     return `키워드 "${label}"로 이미지 업로드를 시작합니다...`;
+}
+
+/**
+ * 프리셋 내보내기
+ */
+function exportPresets() {
+    try {
+        const currentPreset = getCurrentPreset();
+        if (!currentPreset) {
+            showToast('warning', '내보낼 프리셋이 없습니다.');
+            return;
+        }
+        
+        // 파일 다운로드 - 현재 선택된 프리셋만 포함
+        const json = JSON.stringify([currentPreset], null, 2);
+        const filename = `character-assets-preset_${currentPreset.name}_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+        download(json, filename, 'application/json');
+        
+        showToast('success', `"${currentPreset.name}" 프리셋이 성공적으로 내보내졌습니다.`);
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Error exporting preset:`, error);
+        showToast('error', '프리셋 내보내기 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 프리셋 불러오기
+ * @param {File} file JSON 파일
+ */
+async function importPresets(file) {
+    try {
+        const fileContent = await getFileText(file);
+        let importedPresets;
+        
+        try {
+            importedPresets = JSON.parse(fileContent);
+        } catch (parseError) {
+            showToast('error', '잘못된 JSON 형식입니다.', '파싱 오류');
+            return;
+        }
+        
+        // 배열 형식 검증
+        if (!Array.isArray(importedPresets)) {
+            showToast('error', '프리셋 데이터가 배열 형식이 아닙니다.', '형식 오류');
+            return;
+        }
+        
+        // 각 프리셋 검증
+        const validPresets = importedPresets.filter(preset => {
+            return preset && typeof preset === 'object' && 
+                   preset.id && typeof preset.id === 'string' &&
+                   preset.name && typeof preset.name === 'string' &&
+                   preset.prompt && typeof preset.prompt === 'string';
+        });
+        
+        if (validPresets.length === 0) {
+            showToast('error', '유효한 프리셋이 없습니다.', '형식 오류');
+            return;
+        }
+        
+        // 사용자 확인 (덮어쓰기/추가 선택)
+        const confirmImport = await callPopup(
+            `${validPresets.length}개의 프리셋을 불러왔습니다. 어떻게 처리하시겠습니까?`,
+            'confirm',
+            {
+                okButton: '추가',
+                cancelButton: '덮어쓰기',
+                extraButton: '취소',
+            }
+        );
+        
+        if (confirmImport === 'extra') {
+            return; // 취소
+        }
+        
+        const currentPresets = extension_settings[MODULE_NAME].presets || [];
+        const currentPresetId = getCurrentPresetId();
+        
+        if (confirmImport === true) { // 추가
+            // ID 중복 검사
+            const existingIds = new Set(currentPresets.map(p => p.id));
+            // 이름 중복 처리
+            validPresets.forEach(preset => {
+                if (existingIds.has(preset.id)) {
+                    preset.id = uuidv4(); // 새 ID 생성
+                }
+                
+                // 이름 중복 검사
+                let uniqueName = preset.name;
+                let counter = 1;
+                while (currentPresets.some(p => p.name === uniqueName)) {
+                    uniqueName = `${preset.name} (${counter})`;
+                    counter++;
+                }
+                preset.name = uniqueName;
+            });
+            
+            // 프리셋 추가
+            extension_settings[MODULE_NAME].presets = [...currentPresets, ...validPresets];
+        } else { // 덮어쓰기
+            extension_settings[MODULE_NAME].presets = validPresets;
+            
+            // 현재 선택된 프리셋이 삭제된 경우, 첫 번째 프리셋으로 전환
+            if (!validPresets.some(p => p.id === currentPresetId) && validPresets.length > 0) {
+                extension_settings[MODULE_NAME].currentPresetId = validPresets[0].id;
+                extension_settings[MODULE_NAME].imagePrompt = validPresets[0].prompt;
+            }
+        }
+        
+        // 설정 저장 및 UI 업데이트
+        saveSettingsDebounced();
+        updatePresetUI();
+        $('#character_assets_image_prompt').val(extension_settings[MODULE_NAME].imagePrompt || DEFAULT_IMAGE_PROMPT);
+        
+        showToast('success', `${validPresets.length}개의 프리셋이 성공적으로 불러와졌습니다.`);
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Error importing presets:`, error);
+        showToast('error', '프리셋 불러오기 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 갤러리 모달 열기
+ */
+async function openGallery() {
+    const character = getCurrentCharacter();
+    if (!character) {
+        showToast('error', '선택된 캐릭터가 없습니다.');
+        return;
+    }
+    
+    try {
+        // 갤러리 컨테이너 비우기
+        const galleryContainer = $('#asset_gallery_container');
+        galleryContainer.empty();
+        
+        // 로딩 메시지 표시
+        galleryContainer.html('<div class="loading-message">에셋 로딩 중...</div>');
+        
+        // 모달 표시
+        $('#asset_gallery_modal').show();
+        
+        // 캐릭터 에셋 불러오기
+        const characterName = character.avatar.replace(/\.[^/.]+$/, '');
+        const assets = await fetchCharacterAssets(characterName);
+        
+        // 컨테이너 비우기
+        galleryContainer.empty();
+        
+        if (assets.length === 0) {
+            galleryContainer.html('<div class="no-assets-message">에셋이 없습니다.</div>');
+            return;
+        }
+        
+        // 갤러리 아이템 생성
+        assets.forEach(asset => {
+            const keyword = asset.label;
+            const fullFileNameWithQuery = asset.path.split('/').pop();
+            const fileName = fullFileNameWithQuery.split('?')[0];
+            const assetPath = asset.path;
+            
+            const galleryItem = $(`
+                <div class="asset-gallery-item" data-keyword="${keyword}" data-filename="${fileName}">
+                    <div class="asset-gallery-img-container">
+                        <img class="asset-gallery-img" src="${assetPath}" alt="${fileName}" onerror="this.src='../img/notfound.webp'">
+                    </div>
+                    <div class="asset-gallery-caption">${keyword}: ${fileName}</div>
+                    <div class="asset-gallery-actions">
+                        <i class="fa-solid fa-eye asset-gallery-action asset-view-action" title="원본 크기로 보기"></i>
+                        <i class="fa-solid fa-trash asset-gallery-action asset-delete-action" title="삭제"></i>
+                    </div>
+                </div>
+            `);
+            
+            galleryContainer.append(galleryItem);
+        });
+        
+        // 갤러리 아이템 이벤트 연결
+        // 이미지 클릭 - 원본 크기로 보기
+        $('.asset-view-action').on('click', function(e) {
+            e.stopPropagation(); // 이벤트 전파 방지
+            const imgSrc = $(this).closest('.asset-gallery-item').find('.asset-gallery-img').attr('src');
+            showPreviewImage(imgSrc);
+        });
+        
+        // 이미지 삭제
+        $('.asset-delete-action').on('click', async function(e) {
+            e.stopPropagation(); // 이벤트 전파 방지
+            const item = $(this).closest('.asset-gallery-item');
+            const keyword = item.data('keyword');
+            const fileName = item.data('filename');
+            
+            const confirmDelete = await callPopup(`정말로 '${fileName}' 파일을 삭제하시겠습니까?`, 'confirm', undefined, { okButton: '삭제' });
+            if (confirmDelete === true) {
+                await handleDeleteAsset(keyword, fileName);
+                item.remove();
+                
+                // 모든 이미지가 삭제되었는지 확인
+                if ($('.asset-gallery-item').length === 0) {
+                    galleryContainer.html('<div class="no-assets-message">에셋이 없습니다.</div>');
+                }
+                
+                // 에셋 목록 새로고침
+                await loadCharacterAssets();
+            }
+        });
+        
+        // 그리드 크기 변경 적용
+        applyGridSize($('#gallery_grid_size').val());
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Error opening gallery:`, error);
+        showToast('error', '갤러리 로딩 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 이미지 원본 크기로 보기
+ * @param {string} imgSrc 이미지 URL
+ */
+function showPreviewImage(imgSrc) {
+    // 이미 열려있는 프리뷰 모달 제거
+    $('.asset-preview-modal').remove();
+    
+    // 새 프리뷰 모달 생성
+    const previewModal = $(`
+        <div class="asset-preview-modal">
+            <div class="asset-preview-modal-content">
+                <span class="asset-preview-close">&times;</span>
+                <img class="asset-preview-image" src="${imgSrc}" alt="원본 이미지">
+            </div>
+        </div>
+    `);
+    
+    // 모달 배경 클릭 시 닫기
+    previewModal.on('mousedown mouseup click', function(e) {
+        if (e.target === this) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            $(this).remove();
+            $(document).off('keydown.preview'); // ESC 키 리스너 제거
+            return false;
+        }
+    });
+    
+    // 닫기 버튼 이벤트
+    previewModal.find('.asset-preview-close').on('mousedown mouseup click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        previewModal.remove();
+        $(document).off('keydown.preview'); // ESC 키 리스너 제거
+        return false;
+    });
+    
+    // 이미지 클릭시 이벤트 전파 중단
+    previewModal.find('.asset-preview-image').on('mousedown mouseup click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    });
+    
+    // 모달 내용 클릭시 이벤트 전파 중단
+    previewModal.find('.asset-preview-modal-content').on('mousedown mouseup click', function(e) {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    });
+    
+    // ESC 키 누를 때 닫기 이벤트 추가
+    $(document).on('keydown.preview', function(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            previewModal.remove();
+            $(document).off('keydown.preview');
+            return false;
+        }
+    });
+    
+    // 페이지 상위에 모달 표시 (body 직접 자식으로)
+    $('body').append(previewModal);
+    
+    // 기존 모달의 z-index보다 높게 설정
+    previewModal.css('z-index', '10000');
 }
 
 $(document).ready(function() {

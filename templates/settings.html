@@ -325,6 +325,7 @@
         border-radius: 3px !important;
         font-family: monospace !important;
         white-space: nowrap !important;
+        color: var(--white) !important;
     }
     
     /* === 이미지 출력 프롬프트 섹션 (41-88라인 관련) === */
@@ -416,39 +417,64 @@
             width: 100% !important;
         }
         
+        /* 프리셋 액션 버튼 (저장, 새프리셋, 이름변경, 삭제) - 2열 유지 */
         #character_assets_settings .preset-actions-container {
             justify-content: space-between !important;
+            flex-wrap: wrap !important;
         }
         
         #character_assets_settings .preset-actions-container .menu_button {
-            flex: 1 1 calc(50% - 10px) !important;
+            flex: 1 1 calc(50% - 10px) !important; /* 2열 배치 */
             justify-content: center !important;
             margin: 2px !important;
         }
         
+        /* 프리셋 내보내기/불러오기 버튼 - 가로 정렬 */
         #character_assets_settings .preset-io-container {
-            flex-direction: column !important;
+            /* flex-direction: column !important; 제거 */
+            flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
+            justify-content: space-between !important;
         }
         
         #character_assets_settings .preset-io-container .menu_button {
-            flex: auto !important;
-            width: 100% !important;
-            margin: 2px 0 !important;
+            flex: 1 1 auto !important; /* 가변 너비, 기본 크기 자동 */
+            /* width: 100% !important; 제거 */
+            margin: 2px !important; /* 좌우 마진 유지 */
+            min-width: calc(50% - 10px) !important; /* 최소 너비 확보 */
+            justify-content: center !important;
         }
         
         #character_assets_settings .sm-textarea-container {
             margin-bottom: 15px !important;
         }
         
+        /* 프롬프트 하단 버튼 (초기화, 교체, 복사) - 가로 정렬 및 간격/패딩 축소 */
         #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap {
-            flex-direction: column !important;
+            /* flex-direction: column !important; 제거 */
+            flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
+            justify-content: flex-start !important; /* 왼쪽 정렬 */
         }
         
         #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap .menu_button {
-            width: 100% !important;
-            margin: 2px 0 !important;
+            /* width: 100% !important; 제거 */
+            flex: 0 1 auto !important; /* 너비 자동, 필요시 축소 */
+            margin: 2px 1px !important; /* 좌우 마진 추가 축소 */
+            padding-left: 5px !important; /* 모바일에서 좌우 패딩 감소 */
+            padding-right: 5px !important; /* 모바일에서 좌우 패딩 감소 */
         }
         
+        /* 업로드/갤러리 버튼 - 가로 정렬 확인 및 마진/패딩 조정 */
+        #character_assets_settings .upload-buttons {
+            flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
+            justify-content: flex-start !important;
+        }
+        #character_assets_settings .upload-buttons .menu_button {
+             flex: 0 1 auto !important; /* 너비 자동, 필요시 축소 */
+             margin: 2px !important; /* 좌우 마진 유지 */
+             padding-left: 10px !important; /* 모바일에서 좌우 패딩 감소 */
+             padding-right: 10px !important; /* 모바일에서 좌우 패딩 감소 */
+        }
+
         /* 나머지 모바일 스타일 */
         /* (다른 요소들에 대한 모바일 스타일은 여기에 계속 추가될 수 있습니다) */
     }
@@ -734,7 +760,7 @@
         border: 2px solid var(--slate-light) !important;
         display: block !important;
     }
-</style>
+</style> 
 
 <!-- 드래그 앤 드롭 및 검색 기능을 위한 스크립트 -->
 <script>

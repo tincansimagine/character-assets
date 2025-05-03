@@ -360,6 +360,14 @@
     
     /* 반응형 디자인을 위한 미디어 쿼리 */
     @media (max-width: 768px) {
+        /* 레이블 내부 요소 간 간격 조정 */
+        #character_assets_settings label > .description,
+        #character_assets_settings label > .preset-management-container,
+        #character_assets_settings label > .sm-textarea-container {
+            margin-bottom: 15px;
+        }
+        
+        /* 프리셋 선택기 */
         #character_assets_settings .preset-selector-container {
             flex-direction: column;
             align-items: flex-start;
@@ -369,44 +377,36 @@
             width: 100%;
         }
         
-        /* 프리셋 액션 버튼: 세로 쌓기 */
+        /* 프리셋 액션 버튼 (기존 2열 유지) */
         #character_assets_settings .preset-actions-container {
-            flex-direction: column; /* 세로 쌓기 */
-            align-items: stretch; /* 버튼 너비 100% */
-            gap: 5px; /* 버튼 간격 조정 */
+            justify-content: space-between;
         }
         
         #character_assets_settings .preset-actions-container .menu_button {
-            flex-basis: auto; /* 기본 크기 자동 */
-            width: 100%; /* 너비 100% */
-            margin: 2px 0; /* 상하 마진 */
+            flex: 1 1 calc(50% - 10px);
             justify-content: center;
+            margin: 2px;
         }
         
-        /* 프리셋 내보내기/불러오기 버튼: 세로 쌓기 */
+        /* 프리셋 내보내기/불러오기 버튼 세로 정렬 */
         #character_assets_settings .preset-io-container {
             flex-direction: column;
-            align-items: stretch;
         }
         
         #character_assets_settings .preset-io-container .menu_button {
-            flex-basis: auto;
+            flex: auto; /* flex: 1 제거 */
             width: 100%;
-            margin: 2px 0;
-            justify-content: center;
+            margin: 2px 0; /* 상하 마진 조정 */
         }
         
-        /* 이미지 프롬프트 하단 버튼들 */
-        #character_assets_settings .flex-container.flexWrap.marginTopBot10 {
-            flex-direction: column; /* 세로 쌓기 */
-            align-items: stretch;
+        /* 프롬프트 하단 버튼 (초기화, 교체, 복사) 세로 정렬 */
+        #character_assets_settings label + .flex-container.flexWrap {
+            flex-direction: column;
         }
         
-        #character_assets_settings .flex-container.flexWrap.marginTopBot10 .menu_button {
-            flex-basis: auto;
+        #character_assets_settings label + .flex-container.flexWrap .menu_button {
             width: 100%;
-            margin: 2px 0;
-            justify-content: center;
+            margin: 2px 0; /* 상하 마진 조정 */
         }
     }
     

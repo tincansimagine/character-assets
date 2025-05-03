@@ -8,16 +8,10 @@
             <div class="flex-container flexFlowColumn">
                 <!-- 전역 설정 -->
                 <div class="settings_block">
-                    <h4>전역 설정</h4>
-                    <div class="flex-container alignitemscenter">
-                        <label class="checkbox flex-container">
-                            <input id="character_assets_global_enabled" type="checkbox">
-                            <span>전역 활성화</span>
-                        </label>
-                    </div>
-                    <div class="flex-container flexFlowColumn marginTopBot10">
-                        <label for="character_assets_image_prompt">
-                            <b>이미지 출력 프롬프트</b>
+                    <h4>이미지 출력 설정</h4>
+                <div class="flex-container flexFlowColumn marginTopBot10">
+                    <label for="character_assets_image_prompt">
+                        <b>이미지 출력 프롬프트</b>
                             <div class="description">
                                 AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
                             </div>
@@ -42,13 +36,13 @@
                                     <div class="menu_button" id="rename_preset_btn" title="선택한 프리셋의 이름을 변경합니다">
                                         <i class="fa-solid fa-pencil"></i>
                                         <span>이름 변경</span>
-                                    </div>
+                        </div>
                                     <div class="menu_button danger_button" id="delete_preset_btn" title="선택한 프리셋을 삭제합니다">
                                         <i class="fa-solid fa-trash"></i>
                                         <span>삭제</span>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                    </div>
+                </div>
                             <!-- 프리셋 관리 UI 끝 -->
                             
                             <div class="sm-textarea-container">
@@ -70,27 +64,21 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                        </div>
                 <hr>
-                <!-- 캐릭터별 설정 -->
+                <!-- 에셋 관리 섹션 -->
                 <div class="settings_block">
-                    <h4>캐릭터별 설정</h4>
-                    <div class="flex-container alignitemscenter">
-                        <label class="checkbox flex-container">
-                            <input id="character_assets_enabled" type="checkbox">
-                            <span>이 캐릭터에 대해 활성화</span>
-                        </label>
-                    </div>
-
-                    <div id="character_assets_container" style="display: none;">
+                    <h4>에셋 관리</h4>
+                    <div id="character_assets_container">
                         <!-- 에셋 관리 -->
                         <h4>사용 가능한 이미지 키워드</h4>
                          <small class="extensions_info marginBottom10">
-                            <b>이미지 업로드 안내</b><br>
-                            - ZIP 파일에는 이미지 파일이 포함되어야 합니다.<br>
-                            - 이미지 파일명은 키워드로 사용됩니다 (예: <code>joy.png</code>, <code>angry.png</code>).<br>
-                            - 한 키워드에 여러 이미지를 추가하려면 파일명에 접미사를 추가하세요 (예: <code>joy-1.png</code>, <code>joy.expressive.png</code>).
-                        </small>
+                        <b>이미지 업로드 안내</b><br>
+                        - ZIP 파일에는 이미지 파일이 포함되어야 합니다.<br>
+                        - 이미지 파일명은 키워드로 사용됩니다 (예: <code>joy.png</code>, <code>angry.png</code>).<br>
+                        - 한 키워드에 여러 이미지를 추가하려면 파일명에 접미사를 추가하세요 (예: <code>joy-1.png</code>, <code>joy.expressive.png</code>).<br>
+                        - <b>반드시 <a href="https://gall.dcinside.com/mini/tincans/45201" target="_blank" class="asset-link">이 링크</a>에서 에셋 정규식을 다운로드하여 사용하세요.</b>
+                    </small>
                         <div class="upload-buttons marginBottom10">
                             <input type="file" id="character_assets_upload_zip" accept=".zip" style="display: none;">
                             <input type="file" id="character_assets_upload_image" accept="image/png, image/webp, image/gif, image/jpeg" multiple style="display: none;">
@@ -136,7 +124,7 @@
         padding: 10px;
         background-color: var(--black15);
     }
-
+    
     #character_assets_settings .keyword-header {
         display: flex;
         justify-content: space-between;
@@ -145,7 +133,7 @@
         padding-bottom: 5px;
         border-bottom: 1px solid var(--slate-dark);
     }
-
+    
     #character_assets_settings .keyword-name {
         font-weight: bold;
         font-size: 1.1em;
@@ -156,7 +144,7 @@
         flex-direction: column;
         gap: 5px;
     }
-
+    
     #character_assets_settings .file-item {
         display: flex;
         justify-content: space-between;
@@ -173,7 +161,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-
+    
     #character_assets_settings .delete-asset-button {
         color: var(--red-light);
         cursor: pointer;
@@ -183,7 +171,7 @@
     #character_assets_settings .delete-asset-button:hover {
         color: var(--red);
     }
-
+    
     #character_assets_settings .no_assets_message {
         text-align: center;
         padding: 20px;
@@ -235,7 +223,7 @@
 
     #character_assets_settings .danger_button {
         background-color: var(--red-dark) !important;
-        color: white !important;
+        color: var(--black90) !important;
     }
 
     #character_assets_settings .danger_button:hover {
@@ -311,5 +299,16 @@
             justify-content: center;
             margin: 2px;
         }
+    }
+    
+    /* 에셋 링크 스타일 */
+    #character_assets_settings .asset-link {
+        color: var(--blue);
+        text-decoration: underline;
+        transition: color 0.2s ease;
+    }
+    
+    #character_assets_settings .asset-link:hover {
+        color: var(--light-blue);
     }
 </style> 

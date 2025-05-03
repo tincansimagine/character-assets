@@ -194,12 +194,7 @@ function replacePlaceholders(text, characterId) {
  * @returns {boolean} 활성화 여부
  */
 function isCharacterAssetsEnabled(characterId) {
-    if (!extension_settings[MODULE_NAME].enabled) {
-        return false;
-    }
-
-    const assets = getCharacterAssets(characterId);
-    return assets && assets.enabled;
+    return true;
 }
 
 /**
@@ -429,7 +424,6 @@ function extractKeywordFromFileName(fileName) {
 async function onCharacterChanged() {
     const character = getCurrentCharacter();
     if (!character) {
-        $('#character_assets_container').hide();
         return;
     }
 
@@ -581,14 +575,10 @@ async function handleDeleteAsset(keyword, fileName) {
 function updateInterface() {
     const character = getCurrentCharacter();
     if (!character) {
-        $('#character_assets_container').hide();
         return;
     }
 
     const assets = getCharacterAssets(String(this_chid));
-    
-    // 활성화 상태 업데이트
-    $('#character_assets_enabled').prop('checked', assets.enabled);
     
     // 정규식 설정 업데이트
     $('#character_assets_regex_find').val(assets.regexFind || DEFAULT_REGEX_FIND);
@@ -612,8 +602,6 @@ function updateInterface() {
     
     // 프리셋 UI 업데이트
     updatePresetUI();
-
-    $('#character_assets_container').show();
 }
 
 // 페이지에 toastr 라이브러리가 로드되었는지 확인하는 헬퍼 함수
@@ -773,20 +761,6 @@ async function handleImageUpload(file, label) {
  * 이벤트 핸들러 설정
  */
 function setupEventHandlers() {
-    // 전역 활성화 상태 변경
-    $('#character_assets_global_enabled').on('change', function() {
-        extension_settings[MODULE_NAME].enabled = $(this).prop('checked');
-        saveSettingsDebounced();
-    });
-
-    // 캐릭터별 활성화 상태 변경
-    $('#character_assets_enabled').on('change', function() {
-        const assets = getCharacterAssets(String(this_chid));
-        assets.enabled = $(this).prop('checked');
-        saveSettingsDebounced();
-        // createOrUpdateRegexScript(String(this_chid)); // 더 이상 호출 안 함
-    });
-
     // 정규식 설정 변경
     $('#character_assets_regex_find').on('change', function() {
         const assets = getCharacterAssets(String(this_chid));
@@ -1171,7 +1145,6 @@ async function initializeExtension() {
     setupEventHandlers();
     
     // UI 초기화
-    $('#character_assets_global_enabled').prop('checked', extension_settings[MODULE_NAME].enabled);
     $('#character_assets_image_prompt').val(extension_settings[MODULE_NAME].imagePrompt || DEFAULT_IMAGE_PROMPT);
     updatePresetUI();
 

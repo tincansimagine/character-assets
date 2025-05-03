@@ -358,7 +358,7 @@
         gap: 5px;
     }
     
-    /* 반응형 디자인을 위한 미디어 쿼리 - 모바일 최적화 */
+    /* 반응형 디자인을 위한 미디어 쿼리 */
     @media (max-width: 768px) {
         #character_assets_settings .preset-selector-container {
             flex-direction: column;
@@ -371,115 +371,12 @@
         
         #character_assets_settings .preset-actions-container {
             justify-content: space-between;
-            width: 100%;
         }
         
         #character_assets_settings .preset-actions-container .menu_button {
             flex: 1 1 calc(50% - 10px); /* 모바일에서 2열로 정렬 */
             justify-content: center;
             margin: 2px;
-            font-size: 0.9em;
-            padding: 8px;
-        }
-        
-        #character_assets_settings .preset-io-container {
-            flex-direction: column;
-            width: 100%;
-        }
-        
-        #character_assets_settings .preset-io-container .menu_button {
-            width: 100%;
-            margin: 3px 0;
-        }
-        
-        #character_assets_settings .flex-container.flexWrap {
-            flex-direction: column;
-            width: 100%;
-        }
-        
-        #character_assets_settings .flex-container.flexWrap .menu_button {
-            width: 100%;
-            margin: 3px 0;
-        }
-        
-        #character_assets_settings .upload-buttons {
-            flex-direction: column;
-            display: flex;
-            width: 100%;
-        }
-        
-        #character_assets_settings .upload-buttons .menu_button {
-            width: 100%;
-            margin: 3px 0;
-        }
-        
-        #character_assets_settings .asset-controls {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        #character_assets_settings .asset-controls .checkbox {
-            width: 100%;
-        }
-
-        #character_assets_settings .asset-controls .menu_button {
-            width: 100%;
-            margin: 3px 0;
-        }
-        
-        #character_assets_settings .sm-textarea-container {
-            width: 100%;
-        }
-        
-        #character_assets_settings #character_assets_image_prompt {
-            width: 100%;
-        }
-        
-        /* 프롬프트 입력창 높이 조정 */
-        #character_assets_settings #character_assets_image_prompt {
-            min-height: 120px;
-        }
-    }
-    
-    /* 추가적인 모바일 최적화 (매우 작은 화면) */
-    @media (max-width: 480px) {
-        #character_assets_settings .menu_button {
-            padding: 8px 10px;
-            font-size: 0.85em;
-        }
-        
-        #character_assets_settings .asset-modal-content {
-            width: 95%;
-            margin: 10px auto;
-        }
-        
-        .asset-gallery-container.grid-small {
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 5px;
-        }
-        
-        .asset-gallery-container.grid-medium {
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 8px;
-        }
-        
-        .asset-gallery-container.grid-large {
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-        }
-        
-        .asset-gallery-caption {
-            font-size: 0.8em;
-            padding: 4px;
-        }
-        
-        .asset-gallery-filter {
-            flex-direction: column;
-            padding: 10px;
-        }
-        
-        .asset-modal-header h3 {
-            font-size: 1.2em;
         }
     }
     
@@ -779,19 +676,6 @@
         max-height: 80vh;
         border: 2px solid var(--slate-light);
         display: block;
-    }
-
-    /* 모바일 화면에서 미리보기 닫기 버튼 위치 조정 */
-    @media (max-width: 768px) {
-        .asset-preview-close {
-            top: 10px;
-            right: 10px;
-            width: 35px;
-            height: 35px;
-            line-height: 35px;
-            font-size: 24px;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
     }
 </style>
 

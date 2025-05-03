@@ -316,6 +316,7 @@
         border-radius: 5px;
         display: block;
         width: 100%;
+        box-sizing: border-box;
     }
     
     #character_assets_settings .extensions_info code {
@@ -335,12 +336,15 @@
         padding: 10px;
         border-radius: 5px;
         margin-bottom: 15px;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     #character_assets_settings .preset-selector-container {
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
     }
     
     #character_assets_settings .preset-label {
@@ -350,19 +354,42 @@
     
     #character_assets_settings #prompt_preset_selector {
         flex-grow: 1;
+        width: 100%;
     }
     
     #character_assets_settings .preset-actions-container {
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
+        width: 100%;
+    }
+
+    #character_assets_settings .sm-textarea-container {
+        width: 100%;
+    }
+
+    #character_assets_settings #character_assets_image_prompt {
+        width: 100%;
+        box-sizing: border-box;
     }
     
     /* 반응형 디자인을 위한 미디어 쿼리 */
     @media (max-width: 768px) {
+        #character_assets_settings h4 {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        #character_assets_settings .description {
+            font-size: 0.95em;
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
         #character_assets_settings .preset-selector-container {
             flex-direction: column;
             align-items: flex-start;
+            margin-bottom: 10px;
         }
         
         #character_assets_settings #prompt_preset_selector {
@@ -371,12 +398,175 @@
         
         #character_assets_settings .preset-actions-container {
             justify-content: space-between;
+            flex-direction: column;
+            width: 100%;
         }
         
         #character_assets_settings .preset-actions-container .menu_button {
-            flex: 1 1 calc(50% - 10px); /* 모바일에서 2열로 정렬 */
+            flex: 1 1 100%;
             justify-content: center;
-            margin: 2px;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        #character_assets_settings .preset-io-container {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        #character_assets_settings .preset-io-container .menu_button {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        #character_assets_settings .flex-container.flexWrap {
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        #character_assets_settings .flex-container.flexWrap .menu_button {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        #character_assets_settings .upload-buttons {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        #character_assets_settings .upload-buttons .menu_button {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        #character_assets_settings .asset-controls {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+
+        #character_assets_settings .asset-controls .checkbox {
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        #character_assets_settings .asset-controls .menu_button {
+            width: 100%;
+        }
+
+        /* 갤러리 모달 모바일 대응 */
+        .asset-modal-content {
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        .asset-gallery-filter {
+            flex-direction: column;
+        }
+
+        .asset-gallery-filter input,
+        .asset-gallery-filter select {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .asset-gallery-container {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+            gap: 10px !important;
+        }
+
+        /* 프롬프트 출력 설명 개선 */
+        #character_assets_settings .settings_block {
+            padding: 0 5px;
+        }
+
+        #character_assets_settings .inline-drawer-content {
+            padding: 5px;
+        }
+
+        #character_assets_settings .keyword-filter-container {
+            margin: 10px 0;
+        }
+
+        /* 파일명이 너무 길 경우 처리 */
+        #character_assets_settings .file-name {
+            max-width: 70%;
+        }
+    }
+    
+    /* 더 작은 모바일 화면 대응 */
+    @media (max-width: 480px) {
+        #character_assets_settings .description {
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        #character_assets_settings h4 {
+            font-size: 1.1em;
+            margin: 12px 0;
+        }
+
+        #character_assets_settings .extensions_info {
+            font-size: 0.85em;
+            padding: 8px;
+        }
+
+        .asset-modal-header h3 {
+            font-size: 1.1em;
+        }
+
+        .asset-gallery-container {
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+            gap: 8px !important;
+            padding: 10px;
+        }
+
+        .asset-gallery-caption {
+            font-size: 0.8em;
+            padding: 4px;
+        }
+
+        #character_assets_settings .guide-header {
+            padding: 8px;
+        }
+
+        #character_assets_settings .guide-header span {
+            font-size: 0.9em;
+        }
+
+        #character_assets_settings .guide-content {
+            padding: 10px;
+            font-size: 0.85em;
+        }
+
+        #character_assets_settings .guide-content li {
+            margin-bottom: 8px;
+        }
+
+        #character_assets_settings .menu_button {
+            padding: 8px 10px;
+            font-size: 0.9em;
+        }
+
+        #character_assets_settings .menu_button i {
+            margin-right: 4px;
+        }
+
+        #character_assets_settings .keyword-name {
+            font-size: 1em;
+        }
+
+        /* 이미지 미리보기 모달 조정 */
+        .asset-preview-close {
+            top: -25px;
+            right: -25px;
+            font-size: 22px;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
         }
     }
     
@@ -394,6 +584,7 @@
     /* 키워드 검색 필터 스타일 */
     #character_assets_settings .keyword-filter-container {
         width: 100%;
+        box-sizing: border-box;
     }
     
     #character_assets_settings .filter-input-container {
@@ -404,6 +595,7 @@
     #character_assets_settings #keyword_filter {
         width: 100%;
         padding-right: 30px;
+        box-sizing: border-box;
     }
     
     #character_assets_settings .filter-clear-button {
@@ -424,6 +616,8 @@
         border: 1px solid var(--slate-light);
         border-radius: 5px;
         overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     #character_assets_settings .guide-header {

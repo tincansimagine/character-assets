@@ -69,6 +69,7 @@
 ## 슬래시 명령어
 
 - `/assets-upload label=키워드 URL`: URL에서 이미지를 다운로드하여 지정된 키워드로 업로드합니다.
+- `/refresh-img-keywords`: 키워드를 수동으로 갱신합니다.
 
 ## 팁
 

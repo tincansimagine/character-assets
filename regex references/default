@@ -1,0 +1,31 @@
+IN:
+```
+/\{\{img::(.*?)\}\}/gi
+```
+
+OUT:
+```
+<style>
+    .imageWrapper {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    .characterImage {
+      max-width: 400px;
+      max-height: 800px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+
+  <div class="imageWrapper">
+    <img class="characterImage" src="/characters/{{charkey}}/$1">
+  </div>
+
+```

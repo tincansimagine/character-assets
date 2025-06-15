@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- 전역 설정 -->
                 <div class="settings_block">
                     <h4>이미지 출력 설정</h4>
@@ -44,7 +44,10 @@
                     <label for="character_assets_image_prompt">
                         <b>이미지 출력 프롬프트</b>
                             <div class="description">
-                                AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다. <b>{{img_keywords}}</b> 플레이스홀더는 교체 버튼을 누를 경우, 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.
+                                AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다.<br>
+                                • <b>{{img_keywords}}</b> - 교체 버튼을 누를 경우, 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.<br>
+                                • <b>{{img_keywords_autogen}}</b> - 자동으로 갱신되는 이미지 파일명 목록입니다.<br>
+                                • <b>{{charkey}}</b> - 현재 캐릭터의 실제 저장 폴더명입니다. (예: Ian2, Luna3)
                             </div>
                     </label>
                             <!-- 프리셋 관리 UI 시작 -->
@@ -87,7 +90,7 @@
                     </div>
                 </div>
                             <!-- 프리셋 관리 UI 끝 -->
-                            
+
                             <div class="sm-textarea-container">
                                 <textarea id="character_assets_image_prompt" class="text_pole textarea_compact" rows="6"></textarea>
                             </div>
@@ -119,9 +122,87 @@
                         - ZIP 파일에는 이미지 파일이 포함되어야 합니다.<br>
                         - 이미지 파일명은 키워드로 사용됩니다 (예: <code>joy.png</code>, <code>angry.png</code>).<br>
                         - 한 키워드에 여러 이미지를 추가하려면 파일명에 접미사를 추가하세요 (예: <code>joy-1.png</code>, <code>joy.expressive.png</code>).<br>
-                        - <b>반드시 <a href="https://gall.dcinside.com/mini/tincans/45201" target="_blank" class="asset-link">이 링크</a>에서 에셋 정규식을 다운로드하여 사용하세요.</b>
+                        - <b>아래에서 원하는 스타일의 정규식을 다운로드하여 Regex 확장에서 Import하세요.</b>
                     </small>
-                        
+
+                    <!-- 정규식 스타일 선택 섹션 -->
+                    <div class="regex-style-section marginBottom10">
+                        <div class="collapsible-style-selector">
+                            <div class="style-selector-header" id="toggle_style_selector">
+                                <i class="fa-solid fa-palette"></i>
+                                <span>이미지 표시 스타일 선택</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="style-selector-content" id="style_selector_content" style="display: none;">
+                                <div class="style-preview-container">
+                            <div class="style-options">
+                                <div class="style-option" data-style="default">
+                                    <div class="style-preview">
+                                        <div class="preview-image rounded-style"></div>
+                                    </div>
+                                    <div class="style-name">기본형</div>
+                                    <div class="style-desc">둥근 사각형</div>
+                                    <div class="menu_button download-style-btn" data-style="default">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>다운로드</span>
+                                    </div>
+                                </div>
+                                <div class="style-option" data-style="border">
+                                    <div class="style-preview">
+                                        <div class="preview-image border-style"></div>
+                                    </div>
+                                    <div class="style-name">테두리형</div>
+                                    <div class="style-desc">테두리 + 그림자</div>
+                                    <div class="menu_button download-style-btn" data-style="border">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>다운로드</span>
+                                    </div>
+                                </div>
+                                <div class="style-option" data-style="clean">
+                                    <div class="style-preview">
+                                        <div class="preview-image clean-style"></div>
+                                    </div>
+                                    <div class="style-name">깔끔형</div>
+                                    <div class="style-desc">투명 배경</div>
+                                    <div class="menu_button download-style-btn" data-style="clean">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>다운로드</span>
+                                    </div>
+                                </div>
+                                <div class="style-option" data-style="shadow">
+                                    <div class="style-preview">
+                                        <div class="preview-image shadow-style"></div>
+                                    </div>
+                                    <div class="style-name">그림자형</div>
+                                    <div class="style-desc">강한 그림자</div>
+                                    <div class="menu_button download-style-btn" data-style="shadow">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>다운로드</span>
+                                    </div>
+                                </div>
+                                <div class="style-option" data-style="polaroid">
+                                    <div class="style-preview">
+                                        <div class="preview-image polaroid-style"></div>
+                                    </div>
+                                    <div class="style-name">폴라로이드</div>
+                                    <div class="style-desc">사진 프레임</div>
+                                    <div class="menu_button download-style-btn" data-style="polaroid">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>다운로드</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="download-all-container marginTop10">
+                                <div class="menu_button" id="download_all_styles_btn">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>모든 스타일 다운로드</span>
+                                </div>
+                            </div>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+
                         <!-- 키워드 검색 필터 -->
                         <div class="keyword-filter-container marginBottom10">
                             <div class="filter-input-container">
@@ -131,7 +212,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="upload-buttons marginBottom10">
                             <input type="file" id="character_assets_upload_zip" accept=".zip" style="display: none;">
                             <input type="file" id="character_assets_upload_image" accept="image/png, image/webp, image/gif, image/jpeg" multiple style="display: none;">
@@ -203,7 +284,7 @@
         padding: 10px !important;
         background-color: var(--black15) !important;
     }
-    
+
     #character_assets_settings .keyword-header {
         display: flex !important;
         justify-content: space-between !important;
@@ -213,7 +294,7 @@
         border-bottom: 1px solid var(--slate-dark) !important;
         cursor: move !important;
     }
-    
+
     #character_assets_settings .keyword-name {
         font-weight: bold !important;
         font-size: 1.1em !important;
@@ -224,7 +305,7 @@
         flex-direction: column !important;
         gap: 5px !important;
     }
-    
+
     #character_assets_settings .file-item {
         display: flex !important;
         justify-content: space-between !important;
@@ -241,7 +322,7 @@
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
     }
-    
+
     #character_assets_settings .delete-asset-button {
         color: var(--red-light) !important;
         cursor: pointer !important;
@@ -251,7 +332,7 @@
     #character_assets_settings .delete-asset-button:hover {
         color: var(--red) !important;
     }
-    
+
     #character_assets_settings .no_assets_message {
         text-align: center !important;
         padding: 20px !important;
@@ -260,7 +341,7 @@
         border-radius: 5px !important;
         margin: 10px 0 !important;
     }
-    
+
     #character_assets_settings .menu_button {
         display: inline-flex !important;
         align-items: center !important;
@@ -274,15 +355,15 @@
         flex-direction: row !important;
         white-space: nowrap !important;
     }
-    
+
     #character_assets_settings .menu_button:hover {
         background-color: var(--black45) !important;
     }
-    
+
     #character_assets_settings .menu_button i {
         margin-right: 5px !important;
     }
-    
+
     #character_assets_settings .regex_settings_block {
         margin: 15px 0 !important;
         padding: 10px !important;
@@ -318,7 +399,7 @@
         display: block !important;
         width: 100% !important;
     }
-    
+
     #character_assets_settings .extensions_info code {
         background-color: var(--black30) !important;
         padding: 2px 4px !important;
@@ -327,13 +408,13 @@
         white-space: nowrap !important;
         color: var(--white) !important;
     }
-    
+
     /* === 이미지 출력 프롬프트 섹션 (41-88라인 관련) === */
     #character_assets_settings label[for="character_assets_image_prompt"] > b {
         display: block !important;
         margin-bottom: 5px !important; /* 제목 아래 간격 */
     }
-    
+
     #character_assets_settings .description {
         font-size: 0.9em !important;
         color: var(--text-color-secondary) !important; /* 테마 변수 사용 */
@@ -342,7 +423,7 @@
         border-radius: 5px !important;
         margin-bottom: 15px !important; /* 아래 요소와 간격 */
     }
-    
+
     #character_assets_settings .preset-management-container {
         display: flex !important;
         flex-direction: column !important;
@@ -352,90 +433,90 @@
         border-radius: 5px !important;
         margin-bottom: 15px !important; /* 아래 요소와 간격 */
     }
-    
+
     #character_assets_settings .preset-selector-container {
         display: flex !important;
         align-items: center !important;
         gap: 10px !important;
     }
-    
+
     #character_assets_settings .preset-label {
         font-weight: bold !important;
         min-width: 60px !important;
     }
-    
+
     #character_assets_settings #prompt_preset_selector {
         flex-grow: 1 !important;
     }
-    
+
     #character_assets_settings .preset-actions-container {
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 5px !important;
     }
-    
+
     #character_assets_settings .preset-io-container {
         display: flex !important;
         justify-content: space-between !important;
         margin-top: 10px !important;
         gap: 10px !important;
     }
-    
+
     #character_assets_settings .preset-io-container .menu_button {
         flex: 1 !important;
     }
-    
+
     #character_assets_settings .sm-textarea-container {
         margin-bottom: 10px !important; /* 아래 버튼과 간격 */
     }
-    
+
     #character_assets_settings .flex-container.flexWrap {
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 5px !important;
     }
-    
+
     /* ============================================== */
-    
+
     /* 반응형 디자인을 위한 미디어 쿼리 */
     @media (max-width: 768px) {
         /* 이미지 출력 프롬프트 섹션 (41-88라인 관련) 모바일 스타일 */
         #character_assets_settings label[for="character_assets_image_prompt"] > .description {
             margin-bottom: 15px !important;
         }
-        
+
         #character_assets_settings .preset-management-container {
             margin-bottom: 15px !important;
         }
-        
+
         #character_assets_settings .preset-selector-container {
             flex-direction: column !important;
             align-items: flex-start !important;
         }
-        
+
         #character_assets_settings #prompt_preset_selector {
             width: 100% !important;
         }
-        
+
         /* 프리셋 액션 버튼 (저장, 새프리셋, 이름변경, 삭제) - 2열 유지 */
         #character_assets_settings .preset-actions-container {
             justify-content: space-between !important;
             flex-wrap: wrap !important;
         }
-        
+
         #character_assets_settings .preset-actions-container .menu_button {
             flex: 1 1 calc(50% - 10px) !important; /* 2열 배치 */
             justify-content: center !important;
             margin: 2px !important;
         }
-        
+
         /* 프리셋 내보내기/불러오기 버튼 - 가로 정렬 */
         #character_assets_settings .preset-io-container {
             /* flex-direction: column !important; 제거 */
             flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
             justify-content: space-between !important;
         }
-        
+
         #character_assets_settings .preset-io-container .menu_button {
             flex: 1 1 auto !important; /* 가변 너비, 기본 크기 자동 */
             /* width: 100% !important; 제거 */
@@ -443,18 +524,18 @@
             min-width: calc(50% - 10px) !important; /* 최소 너비 확보 */
             justify-content: center !important;
         }
-        
+
         #character_assets_settings .sm-textarea-container {
             margin-bottom: 15px !important;
         }
-        
+
         /* 프롬프트 하단 버튼 (초기화, 교체, 복사) - 가로 정렬 및 간격/패딩 축소 */
         #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap {
             /* flex-direction: column !important; 제거 */
             flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
             justify-content: flex-start !important; /* 왼쪽 정렬 */
         }
-        
+
         #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap .menu_button {
             /* width: 100% !important; 제거 */
             flex: 0 1 auto !important; /* 너비 자동, 필요시 축소 */
@@ -462,7 +543,7 @@
             padding-left: 5px !important; /* 모바일에서 좌우 패딩 감소 */
             padding-right: 5px !important; /* 모바일에서 좌우 패딩 감소 */
         }
-        
+
         /* 업로드/갤러리 버튼 - 가로 정렬 확인 및 마진/패딩 조정 */
         #character_assets_settings .upload-buttons {
             flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
@@ -478,33 +559,33 @@
         /* 나머지 모바일 스타일 */
         /* (다른 요소들에 대한 모바일 스타일은 여기에 계속 추가될 수 있습니다) */
     }
-    
+
     /* 에셋 링크 스타일 */
     #character_assets_settings .asset-link {
         color: var(--blue) !important;
         text-decoration: underline !important;
         transition: color 0.2s ease !important;
     }
-    
+
     #character_assets_settings .asset-link:hover {
         color: var(--light-blue) !important;
     }
-    
+
     /* 키워드 검색 필터 스타일 */
     #character_assets_settings .keyword-filter-container {
         width: 100% !important;
     }
-    
+
     #character_assets_settings .filter-input-container {
         position: relative !important;
         width: 100% !important;
     }
-    
+
     #character_assets_settings #keyword_filter {
         width: 100% !important;
         padding-right: 30px !important;
     }
-    
+
     #character_assets_settings .filter-clear-button {
         position: absolute !important;
         right: 10px !important;
@@ -513,18 +594,18 @@
         cursor: pointer !important;
         color: var(--grey80) !important;
     }
-    
+
     #character_assets_settings .filter-clear-button:hover {
         color: var(--grey30) !important;
     }
-    
+
     /* 가이드 스타일 */
     #character_assets_settings .usage-guide {
         border: 1px solid var(--slate-light) !important;
         border-radius: 5px !important;
         overflow: hidden !important;
     }
-    
+
     #character_assets_settings .guide-header {
         display: flex !important;
         align-items: center !important;
@@ -534,55 +615,55 @@
         cursor: pointer !important;
         transition: background-color 0.2s ease !important;
     }
-    
+
     #character_assets_settings .guide-header:hover {
         background-color: var(--black30) !important;
     }
-    
+
     #character_assets_settings .guide-header span {
         flex-grow: 1 !important;
         font-weight: bold !important;
     }
-    
+
     #character_assets_settings .guide-content {
         padding: 15px !important;
         background-color: var(--black10) !important;
     }
-    
+
     #character_assets_settings .guide-section {
         margin-bottom: 15px !important;
     }
-    
+
     #character_assets_settings .guide-section:last-child {
         margin-bottom: 0 !important;
     }
-    
+
     #character_assets_settings .guide-section h5 {
         margin-top: 0 !important;
         margin-bottom: 8px !important;
         font-size: 1em !important;
         color: var(--blue) !important;
     }
-    
+
     #character_assets_settings .guide-section p,
     #character_assets_settings .guide-section ul {
         margin: 5px 0 !important;
     }
-    
+
     #character_assets_settings .guide-section li {
         margin-bottom: 5px !important;
     }
-    
+
     /* 키워드 드래그 앤 드롭 스타일 */
     #character_assets_settings .keyword-group.dragging {
         opacity: 0.5 !important;
         border: 2px dashed var(--blue) !important;
     }
-    
+
     #character_assets_settings .keyword-group.drag-over {
         border: 2px dashed var(--blue) !important;
     }
-    
+
     /* 에셋 갤러리 모달 스타일 */
     .asset-modal {
         position: fixed !important;
@@ -594,7 +675,7 @@
         background-color: rgba(0, 0, 0, 0.7) !important;
         overflow: auto !important;
     }
-    
+
     .asset-modal-content {
         background-color: var(--black30) !important;
         border: 1px solid var(--slate-dark) !important;
@@ -604,7 +685,7 @@
         margin: 50px auto !important;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
     }
-    
+
     .asset-modal-header {
         display: flex !important;
         justify-content: space-between !important;
@@ -612,51 +693,51 @@
         padding: 15px 20px !important;
         border-bottom: 1px solid var(--slate-dark) !important;
     }
-    
+
     .asset-modal-close {
         color: var(--grey70) !important;
         font-size: 28px !important;
         font-weight: bold !important;
         cursor: pointer !important;
     }
-    
+
     .asset-modal-close:hover {
         color: var(--grey30) !important;
     }
-    
+
     .asset-gallery-filter {
         display: flex !important;
         padding: 15px 20px !important;
         gap: 10px !important;
     }
-    
+
     .asset-gallery-filter input {
         flex-grow: 1 !important;
     }
-    
+
     .asset-gallery-container {
         display: grid !important;
         padding: 20px !important;
         max-height: 70vh !important;
         overflow-y: auto !important;
     }
-    
+
     /* 그리드 크기별 스타일 */
     .asset-gallery-container.grid-small {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
         gap: 10px !important;
     }
-    
+
     .asset-gallery-container.grid-medium {
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
         gap: 15px !important;
     }
-    
+
     .asset-gallery-container.grid-large {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
         gap: 20px !important;
     }
-    
+
     .asset-gallery-item {
         display: flex !important;
         flex-direction: column !important;
@@ -666,17 +747,17 @@
         background-color: var(--black20) !important;
         transition: transform 0.2s !important;
     }
-    
+
     .asset-gallery-item:hover {
         transform: scale(1.05) !important;
         box-shadow: 0 0 8px rgba(0, 0, 0, 0.3) !important;
     }
-    
+
     .asset-gallery-img-container {
         position: relative !important;
         padding-top: 100% !important; /* 1:1 비율 유지 */
     }
-    
+
     .asset-gallery-img {
         position: absolute !important;
         top: 0 !important;
@@ -686,7 +767,7 @@
         object-fit: cover !important;
         cursor: pointer !important;
     }
-    
+
     .asset-gallery-caption {
         padding: 8px !important;
         text-align: center !important;
@@ -695,24 +776,24 @@
         overflow: hidden !important;
         text-overflow: ellipsis !important;
     }
-    
+
     .asset-gallery-actions {
         display: flex !important;
         justify-content: space-around !important;
         padding: 5px !important;
         border-top: 1px solid var(--slate-dark) !important;
     }
-    
+
     .asset-gallery-action {
         color: var(--grey70) !important;
         cursor: pointer !important;
         transition: color 0.2s !important;
     }
-    
+
     .asset-gallery-action:hover {
         color: var(--grey30) !important;
     }
-    
+
     .asset-preview-modal {
         position: fixed !important;
         z-index: 10000 !important;
@@ -725,13 +806,13 @@
         align-items: center !important;
         justify-content: center !important;
     }
-    
+
     .asset-preview-modal-content {
         position: relative !important;
         max-width: 90% !important;
         max-height: 90% !important;
     }
-    
+
     .asset-preview-close {
         position: absolute !important;
         top: 10px !important; /* 모달 내용 영역 안쪽 상단 */
@@ -749,19 +830,141 @@
         z-index: 10001 !important;
         transition: background-color 0.2s ease !important; /* 호버 효과 추가 */
     }
-    
+
     .asset-preview-close:hover {
         color: #ddd !important;
         background-color: rgba(0, 0, 0, 0.9) !important;
     }
-    
+
     .asset-preview-image {
         max-width: 100% !important;
         max-height: 80vh !important;
         border: 2px solid var(--slate-light) !important;
         display: block !important;
     }
-</style> 
+
+    /* 정규식 스타일 선택 섹션 */
+    #character_assets_settings .regex-style-section {
+        border: 1px solid var(--slate-light) !important;
+        border-radius: 5px !important;
+        overflow: hidden !important;
+    }
+
+    #character_assets_settings .style-selector-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        background-color: var(--black20) !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+    }
+
+    #character_assets_settings .style-selector-header:hover {
+        background-color: var(--black30) !important;
+    }
+
+    #character_assets_settings .style-selector-header span {
+        flex-grow: 1 !important;
+        font-weight: bold !important;
+    }
+
+    #character_assets_settings .style-selector-content {
+        padding: 15px !important;
+        background-color: var(--black10) !important;
+    }
+
+    #character_assets_settings .style-options {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        gap: 15px !important;
+    }
+
+    #character_assets_settings .style-option {
+        text-align: center !important;
+        background-color: var(--black20) !important;
+        padding: 10px !important;
+        border-radius: 5px !important;
+        transition: background-color 0.2s !important;
+    }
+
+    #character_assets_settings .style-option:hover {
+        background-color: var(--black30) !important;
+    }
+
+    #character_assets_settings .style-preview {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        height: 80px !important;
+        margin-bottom: 10px !important;
+    }
+
+    #character_assets_settings .preview-image {
+        width: 60px !important;
+        height: 60px !important;
+        background-color: var(--grey70) !important;
+        background-image: linear-gradient(45deg, var(--grey70) 25%, var(--grey80) 25%, var(--grey80) 50%, var(--grey70) 50%, var(--grey70) 75%, var(--grey80) 75%, var(--grey80)) !important;
+        background-size: 20px 20px !important;
+    }
+
+    #character_assets_settings .preview-image.rounded-style {
+        border-radius: 1rem !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    #character_assets_settings .preview-image.border-style {
+        border: 3px solid var(--SmartThemeBorderColor, #ccc) !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+        padding: 5px !important;
+        background-color: var(--SmartThemeBlurTintColor, #fff) !important;
+    }
+
+    #character_assets_settings .preview-image.clean-style {
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2)) !important;
+    }
+
+    #character_assets_settings .preview-image.shadow-style {
+        border-radius: 0.75rem !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    #character_assets_settings .preview-image.polaroid-style {
+        background-color: #f8f8f8 !important;
+        padding: 5px 5px 15px 5px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        transform: rotate(-2deg) !important;
+    }
+
+    #character_assets_settings .style-name {
+        font-weight: bold !important;
+        margin-bottom: 5px !important;
+    }
+
+    #character_assets_settings .style-desc {
+        font-size: 0.9em !important;
+        color: var(--grey70) !important;
+        margin-bottom: 10px !important;
+    }
+
+    #character_assets_settings .download-style-btn {
+        font-size: 0.9em !important;
+        padding: 3px 10px !important;
+    }
+
+    #character_assets_settings .download-all-container {
+        text-align: center !important;
+        padding-top: 10px !important;
+        border-top: 1px solid var(--slate-dark) !important;
+    }
+
+    @media (max-width: 768px) {
+        #character_assets_settings .style-options {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+        }
+    }
+</style>
 
 <!-- 드래그 앤 드롭 및 검색 기능을 위한 스크립트 -->
 <script>
@@ -772,7 +975,13 @@
             $('#usage_guide_content').slideToggle(200);
             $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
         });
-        
+
+        // 스타일 선택기 토글
+        $('#toggle_style_selector').on('click', function() {
+            $('#style_selector_content').slideToggle(200);
+            $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
+        });
+
         // 키워드 필터 기능
         $('#keyword_filter').on('input', function() {
             const filterValue = $(this).val().toLowerCase();
@@ -785,69 +994,69 @@
                 }
             });
         });
-        
+
         // 필터 초기화 버튼
         $('#clear_keyword_filter').on('click', function() {
             $('#keyword_filter').val('');
             $('.keyword-group').show();
         });
-        
+
         // 키워드 그룹에 드래그 앤 드롭 기능 설정
         function setupDragAndDrop() {
             const keywordGroups = document.querySelectorAll('.keyword-group');
-            
+
             keywordGroups.forEach(group => {
                 group.setAttribute('draggable', true);
-                
+
                 group.addEventListener('dragstart', function(e) {
                     e.dataTransfer.setData('text/plain', this.dataset.keyword);
                     this.classList.add('dragging');
                 });
-                
+
                 group.addEventListener('dragend', function() {
                     this.classList.remove('dragging');
                 });
-                
+
                 group.addEventListener('dragover', function(e) {
                     e.preventDefault();
                     this.classList.add('drag-over');
                 });
-                
+
                 group.addEventListener('dragleave', function() {
                     this.classList.remove('drag-over');
                 });
-                
+
                 group.addEventListener('drop', function(e) {
                     e.preventDefault();
                     this.classList.remove('drag-over');
-                    
+
                     const draggedKeyword = e.dataTransfer.getData('text/plain');
                     const draggedElement = document.querySelector(`.keyword-group[data-keyword="${draggedKeyword}"]`);
                     const dropTarget = this;
-                    
+
                     if (draggedElement && dropTarget !== draggedElement) {
                         const container = document.getElementById('character_assets_list');
                         const afterElement = getAfterElement(container, e.clientY);
-                        
+
                         if (afterElement) {
                             container.insertBefore(draggedElement, afterElement);
                         } else {
                             container.appendChild(draggedElement);
                         }
-                        
+
                         // 여기에 키워드 순서 저장 로직 추가 (확장 개발자가 구현)
                         saveKeywordOrder();
                     }
                 });
             });
-            
+
             function getAfterElement(container, y) {
                 const draggableElements = [...container.querySelectorAll('.keyword-group:not(.dragging)')];
-                
+
                 return draggableElements.reduce((closest, child) => {
                     const box = child.getBoundingClientRect();
                     const offset = y - box.top - box.height / 2;
-                    
+
                     if (offset < 0 && offset > closest.offset) {
                         return { offset: offset, element: child };
                     } else {
@@ -855,20 +1064,35 @@
                     }
                 }, { offset: Number.NEGATIVE_INFINITY }).element;
             }
-            
+
             function saveKeywordOrder() {
                 // 순서 저장 로직 (확장 개발자가 구현)
                 console.log('키워드 순서가 변경되었습니다');
-                
+
                 // 이벤트 발생
                 const event = new CustomEvent('character-assets-order-changed');
                 document.dispatchEvent(event);
             }
         }
-        
+
         // 키워드 목록이 로드된 후 드래그 앤 드롭 설정
         $(document).on('character-assets-loaded', function() {
             setupDragAndDrop();
+        });
+
+        // 스타일 다운로드 버튼 이벤트
+        $('.download-style-btn').on('click', function() {
+            const styleId = $(this).data('style');
+            // 이벤트 발생
+            const event = new CustomEvent('download-regex-style', { detail: { styleId } });
+            document.dispatchEvent(event);
+        });
+
+        // 모든 스타일 다운로드 버튼 이벤트
+        $('#download_all_styles_btn').on('click', function() {
+            // 이벤트 발생
+            const event = new CustomEvent('download-all-regex-styles');
+            document.dispatchEvent(event);
         });
     });
 </script>

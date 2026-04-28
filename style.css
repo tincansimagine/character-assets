@@ -530,7 +530,7 @@
 /* ===== Gallery modal ===== */
 .asset-modal {
     position: fixed;
-    z-index: 1000;
+    z-index: 31000;
     inset: 0;
     background: rgba(0,0,0,0.72);
     overflow: auto;
@@ -643,7 +643,7 @@
 /* ===== Full-size preview overlay ===== */
 .asset-preview-modal {
     position: fixed;
-    z-index: 10000;
+    z-index: 32000;
     inset: 0;
     display: flex;
     align-items: center;

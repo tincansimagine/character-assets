@@ -285,6 +285,17 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 8px;
+    align-content: start;
+}
+
+/* 그룹챗: 멤버별 섹션은 항상 전체 너비 한 행 (다열 그리드에 나란히 들어가면 겹침) */
+.character-assets__asset-grid .group-member-section {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .keyword-group {
@@ -875,6 +886,88 @@
 #gallery_select_mode_btn.active {
     background: var(--SmartThemeQuoteColor, #66f);
     color: #fff;
+}
+
+/* ===== Group member sections ===== */
+.group-member-section {
+    border: 1px solid var(--ca-border);
+    border-radius: var(--ca-r);
+    background: var(--ca-card);
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.group-member-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    user-select: none;
+    min-height: 44px;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+    background: rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid var(--ca-border);
+}
+
+.group-member-user-icon {
+    opacity: 0.55;
+    flex-shrink: 0;
+    font-size: 0.9em;
+}
+
+.group-member-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.group-member-header:hover {
+    background: var(--SmartThemeBlurTintColor, rgba(255, 255, 255, 0.06)) !important;
+}
+
+.group-member-header strong,
+.group-member-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.group-member-header .file-count {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.78em !important;
+    color: var(--ca-muted) !important;
+}
+
+.group-member-toggle {
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 0.75em;
+    transition: transform 0.2s ease;
+}
+
+/* 접힘: 펼치면 is-expanded + display:grid (slideToggle이 block으로 깨지지 않게) */
+.group-member-assets {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 10px 10px 12px 14px;
+    border-top: 1px solid var(--ca-border);
+    background: rgba(0, 0, 0, 0.1);
+    align-content: start;
+}
+
+.group-member-assets.is-expanded {
+    display: grid;
+}
+
+.group-member-assets > .no_assets_message {
+    grid-column: 1 / -1;
+    margin: 4px 0;
 }
 
 /* ===== Chat rendered images ===== */

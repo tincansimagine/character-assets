@@ -937,23 +937,107 @@ async function loadGroupAssetsSummary() {
         const assets = await fetchCharacterAssets(memberId);
         const char = characters.find(c => c.avatar.replace(/\.[^/.]+$/, '') === memberId);
         const displayName = char ? (char.name || memberId) : memberId;
-        const keywordSet = new Set(assets.map(a => a.label));
 
+        initializeCharacterAssets(memberId);
+        const charData = extension_settings[MODULE_NAME].characterAssets[memberId];
+        const disabledSet = new Set(charData.disabledAssets || []);
+
+        const keywordMap = {};
+        assets.forEach(asset => {
+            const keyword = asset.label;
+            const fullFileNameWithQuery = asset.path.split('/').pop();
+            const fileName = fullFileNameWithQuery.split('?')[0];
+            if (!keywordMap[keyword]) keywordMap[keyword] = [];
+            keywordMap[keyword].push({ fileName, path: asset.path });
+        });
+
+        const keywordCount = Object.keys(keywordMap).length;
         totalAssets += assets.length;
-        totalKeywords += keywordSet.size;
+        totalKeywords += keywordCount;
 
-        const memberCard = $(`
-            <div class="keyword-group">
-                <div class="keyword-header" style="padding: 8px 10px;">
-                    <span class="keyword-name" style="font-weight: bold;">
-                        <i class="fa-solid fa-user" style="margin-right: 4px;"></i>${escapeHtml(displayName)}
-                    </span>
-                    <span class="file-count">${assets.length}개 에셋 / ${keywordSet.size}개 키워드</span>
+        const memberSection = $(`
+            <div class="group-member-section" data-member-id="${escapeHtml(memberId)}">
+                <div class="group-member-header" role="button" tabindex="0">
+                    <i class="fa-solid fa-chevron-right group-member-toggle"></i>
+                    <i class="fa-solid fa-user group-member-user-icon"></i>
+                    <strong class="group-member-title">${escapeHtml(displayName)}</strong>
+                    <span class="file-count">${assets.length}개 에셋 · ${keywordCount}개 키워드</span>
                 </div>
+                <div class="group-member-assets"></div>
             </div>
         `);
-        assetsListContainer.append(memberCard);
+
+        const memberAssetsContainer = memberSection.find('.group-member-assets');
+
+        if (assets.length === 0) {
+            memberAssetsContainer.append('<div class="no_assets_message" style="padding:6px 8px;font-size:0.85em;">에셋 없음</div>');
+        } else {
+            Object.keys(keywordMap).sort().forEach(keyword => {
+                const files = keywordMap[keyword];
+                const enabledFiles = files.filter(f => !disabledSet.has(f.fileName));
+                const primaryFile = enabledFiles.length > 0 ? enabledFiles[0] : files[0];
+                const allDisabled = enabledFiles.length === 0;
+
+                const keywordGroup = $(`
+                    <div class="keyword-group${allDisabled ? ' keyword-disabled' : ''}">
+                        <img class="asset-preview-thumb" src="${escapeHtml(primaryFile.path)}" alt="${escapeHtml(primaryFile.fileName)}" loading="lazy" onerror="this.src='../img/notfound.webp'">
+                        <div class="keyword-header">
+                            <span class="keyword-name">${escapeHtml(keyword)}</span>
+                            <span class="file-count">${enabledFiles.length}/${files.length}</span>
+                        </div>
+                        <div class="file-list"></div>
+                    </div>
+                `);
+
+                const fileListContainer = keywordGroup.find('.file-list');
+                files.forEach(file => {
+                    const isDisabled = disabledSet.has(file.fileName);
+                    const fileItem = $(`
+                        <div class="file-item${isDisabled ? ' file-disabled' : ''}">
+                            <span class="file-name" title="${escapeHtml(file.fileName)}">${escapeHtml(file.fileName)}</span>
+                            <i class="fa-solid ${isDisabled ? 'fa-eye-slash' : 'fa-eye'} toggle-asset-button" data-member-id="${escapeHtml(memberId)}" data-filename="${escapeHtml(file.fileName)}" title="${isDisabled ? '활성화' : '비활성화'}"></i>
+                        </div>
+                    `);
+                    fileListContainer.append(fileItem);
+                });
+
+                memberAssetsContainer.append(keywordGroup);
+            });
+        }
+
+        assetsListContainer.append(memberSection);
     }
+
+    // 멤버 섹션 접기/펼치기 (slideToggle 대신 grid 유지)
+    assetsListContainer.off('click', '.group-member-header').on('click', '.group-member-header', function() {
+        const $section = $(this).closest('.group-member-section');
+        const $assets = $section.find('.group-member-assets');
+        const $icon = $(this).find('.group-member-toggle');
+        $assets.toggleClass('is-expanded');
+        const open = $assets.hasClass('is-expanded');
+        $icon.css('transform', open ? 'rotate(90deg)' : '');
+    });
+
+    // 그룹 내 에셋 On/Off 토글
+    assetsListContainer.off('click', '.toggle-asset-button').on('click', '.toggle-asset-button', async function(e) {
+        e.stopPropagation();
+        const memberId = $(this).data('member-id');
+        const fileName = $(this).data('filename');
+        if (!memberId) return;
+
+        const charData = extension_settings[MODULE_NAME].characterAssets[memberId];
+        if (!charData) return;
+        if (!Array.isArray(charData.disabledAssets)) charData.disabledAssets = [];
+
+        const idx = charData.disabledAssets.indexOf(fileName);
+        if (idx >= 0) {
+            charData.disabledAssets.splice(idx, 1);
+        } else {
+            charData.disabledAssets.push(fileName);
+        }
+        saveSettingsDebounced();
+        await loadCharacterAssets();
+    });
 
     updateAssetStatus(totalAssets, totalKeywords);
 
@@ -980,13 +1064,14 @@ async function loadCharacterAssets() {
     populateAssetPresetSelect();
 
     const characterId = character.avatar.replace(/\.[^/.]+$/, '');
-    const effectiveName = getEffectiveCharacterName(characterId);
-    const isLinked = effectiveName !== characterId;
+    initializeCharacterAssets(characterId);
+    const charData = extension_settings[MODULE_NAME].characterAssets[characterId];
+    const isLinked = Boolean(charData.linkedCharacter);
     const assets = await fetchCharacterAssets(characterId);
     const assetsListContainer = $('#character_assets_list');
     assetsListContainer.empty();
 
-    // 링크된 상태일 때 업로드/삭제/정돈 비활성화
+    // 링크된 상태일 때만 업로드/삭제/정돈 비활성화 (에셋 버전은 영향 없음)
     const writeButtons = $('#character_assets_upload_zip_btn, #character_assets_upload_image_btn, #smart_rename_btn, #delete_selected_keywords');
     if (isLinked) {
         writeButtons.addClass('disabled').css('pointer-events', 'none').css('opacity', '0.4');
@@ -1025,8 +1110,6 @@ async function loadCharacterAssets() {
     updateAssetStatus(assets.length, Object.keys(keywordMap).length);
 
     // 비활성 에셋 목록
-    initializeCharacterAssets(characterId);
-    const charData = extension_settings[MODULE_NAME].characterAssets[characterId];
     const disabledSet = new Set(charData.disabledAssets || []);
 
     // 키워드별로 UI 생성
@@ -2628,15 +2711,15 @@ async function initializeExtension() {
         // {{img_keywords_autogen}} 매크로 등록 - 자동 갱신되는 이미지 파일명 목록
         MacrosParser.registerMacro('img_keywords_autogen', () => autoGeneratedKeywords, '자동 갱신되는 캐릭터 에셋 파일명 목록');
 
-        // {{charkey}} 매크로 등록 - 현재 캐릭터의 실제 폴더명
+        // {{charkey}} 매크로 등록 - 에셋 링크/버전을 반영한 실제 폴더 경로
         MacrosParser.registerMacro('charkey', () => {
             const character = getCurrentCharacter();
             if (!character || !character.avatar) {
                 return '';
             }
-            // avatar에서 확장자를 제거하여 실제 폴더명 반환
-            return character.avatar.replace(/\.[^/.]+$/, '');
-        }, '현재 캐릭터의 실제 저장 폴더명');
+            const characterId = character.avatar.replace(/\.[^/.]+$/, '');
+            return getEffectiveCharacterName(characterId);
+        }, '현재 캐릭터의 실제 에셋 폴더 경로 (링크/버전 반영)');
 
         // {{img_rand::PREFIX}} - 프리픽스 기반 랜덤 에셋 URL
         MacrosParser.registerMacro('img_rand', (prefix) => {

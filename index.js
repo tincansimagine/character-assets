@@ -568,6 +568,35 @@ function initializeCharacterAssets(characterId) {
     if (!Array.isArray(charData.assetPresets)) {
         charData.assetPresets = [];
     }
+
+    // 에셋 링크 값은 "다른 캐릭터의 실제 폴더명"만 허용 — 프리셋명(BL 등)·오타·과거 버그 값이면 잠금 상태로 남음
+    if (Array.isArray(characters) && characters.length > 0) {
+        let link = String(charData.linkedCharacter || '').trim();
+        if (link === characterId) {
+            link = '';
+        }
+        const otherIds = characters
+            .map(c => (c && c.avatar) ? c.avatar.replace(/\.[^/.]+$/, '') : '')
+            .filter(uid => uid && uid !== characterId);
+
+        if (link && !otherIds.includes(link)) {
+            console.debug(`[${MODULE_NAME}] invalid linkedCharacter cleared for ${characterId}:`, link);
+            charData.linkedCharacter = '';
+            saveSettingsDebounced();
+        } else if (link) {
+            charData.linkedCharacter = link;
+        } else {
+            charData.linkedCharacter = '';
+        }
+    }
+}
+
+/**
+ * 다른 캐릭터 폴더에 링크되어 있어 업로드·삭제·정돈을 막아야 하는지
+ */
+function isAssetLinkActive(characterId) {
+    initializeCharacterAssets(characterId);
+    return String(extension_settings[MODULE_NAME].characterAssets[characterId].linkedCharacter || '').trim().length > 0;
 }
 
 /**
@@ -914,7 +943,8 @@ async function onCharacterChanged() {
         return;
     }
 
-    initializeCharacterAssets(String(this_chid));
+    const characterId = character.avatar.replace(/\.[^/.]+$/, '');
+    initializeCharacterAssets(characterId);
     updateInterface();
     await loadCharacterAssets();
 }
@@ -1066,7 +1096,7 @@ async function loadCharacterAssets() {
     const characterId = character.avatar.replace(/\.[^/.]+$/, '');
     initializeCharacterAssets(characterId);
     const charData = extension_settings[MODULE_NAME].characterAssets[characterId];
-    const isLinked = Boolean(charData.linkedCharacter);
+    const isLinked = isAssetLinkActive(characterId);
     const assets = await fetchCharacterAssets(characterId);
     const assetsListContainer = $('#character_assets_list');
     assetsListContainer.empty();

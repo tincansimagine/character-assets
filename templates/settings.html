@@ -1,236 +1,190 @@
-<div id="character_assets_settings">
+<div id="character_assets_settings" class="character-assets">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b>캐릭터 에셋 확장</b>
+            <b><i class="fa-solid fa-images"></i> 캐릭터 에셋 확장</b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <div class="flex-container flexFlowColumn">
-                <!-- 에셋 사용법 가이드 - 상단으로 이동 -->
-                <div class="usage-guide marginTopBot10">
-                    <div class="collapsible-guide">
-                        <div class="guide-header" id="toggle_usage_guide">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <span>에셋 사용법 가이드</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div class="guide-content" id="usage_guide_content" style="display: none;">
-                            <div class="guide-section">
-                                <h5>기본 사용법</h5>
-                                <ol>
-                                    <li>에셋에 사용할 이미지들을 AI가 쉽게 구분할 수 있도록 파일명을 명확한 키워드로 작성합니다.</li>
-                                    <li>준비된 이미지를 사용할 캐릭터를 고르고 채팅방에 들어갑니다.</li>
-                                    <li>업로드 버튼을 통해 준비된 이미지들을 업로드합니다.</li>
-                                    <li>플레이스홀더 교체 버튼을 통해 자동으로 모든 키워드들을 프롬프트에 삽입합니다.</li>
-                                    <li>최대한 사용 중인 프롬프트 하단 위치에 <code>{{img_inprompt}}</code> 플레이스홀더를 위치해 이미지 출력 프롬프트를 삽입합니다.</li>
-                                    <li>글을 통해 다운 받은 필수 에셋 정규식을 Regex 확장 메뉴에서 Scoped로 Import 해주면 끝입니다.</li>
-                                </ol>
-                            </div>
-                            <div class="guide-section">
-                                <h5>팁</h5>
-                                <ul>
-                                    <li>키워드는 짧고 간단하게 작성하되, 어떤 이미지인지 명확하게 구분이 돼야 합니다.</li>
-                                    <li>같은 이름의 캐릭터가 있을 경우, 캐릭터의 이름이 만들어진 순서대로 A1, A2, A3과 같이 배정되기 때문에 이 경우 정규식에서 Out 결과를 일부 수정해주어야 오류가 나지 않습니다. (e.g., {{char}} -> {{char}}2 로 수정)</li>
-                                </ul>
-                            </div>
-                        </div>
+            <div class="character-assets__status">
+                <div>
+                    <strong id="character_assets_status_title">현재 캐릭터 에셋</strong>
+                    <span id="character_assets_status_summary">캐릭터를 선택하면 에셋 상태가 표시됩니다.</span>
+                </div>
+                <div class="character-assets__status-actions">
+                    <div class="menu_button" id="refresh_assets_btn" title="현재 캐릭터의 에셋 목록을 다시 불러옵니다.">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>새로고침</span>
+                    </div>
+                    <div class="menu_button" id="copy_image_prompt_btn" title="현재 이미지 출력 프롬프트를 복사합니다.">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>프롬프트 복사</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- 전역 설정 -->
-                <div class="settings_block">
-                    <h4>이미지 출력 설정</h4>
-                <div class="flex-container flexFlowColumn marginTopBot10">
-                    <label for="character_assets_image_prompt">
-                        <b>이미지 출력 프롬프트</b>
-                            <div class="description">
-                                AI가 이미지 태그를 생성하는 방식을 안내하는 프롬프트입니다.<br>
-                                • <b>{{img_keywords}}</b> - 교체 버튼을 누를 경우, 현재 캐릭터에 등록된 키워드로 자동 치환됩니다.<br>
-                                • <b>{{img_keywords_autogen}}</b> - 자동으로 갱신되는 이미지 파일명 목록입니다.<br>
-                                • <b>{{charkey}}</b> - 현재 캐릭터의 실제 저장 폴더명입니다. (예: Ian2, Luna3)
-                            </div>
-                    </label>
-                            <!-- 프리셋 관리 UI 시작 -->
-                            <div class="preset-management-container marginTopBot10">
-                                <div class="preset-selector-container">
-                                    <label for="prompt_preset_selector" class="preset-label">프리셋:</label>
-                                    <select id="prompt_preset_selector" class="text_pole">
-                                        <!-- 프리셋 옵션들이 이곳에 동적으로 추가됩니다 -->
-                                    </select>
-                                </div>
-                                <div class="preset-actions-container">
-                                    <div class="menu_button" id="save_preset_btn" title="현재 프롬프트를 선택된 프리셋에 저장합니다">
-                                        <i class="fa-solid fa-save"></i>
-                                        <span>저장</span>
-                                    </div>
-                                    <div class="menu_button" id="new_preset_btn" title="새 프리셋을 생성합니다">
-                                        <i class="fa-solid fa-plus"></i>
-                                        <span>새 프리셋</span>
-                                    </div>
-                                    <div class="menu_button" id="rename_preset_btn" title="선택한 프리셋의 이름을 변경합니다">
-                                        <i class="fa-solid fa-pencil"></i>
-                                        <span>이름 변경</span>
+            <div class="character-assets__tabs" role="tablist" aria-label="캐릭터 에셋 설정">
+                <button class="character-assets__tab is-active" type="button" data-tab="prompt">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>프롬프트</span>
+                </button>
+                <button class="character-assets__tab" type="button" data-tab="assets">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>에셋</span>
+                </button>
+                <button class="character-assets__tab" type="button" data-tab="render">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>렌더링</span>
+                </button>
+                <button class="character-assets__tab" type="button" data-tab="tools">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <span>도구</span>
+                </button>
+            </div>
+
+            <section class="character-assets__panel is-active" data-panel="prompt">
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4>이미지 출력 프롬프트</h4>
+                            <p>AI가 대화 맥락에 맞는 내부 이미지 태그를 고르도록 안내합니다.</p>
                         </div>
-                                    <div class="menu_button danger_button" id="delete_preset_btn" title="선택한 프리셋을 삭제합니다">
-                                        <i class="fa-solid fa-trash"></i>
-                                        <span>삭제</span>
+                        <div class="character-assets__compact-actions">
+                            <div class="menu_button" id="character_assets_reset_prompt">
+                                <i class="fa-solid fa-undo"></i>
+                                <span>기본값</span>
+                            </div>
+                            <div class="menu_button" id="replace_keywords_placeholder_btn" title="{{img_keywords}}를 현재 파일명 목록으로 교체합니다.">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>키워드 교체</span>
+                            </div>
                         </div>
                     </div>
-                    <!-- 프리셋 내보내기/불러오기 버튼 -->
-                    <div class="preset-io-container">
-                        <div class="menu_button" id="export_presets_btn" title="모든 프리셋을 JSON 파일로 내보냅니다">
+
+                    <div class="character-assets__hint">
+                        <code>{{img_inprompt}}</code>는 전체 프롬프트, <code>{{img_keywords_autogen}}</code>는 자동 파일명 목록, <code>{{charkey}}</code>는 실제 캐릭터 폴더명으로 바뀝니다.
+                    </div>
+
+                    <div class="character-assets__preset-row">
+                        <label for="prompt_preset_selector">프리셋</label>
+                        <select id="prompt_preset_selector" class="text_pole"></select>
+                    </div>
+
+                    <div class="character-assets__button-grid">
+                        <div class="menu_button" id="save_preset_btn" title="현재 프롬프트를 선택된 프리셋에 저장합니다.">
+                            <i class="fa-solid fa-save"></i>
+                            <span>저장</span>
+                        </div>
+                        <div class="menu_button" id="new_preset_btn" title="새 프리셋을 생성합니다.">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>새 프리셋</span>
+                        </div>
+                        <div class="menu_button" id="rename_preset_btn" title="선택한 프리셋 이름을 변경합니다.">
+                            <i class="fa-solid fa-pencil"></i>
+                            <span>이름 변경</span>
+                        </div>
+                        <div class="menu_button danger_button" id="delete_preset_btn" title="선택한 프리셋을 삭제합니다.">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>삭제</span>
+                        </div>
+                    </div>
+
+                    <textarea id="character_assets_image_prompt" class="text_pole textarea_compact character-assets__prompt" rows="9"></textarea>
+
+                    <div class="character-assets__button-grid character-assets__button-grid--two">
+                        <div class="menu_button" id="export_presets_btn" title="현재 프리셋을 JSON 파일로 내보냅니다.">
                             <i class="fa-solid fa-file-export"></i>
                             <span>프리셋 내보내기</span>
                         </div>
                         <input type="file" id="import_presets_input" accept=".json" style="display: none;">
-                        <div class="menu_button" id="import_presets_btn" title="JSON 파일에서 프리셋을 불러옵니다">
+                        <div class="menu_button" id="import_presets_btn" title="JSON 파일에서 프리셋을 불러옵니다.">
                             <i class="fa-solid fa-file-import"></i>
                             <span>프리셋 불러오기</span>
                         </div>
                     </div>
                 </div>
-                            <!-- 프리셋 관리 UI 끝 -->
+            </section>
 
-                            <div class="sm-textarea-container">
-                                <textarea id="character_assets_image_prompt" class="text_pole textarea_compact" rows="6"></textarea>
-                            </div>
-                        <div class="flex-container flexWrap marginTopBot10">
-                            <div class="menu_button" id="character_assets_reset_prompt">
-                                <i class="fa-solid fa-undo"></i>
-                                <span>기본값으로 초기화</span>
-                            </div>
-                            <div class="menu_button" id="replace_keywords_placeholder_btn" title="프롬프트 내 {{img_keywords}} 플레이스홀더를 현재 캐릭터의 에셋 파일명 목록으로 교체합니다.">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                <span>플레이스홀더 교체</span>
-                            </div>
-                            <div class="menu_button" id="copy_image_prompt_btn" title="현재 프롬프트를 클립보드에 복사합니다.">
-                                <i class="fa-solid fa-copy"></i>
-                                <span>프롬프트 복사</span>
-                            </div>
+            <section class="character-assets__panel" data-panel="assets">
+                <div class="character-assets__section character-assets__link-section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4><i class="fa-solid fa-link"></i> 에셋 링크</h4>
+                            <p>다른 캐릭터의 에셋을 공유합니다. 동일 에셋을 중복 저장하지 않아 용량을 절약합니다.</p>
                         </div>
                     </div>
-                        </div>
-                <hr>
-                <!-- 에셋 관리 섹션 -->
-                <div class="settings_block">
-                    <h4>에셋 관리</h4>
-                    <div id="character_assets_container">
-                        <!-- 에셋 관리 -->
-                        <h4>사용 가능한 이미지 키워드</h4>
-                         <small class="extensions_info marginBottom10">
-                        <b>이미지 업로드 안내</b><br>
-                        - ZIP 파일에는 이미지 파일이 포함되어야 합니다.<br>
-                        - 이미지 파일명은 키워드로 사용됩니다 (예: <code>joy.png</code>, <code>angry.png</code>).<br>
-                        - 한 키워드에 여러 이미지를 추가하려면 파일명에 접미사를 추가하세요 (예: <code>joy-1.png</code>, <code>joy.expressive.png</code>).<br>
-                        - <b>아래에서 원하는 스타일의 정규식을 다운로드하여 Regex 확장에서 Import하세요.</b>
-                    </small>
-
-                    <!-- 정규식 스타일 선택 섹션 -->
-                    <div class="regex-style-section marginBottom10">
-                        <div class="collapsible-style-selector">
-                            <div class="style-selector-header" id="toggle_style_selector">
-                                <i class="fa-solid fa-palette"></i>
-                                <span>이미지 표시 스타일 선택</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </div>
-                            <div class="style-selector-content" id="style_selector_content" style="display: none;">
-                                <div class="style-preview-container">
-                            <div class="style-options">
-                                <div class="style-option" data-style="default">
-                                    <div class="style-preview">
-                                        <div class="preview-image rounded-style"></div>
-                                    </div>
-                                    <div class="style-name">기본형</div>
-                                    <div class="style-desc">둥근 사각형</div>
-                                    <div class="menu_button download-style-btn" data-style="default">
-                                        <i class="fa-solid fa-download"></i>
-                                        <span>다운로드</span>
-                                    </div>
-                                </div>
-                                <div class="style-option" data-style="border">
-                                    <div class="style-preview">
-                                        <div class="preview-image border-style"></div>
-                                    </div>
-                                    <div class="style-name">테두리형</div>
-                                    <div class="style-desc">테두리 + 그림자</div>
-                                    <div class="menu_button download-style-btn" data-style="border">
-                                        <i class="fa-solid fa-download"></i>
-                                        <span>다운로드</span>
-                                    </div>
-                                </div>
-                                <div class="style-option" data-style="clean">
-                                    <div class="style-preview">
-                                        <div class="preview-image clean-style"></div>
-                                    </div>
-                                    <div class="style-name">깔끔형</div>
-                                    <div class="style-desc">투명 배경</div>
-                                    <div class="menu_button download-style-btn" data-style="clean">
-                                        <i class="fa-solid fa-download"></i>
-                                        <span>다운로드</span>
-                                    </div>
-                                </div>
-                                <div class="style-option" data-style="shadow">
-                                    <div class="style-preview">
-                                        <div class="preview-image shadow-style"></div>
-                                    </div>
-                                    <div class="style-name">그림자형</div>
-                                    <div class="style-desc">강한 그림자</div>
-                                    <div class="menu_button download-style-btn" data-style="shadow">
-                                        <i class="fa-solid fa-download"></i>
-                                        <span>다운로드</span>
-                                    </div>
-                                </div>
-                                <div class="style-option" data-style="polaroid">
-                                    <div class="style-preview">
-                                        <div class="preview-image polaroid-style"></div>
-                                    </div>
-                                    <div class="style-name">폴라로이드</div>
-                                    <div class="style-desc">사진 프레임</div>
-                                    <div class="menu_button download-style-btn" data-style="polaroid">
-                                        <i class="fa-solid fa-download"></i>
-                                        <span>다운로드</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="download-all-container marginTop10">
-                                <div class="menu_button" id="download_all_styles_btn">
-                                    <i class="fa-solid fa-download"></i>
-                                    <span>모든 스타일 다운로드</span>
-                                </div>
-                            </div>
-                        </div>
-                            </div>
+                    <div class="character-assets__link-row">
+                        <select id="asset_link_select" class="text_pole">
+                            <option value="">사용 안 함 (자체 에셋 사용)</option>
+                        </select>
+                        <div class="menu_button menu_button_icon" id="asset_link_clear_btn" title="링크 해제">
+                            <i class="fa-solid fa-xmark"></i>
                         </div>
                     </div>
+                    <small id="asset_link_info" class="character-assets__link-info"></small>
+                </div>
 
-                        <!-- 키워드 검색 필터 -->
-                        <div class="keyword-filter-container marginBottom10">
-                            <div class="filter-input-container">
-                                <input type="text" id="keyword_filter" class="text_pole" placeholder="키워드 검색...">
-                                <div class="filter-clear-button" id="clear_keyword_filter" title="검색 초기화">
-                                    <i class="fa-solid fa-times"></i>
-                                </div>
-                            </div>
+                <div class="character-assets__section character-assets__preset-section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4><i class="fa-solid fa-layer-group"></i> 에셋 버전</h4>
+                            <p>한 캐릭터의 에셋을 여러 버전으로 나눠 관리합니다. (예: 헤테로 / BL / 공통)</p>
                         </div>
+                    </div>
+                    <div class="character-assets__preset-row">
+                        <select id="asset_preset_select" class="text_pole">
+                            <option value="">기본 (Default)</option>
+                        </select>
+                        <div class="menu_button menu_button_icon" id="asset_preset_add_btn" title="새 버전 추가">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="menu_button menu_button_icon" id="asset_preset_rename_btn" title="현재 버전 이름 변경">
+                            <i class="fa-solid fa-pen"></i>
+                        </div>
+                        <div class="menu_button menu_button_icon" id="asset_preset_delete_btn" title="현재 버전 삭제">
+                            <i class="fa-solid fa-trash"></i>
+                        </div>
+                    </div>
+                    <small id="asset_preset_info" class="character-assets__preset-info"></small>
+                </div>
 
-                        <div class="upload-buttons marginBottom10">
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4>에셋 관리</h4>
+                            <p>파일명은 AI가 사용할 키워드가 됩니다. 예: <code>joy.png</code>, <code>street-night.webp</code></p>
+                        </div>
+                        <div class="character-assets__compact-actions">
                             <input type="file" id="character_assets_upload_zip" accept=".zip" style="display: none;">
                             <input type="file" id="character_assets_upload_image" accept="image/png, image/webp, image/gif, image/jpeg" multiple style="display: none;">
                             <div class="menu_button" id="character_assets_upload_zip_btn">
                                 <i class="fa-solid fa-file-zipper"></i>
-                                <span>ZIP 업로드</span>
+                                <span>ZIP</span>
                             </div>
                             <div class="menu_button" id="character_assets_upload_image_btn">
-                                <i class="fa-solid fa-images"></i>
-                                <span>이미지 업로드</span>
+                                <i class="fa-solid fa-upload"></i>
+                                <span>업로드</span>
                             </div>
-                            <div class="menu_button" id="open_asset_gallery_btn" title="모든 에셋 이미지를 갤러리로 미리 봅니다">
-                                <i class="fa-solid fa-image"></i>
-                                <span>미리보기 갤러리</span>
+                            <div class="menu_button" id="open_asset_gallery_btn">
+                                <i class="fa-solid fa-table-cells-large"></i>
+                                <span>갤러리</span>
+                            </div>
+                            <div class="menu_button" id="smart_rename_btn" title="파일명을 일괄 정돈합니다.">
+                                <i class="fa-solid fa-broom"></i>
+                                <span>정돈</span>
                             </div>
                         </div>
-                        <div class="asset-controls">
-                            <label class="checkbox flex-container flex1">
+                    </div>
+
+                    <div class="character-assets__toolbar">
+                        <div class="character-assets__search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="keyword_filter" class="text_pole" placeholder="키워드 또는 파일명 검색...">
+                            <button type="button" id="clear_keyword_filter" title="검색 초기화">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="character-assets__toolbar-actions">
+                            <label class="checkbox flex-container">
                                 <input type="checkbox" id="select_all_keywords">
                                 <span>전체 선택</span>
                             </label>
@@ -239,17 +193,185 @@
                                 <span>선택 삭제</span>
                             </div>
                         </div>
-                        <div id="character_assets_list" class="asset-list-container marginTopBot10">
-                            <!-- 키워드 및 파일 목록이 여기에 동적으로 생성됩니다. -->
+                    </div>
+
+                    <div id="character_assets_list" class="asset-list-container character-assets__asset-grid"></div>
+                </div>
+            </section>
+
+            <section class="character-assets__panel" data-panel="render">
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4>채팅 렌더링</h4>
+                            <p>Regex 확장 없이도 <code>{{img::filename.ext}}</code> 태그를 현재 캐릭터 이미지로 표시할 수 있습니다.</p>
+                        </div>
+                    </div>
+
+                    <label class="checkbox_label character-assets__toggle-row" for="character_assets_builtin_renderer_enabled">
+                        <input type="checkbox" id="character_assets_builtin_renderer_enabled">
+                        <span>
+                            <strong>내장 렌더러 사용</strong>
+                            <small>기존 Regex Import 방식과 공존합니다. 둘을 동시에 쓰면 이미지가 중복될 수 있습니다.</small>
+                        </span>
+                    </label>
+
+                    <label class="checkbox_label character-assets__toggle-row" for="character_assets_random_asset">
+                        <input type="checkbox" id="character_assets_random_asset">
+                        <span>
+                            <strong>랜덤 에셋 출력</strong>
+                            <small>같은 키워드 그룹(예: angry_1, angry_2)이 있으면 AI에게는 키워드(angry)만 전달하고, 렌더링 시 그룹 내에서 랜덤으로 하나를 표시합니다.</small>
+                        </span>
+                    </label>
+
+                    <label class="checkbox_label character-assets__toggle-row" for="character_assets_renderer_lazy">
+                        <input type="checkbox" id="character_assets_renderer_lazy">
+                        <span>
+                            <strong>이미지 지연 로딩</strong>
+                            <small>대량 이미지가 있는 긴 채팅에서 스크롤 성능을 개선합니다.</small>
+                        </span>
+                    </label>
+
+                    <div class="character-assets__hint">
+                        권장 흐름: 새 사용자는 내장 렌더러를 켜고 바로 사용, 기존 사용자는 Regex 탭에서 스타일 JSON을 내려받아 계속 사용할 수 있습니다.
+                    </div>
+                </div>
+            </section>
+
+            <section class="character-assets__panel" data-panel="tools">
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4><i class="fa-solid fa-user"></i> 페르소나 에셋</h4>
+                            <p>캐릭터 에셋에서 못 찾은 키워드는 페르소나 에셋에서 검색됩니다. 모든 캐릭터에 공통으로 사용할 이미지를 여기에 업로드하세요.</p>
+                        </div>
+                    </div>
+                    <div class="character-assets__button-grid">
+                        <input type="file" id="persona_assets_upload" accept="image/png, image/webp, image/gif, image/jpeg" multiple style="display: none;">
+                        <input type="file" id="persona_assets_upload_zip" accept=".zip" style="display: none;">
+                        <div class="menu_button" id="persona_assets_upload_btn">
+                            <i class="fa-solid fa-upload"></i>
+                            <span>업로드</span>
+                        </div>
+                        <div class="menu_button" id="persona_assets_upload_zip_btn">
+                            <i class="fa-solid fa-file-zipper"></i>
+                            <span>ZIP</span>
+                        </div>
+                    </div>
+                    <div id="persona_assets_status" class="character-assets__link-info" style="padding: 4px 2px;"></div>
+                </div>
+
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4>백업 &amp; 내보내기</h4>
+                            <p>현재 캐릭터의 에셋을 ZIP으로 다운로드합니다.</p>
+                        </div>
+                    </div>
+                    <div class="character-assets__button-grid">
+                        <div class="menu_button" id="export_assets_zip_btn" title="현재 캐릭터의 모든 에셋을 ZIP으로 내려받습니다.">
+                            <i class="fa-solid fa-file-zipper"></i>
+                            <span>에셋 ZIP 내보내기</span>
+                        </div>
+                        <div class="menu_button" id="copy_prompt_oneclick_btn" title="현재 이미지 출력 프롬프트를 클립보드에 복사합니다.">
+                            <i class="fa-solid fa-clipboard"></i>
+                            <span>프롬프트 복사</span>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4>사용 가이드</h4>
+                            <p>프롬프트와 태그 형식을 빠르게 확인합니다.</p>
+                        </div>
+                    </div>
+                    <details class="character-assets__details">
+                        <summary><i class="fa-solid fa-circle-info"></i> 기본 사용법</summary>
+                        <ol>
+                            <li>캐릭터를 선택하고 이미지 또는 ZIP 파일을 업로드합니다.</li>
+                            <li>프롬프트에 <code>{{img_inprompt}}</code>를 넣거나 프롬프트 복사 버튼을 사용합니다.</li>
+                            <li>AI가 <code>{{img::파일명.ext}}</code> 형식으로 출력하면 내장 렌더러 또는 Regex가 이미지를 표시합니다.</li>
+                        </ol>
+                    </details>
+                </div>
+
+                <div class="character-assets__section">
+                    <div class="character-assets__section-head">
+                        <div>
+                            <h4>Regex 스타일 다운로드</h4>
+                            <p>기존 Regex 확장 사용자를 위한 호환 기능입니다.</p>
+                        </div>
+                    </div>
+                    <div class="style-options">
+                        <div class="style-option" data-style="default">
+                            <div class="style-preview"><div class="preview-image rounded-style"></div></div>
+                            <div class="style-name">기본형</div>
+                            <div class="style-desc">둥근 사각형</div>
+                            <div class="menu_button download-style-btn" data-style="default"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="border">
+                            <div class="style-preview"><div class="preview-image border-style"></div></div>
+                            <div class="style-name">테두리형</div>
+                            <div class="style-desc">테두리 + 그림자</div>
+                            <div class="menu_button download-style-btn" data-style="border"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="clean">
+                            <div class="style-preview"><div class="preview-image clean-style"></div></div>
+                            <div class="style-name">깔끔형</div>
+                            <div class="style-desc">투명 배경</div>
+                            <div class="menu_button download-style-btn" data-style="clean"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="shadow">
+                            <div class="style-preview"><div class="preview-image shadow-style"></div></div>
+                            <div class="style-name">그림자형</div>
+                            <div class="style-desc">강한 그림자</div>
+                            <div class="menu_button download-style-btn" data-style="shadow"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="polaroid">
+                            <div class="style-preview"><div class="preview-image polaroid-style"></div></div>
+                            <div class="style-name">폴라로이드</div>
+                            <div class="style-desc">사진 프레임</div>
+                            <div class="menu_button download-style-btn" data-style="polaroid"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="cinema">
+                            <div class="style-preview"><div class="preview-image cinema-style"></div></div>
+                            <div class="style-name">시네마틱</div>
+                            <div class="style-desc">레터박스</div>
+                            <div class="menu_button download-style-btn" data-style="cinema"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="float-left">
+                            <div class="style-preview"><div class="preview-image float-left-style"></div></div>
+                            <div class="style-name">왼쪽 플로팅</div>
+                            <div class="style-desc">텍스트 감싸기</div>
+                            <div class="menu_button download-style-btn" data-style="float-left"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="float-right">
+                            <div class="style-preview"><div class="preview-image float-right-style"></div></div>
+                            <div class="style-name">오른쪽 플로팅</div>
+                            <div class="style-desc">텍스트 감싸기</div>
+                            <div class="menu_button download-style-btn" data-style="float-right"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                        <div class="style-option" data-style="vignette">
+                            <div class="style-preview"><div class="preview-image vignette-style"></div></div>
+                            <div class="style-name">비네팅</div>
+                            <div class="style-desc">어두운 테두리</div>
+                            <div class="menu_button download-style-btn" data-style="vignette"><i class="fa-solid fa-download"></i><span>다운로드</span></div>
+                        </div>
+                    </div>
+                    <div class="character-assets__footer-action">
+                        <div class="menu_button" id="download_all_styles_btn">
+                            <i class="fa-solid fa-download"></i>
+                            <span>모든 스타일 다운로드</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>
 
-<!-- 에셋 갤러리 모달 -->
 <div id="asset_gallery_modal" class="asset-modal" style="display: none;">
     <div class="asset-modal-content">
         <div class="asset-modal-header">
@@ -257,842 +379,22 @@
             <span class="asset-modal-close">&times;</span>
         </div>
         <div class="asset-gallery-filter">
-            <input type="text" id="gallery_search" class="text_pole" placeholder="갤러리 필터...">
-            <select id="gallery_grid_size" class="text_pole">
-                <option value="small">작은 그리드</option>
-                <option value="medium" selected>중간 그리드</option>
-                <option value="large">큰 그리드</option>
+            <div class="asset-gallery-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="gallery_search" class="text_pole" placeholder="키워드 또는 파일명으로 검색...">
+            </div>
+            <select id="gallery_grid_size" class="asset-gallery-grid-select">
+                <option value="small">S</option>
+                <option value="medium" selected>M</option>
+                <option value="large">L</option>
             </select>
+            <div class="menu_button menu_button_icon" id="gallery_select_mode_btn" title="선택 모드">
+                <i class="fa-solid fa-check-double"></i>
+            </div>
+            <div class="menu_button danger_button menu_button_icon" id="gallery_delete_selected_btn" title="선택 삭제" style="display:none;">
+                <i class="fa-solid fa-trash"></i> <span id="gallery_select_count">0</span>
+            </div>
         </div>
-        <div id="asset_gallery_container" class="asset-gallery-container">
-            <!-- 여기에 갤러리 이미지가 동적으로 추가됩니다 -->
-        </div>
+        <div id="asset_gallery_container" class="asset-gallery-container"></div>
     </div>
 </div>
-
-<style>
-    /* 모든 CSS 규칙에 !important 추가하여 우선순위 확보 */
-    #character_assets_settings .asset-list-container {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
-    }
-
-    #character_assets_settings .keyword-group {
-        border: 1px solid var(--slate-light) !important;
-        border-radius: 5px !important;
-        padding: 10px !important;
-        background-color: var(--black15) !important;
-    }
-
-    #character_assets_settings .keyword-header {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        margin-bottom: 10px !important;
-        padding-bottom: 5px !important;
-        border-bottom: 1px solid var(--slate-dark) !important;
-        cursor: move !important;
-    }
-
-    #character_assets_settings .keyword-name {
-        font-weight: bold !important;
-        font-size: 1.1em !important;
-    }
-
-    #character_assets_settings .file-list {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 5px !important;
-    }
-
-    #character_assets_settings .file-item {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 5px !important;
-        background-color: var(--black20) !important;
-        border-radius: 3px !important;
-    }
-
-    #character_assets_settings .file-name {
-        flex-grow: 1 !important;
-        margin-right: 10px !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-
-    #character_assets_settings .delete-asset-button {
-        color: var(--red-light) !important;
-        cursor: pointer !important;
-        transition: color 0.2s ease !important;
-    }
-
-    #character_assets_settings .delete-asset-button:hover {
-        color: var(--red) !important;
-    }
-
-    #character_assets_settings .no_assets_message {
-        text-align: center !important;
-        padding: 20px !important;
-        color: var(--grey70) !important;
-        background-color: var(--black10) !important;
-        border-radius: 5px !important;
-        margin: 10px 0 !important;
-    }
-
-    #character_assets_settings .menu_button {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 5px 15px !important;
-        margin: 5px !important;
-        border-radius: 5px !important;
-        background-color: var(--black30) !important;
-        cursor: pointer !important;
-        transition: background-color 0.2s ease !important;
-        flex-direction: row !important;
-        white-space: nowrap !important;
-    }
-
-    #character_assets_settings .menu_button:hover {
-        background-color: var(--black45) !important;
-    }
-
-    #character_assets_settings .menu_button i {
-        margin-right: 5px !important;
-    }
-
-    #character_assets_settings .regex_settings_block {
-        margin: 15px 0 !important;
-        padding: 10px !important;
-        border-radius: 5px !important;
-        background-color: var(--black10) !important;
-    }
-
-    #character_assets_settings .asset-controls {
-        padding: 0 10px !important; /* 키워드 그룹과 패딩 맞춤 */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-    }
-
-    #character_assets_settings .marginBottom10 {
-        margin-bottom: 10px !important;
-    }
-
-    #character_assets_settings .danger_button {
-        background-color: var(--red-dark) !important;
-        color: var(--black90) !important;
-    }
-
-    #character_assets_settings .danger_button:hover {
-        background-color: var(--red) !important;
-    }
-
-    #character_assets_settings .extensions_info {
-        margin-bottom: 10px !important;
-        background-color: var(--black15) !important;
-        padding: 10px !important;
-        border-radius: 5px !important;
-        display: block !important;
-        width: 100% !important;
-    }
-
-    #character_assets_settings .extensions_info code {
-        background-color: var(--black30) !important;
-        padding: 2px 4px !important;
-        border-radius: 3px !important;
-        font-family: monospace !important;
-        white-space: nowrap !important;
-        color: var(--white) !important;
-    }
-
-    /* === 이미지 출력 프롬프트 섹션 (41-88라인 관련) === */
-    #character_assets_settings label[for="character_assets_image_prompt"] > b {
-        display: block !important;
-        margin-bottom: 5px !important; /* 제목 아래 간격 */
-    }
-
-    #character_assets_settings .description {
-        font-size: 0.9em !important;
-        color: var(--text-color-secondary) !important; /* 테마 변수 사용 */
-        padding: 10px !important;
-        background-color: var(--black10) !important;
-        border-radius: 5px !important;
-        margin-bottom: 15px !important; /* 아래 요소와 간격 */
-    }
-
-    #character_assets_settings .preset-management-container {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
-        background-color: var(--black15) !important;
-        padding: 10px !important;
-        border-radius: 5px !important;
-        margin-bottom: 15px !important; /* 아래 요소와 간격 */
-    }
-
-    #character_assets_settings .preset-selector-container {
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-    }
-
-    #character_assets_settings .preset-label {
-        font-weight: bold !important;
-        min-width: 60px !important;
-    }
-
-    #character_assets_settings #prompt_preset_selector {
-        flex-grow: 1 !important;
-    }
-
-    #character_assets_settings .preset-actions-container {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 5px !important;
-    }
-
-    #character_assets_settings .preset-io-container {
-        display: flex !important;
-        justify-content: space-between !important;
-        margin-top: 10px !important;
-        gap: 10px !important;
-    }
-
-    #character_assets_settings .preset-io-container .menu_button {
-        flex: 1 !important;
-    }
-
-    #character_assets_settings .sm-textarea-container {
-        margin-bottom: 10px !important; /* 아래 버튼과 간격 */
-    }
-
-    #character_assets_settings .flex-container.flexWrap {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 5px !important;
-    }
-
-    /* ============================================== */
-
-    /* 반응형 디자인을 위한 미디어 쿼리 */
-    @media (max-width: 768px) {
-        /* 이미지 출력 프롬프트 섹션 (41-88라인 관련) 모바일 스타일 */
-        #character_assets_settings label[for="character_assets_image_prompt"] > .description {
-            margin-bottom: 15px !important;
-        }
-
-        #character_assets_settings .preset-management-container {
-            margin-bottom: 15px !important;
-        }
-
-        #character_assets_settings .preset-selector-container {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-        }
-
-        #character_assets_settings #prompt_preset_selector {
-            width: 100% !important;
-        }
-
-        /* 프리셋 액션 버튼 (저장, 새프리셋, 이름변경, 삭제) - 2열 유지 */
-        #character_assets_settings .preset-actions-container {
-            justify-content: space-between !important;
-            flex-wrap: wrap !important;
-        }
-
-        #character_assets_settings .preset-actions-container .menu_button {
-            flex: 1 1 calc(50% - 10px) !important; /* 2열 배치 */
-            justify-content: center !important;
-            margin: 2px !important;
-        }
-
-        /* 프리셋 내보내기/불러오기 버튼 - 가로 정렬 */
-        #character_assets_settings .preset-io-container {
-            /* flex-direction: column !important; 제거 */
-            flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
-            justify-content: space-between !important;
-        }
-
-        #character_assets_settings .preset-io-container .menu_button {
-            flex: 1 1 auto !important; /* 가변 너비, 기본 크기 자동 */
-            /* width: 100% !important; 제거 */
-            margin: 2px !important; /* 좌우 마진 유지 */
-            min-width: calc(50% - 10px) !important; /* 최소 너비 확보 */
-            justify-content: center !important;
-        }
-
-        #character_assets_settings .sm-textarea-container {
-            margin-bottom: 15px !important;
-        }
-
-        /* 프롬프트 하단 버튼 (초기화, 교체, 복사) - 가로 정렬 및 간격/패딩 축소 */
-        #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap {
-            /* flex-direction: column !important; 제거 */
-            flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
-            justify-content: flex-start !important; /* 왼쪽 정렬 */
-        }
-
-        #character_assets_settings label[for="character_assets_image_prompt"] + .flex-container.flexWrap .menu_button {
-            /* width: 100% !important; 제거 */
-            flex: 0 1 auto !important; /* 너비 자동, 필요시 축소 */
-            margin: 2px 1px !important; /* 좌우 마진 추가 축소 */
-            padding-left: 5px !important; /* 모바일에서 좌우 패딩 감소 */
-            padding-right: 5px !important; /* 모바일에서 좌우 패딩 감소 */
-        }
-
-        /* 업로드/갤러리 버튼 - 가로 정렬 확인 및 마진/패딩 조정 */
-        #character_assets_settings .upload-buttons {
-            flex-wrap: wrap !important; /* 공간 부족 시 줄바꿈 */
-            justify-content: flex-start !important;
-        }
-        #character_assets_settings .upload-buttons .menu_button {
-             flex: 0 1 auto !important; /* 너비 자동, 필요시 축소 */
-             margin: 2px !important; /* 좌우 마진 유지 */
-             padding-left: 10px !important; /* 모바일에서 좌우 패딩 감소 */
-             padding-right: 10px !important; /* 모바일에서 좌우 패딩 감소 */
-        }
-
-        /* 나머지 모바일 스타일 */
-        /* (다른 요소들에 대한 모바일 스타일은 여기에 계속 추가될 수 있습니다) */
-    }
-
-    /* 에셋 링크 스타일 */
-    #character_assets_settings .asset-link {
-        color: var(--blue) !important;
-        text-decoration: underline !important;
-        transition: color 0.2s ease !important;
-    }
-
-    #character_assets_settings .asset-link:hover {
-        color: var(--light-blue) !important;
-    }
-
-    /* 키워드 검색 필터 스타일 */
-    #character_assets_settings .keyword-filter-container {
-        width: 100% !important;
-    }
-
-    #character_assets_settings .filter-input-container {
-        position: relative !important;
-        width: 100% !important;
-    }
-
-    #character_assets_settings #keyword_filter {
-        width: 100% !important;
-        padding-right: 30px !important;
-    }
-
-    #character_assets_settings .filter-clear-button {
-        position: absolute !important;
-        right: 10px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        cursor: pointer !important;
-        color: var(--grey80) !important;
-    }
-
-    #character_assets_settings .filter-clear-button:hover {
-        color: var(--grey30) !important;
-    }
-
-    /* 가이드 스타일 */
-    #character_assets_settings .usage-guide {
-        border: 1px solid var(--slate-light) !important;
-        border-radius: 5px !important;
-        overflow: hidden !important;
-    }
-
-    #character_assets_settings .guide-header {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        padding: 10px !important;
-        background-color: var(--black20) !important;
-        cursor: pointer !important;
-        transition: background-color 0.2s ease !important;
-    }
-
-    #character_assets_settings .guide-header:hover {
-        background-color: var(--black30) !important;
-    }
-
-    #character_assets_settings .guide-header span {
-        flex-grow: 1 !important;
-        font-weight: bold !important;
-    }
-
-    #character_assets_settings .guide-content {
-        padding: 15px !important;
-        background-color: var(--black10) !important;
-    }
-
-    #character_assets_settings .guide-section {
-        margin-bottom: 15px !important;
-    }
-
-    #character_assets_settings .guide-section:last-child {
-        margin-bottom: 0 !important;
-    }
-
-    #character_assets_settings .guide-section h5 {
-        margin-top: 0 !important;
-        margin-bottom: 8px !important;
-        font-size: 1em !important;
-        color: var(--blue) !important;
-    }
-
-    #character_assets_settings .guide-section p,
-    #character_assets_settings .guide-section ul {
-        margin: 5px 0 !important;
-    }
-
-    #character_assets_settings .guide-section li {
-        margin-bottom: 5px !important;
-    }
-
-    /* 키워드 드래그 앤 드롭 스타일 */
-    #character_assets_settings .keyword-group.dragging {
-        opacity: 0.5 !important;
-        border: 2px dashed var(--blue) !important;
-    }
-
-    #character_assets_settings .keyword-group.drag-over {
-        border: 2px dashed var(--blue) !important;
-    }
-
-    /* 에셋 갤러리 모달 스타일 */
-    .asset-modal {
-        position: fixed !important;
-        z-index: 1000 !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background-color: rgba(0, 0, 0, 0.7) !important;
-        overflow: auto !important;
-    }
-
-    .asset-modal-content {
-        background-color: var(--black30) !important;
-        border: 1px solid var(--slate-dark) !important;
-        border-radius: 10px !important;
-        width: 80% !important;
-        max-width: 1200px !important;
-        margin: 50px auto !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    .asset-modal-header {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 15px 20px !important;
-        border-bottom: 1px solid var(--slate-dark) !important;
-    }
-
-    .asset-modal-close {
-        color: var(--grey70) !important;
-        font-size: 28px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-    }
-
-    .asset-modal-close:hover {
-        color: var(--grey30) !important;
-    }
-
-    .asset-gallery-filter {
-        display: flex !important;
-        padding: 15px 20px !important;
-        gap: 10px !important;
-    }
-
-    .asset-gallery-filter input {
-        flex-grow: 1 !important;
-    }
-
-    .asset-gallery-container {
-        display: grid !important;
-        padding: 20px !important;
-        max-height: 70vh !important;
-        overflow-y: auto !important;
-    }
-
-    /* 그리드 크기별 스타일 */
-    .asset-gallery-container.grid-small {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
-        gap: 10px !important;
-    }
-
-    .asset-gallery-container.grid-medium {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-        gap: 15px !important;
-    }
-
-    .asset-gallery-container.grid-large {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
-        gap: 20px !important;
-    }
-
-    .asset-gallery-item {
-        display: flex !important;
-        flex-direction: column !important;
-        border: 1px solid var(--slate-light) !important;
-        border-radius: 5px !important;
-        overflow: hidden !important;
-        background-color: var(--black20) !important;
-        transition: transform 0.2s !important;
-    }
-
-    .asset-gallery-item:hover {
-        transform: scale(1.05) !important;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    .asset-gallery-img-container {
-        position: relative !important;
-        padding-top: 100% !important; /* 1:1 비율 유지 */
-    }
-
-    .asset-gallery-img {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        cursor: pointer !important;
-    }
-
-    .asset-gallery-caption {
-        padding: 8px !important;
-        text-align: center !important;
-        font-size: 0.9em !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-
-    .asset-gallery-actions {
-        display: flex !important;
-        justify-content: space-around !important;
-        padding: 5px !important;
-        border-top: 1px solid var(--slate-dark) !important;
-    }
-
-    .asset-gallery-action {
-        color: var(--grey70) !important;
-        cursor: pointer !important;
-        transition: color 0.2s !important;
-    }
-
-    .asset-gallery-action:hover {
-        color: var(--grey30) !important;
-    }
-
-    .asset-preview-modal {
-        position: fixed !important;
-        z-index: 10000 !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background-color: rgba(0, 0, 0, 0.9) !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    .asset-preview-modal-content {
-        position: relative !important;
-        max-width: 90% !important;
-        max-height: 90% !important;
-    }
-
-    .asset-preview-close {
-        position: absolute !important;
-        top: 10px !important; /* 모달 내용 영역 안쪽 상단 */
-        right: 10px !important; /* 모달 내용 영역 안쪽 우측 */
-        color: #fff !important;
-        font-size: 24px !important; /* 크기 살짝 줄임 */
-        font-weight: bold !important;
-        cursor: pointer !important;
-        width: 30px !important;
-        height: 30px !important;
-        text-align: center !important;
-        line-height: 30px !important;
-        background-color: rgba(0, 0, 0, 0.6) !important; /* 배경 약간 진하게 */
-        border-radius: 50% !important;
-        z-index: 10001 !important;
-        transition: background-color 0.2s ease !important; /* 호버 효과 추가 */
-    }
-
-    .asset-preview-close:hover {
-        color: #ddd !important;
-        background-color: rgba(0, 0, 0, 0.9) !important;
-    }
-
-    .asset-preview-image {
-        max-width: 100% !important;
-        max-height: 80vh !important;
-        border: 2px solid var(--slate-light) !important;
-        display: block !important;
-    }
-
-    /* 정규식 스타일 선택 섹션 */
-    #character_assets_settings .regex-style-section {
-        border: 1px solid var(--slate-light) !important;
-        border-radius: 5px !important;
-        overflow: hidden !important;
-    }
-
-    #character_assets_settings .style-selector-header {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        padding: 10px !important;
-        background-color: var(--black20) !important;
-        cursor: pointer !important;
-        transition: background-color 0.2s ease !important;
-    }
-
-    #character_assets_settings .style-selector-header:hover {
-        background-color: var(--black30) !important;
-    }
-
-    #character_assets_settings .style-selector-header span {
-        flex-grow: 1 !important;
-        font-weight: bold !important;
-    }
-
-    #character_assets_settings .style-selector-content {
-        padding: 15px !important;
-        background-color: var(--black10) !important;
-    }
-
-    #character_assets_settings .style-options {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
-        gap: 15px !important;
-    }
-
-    #character_assets_settings .style-option {
-        text-align: center !important;
-        background-color: var(--black20) !important;
-        padding: 10px !important;
-        border-radius: 5px !important;
-        transition: background-color 0.2s !important;
-    }
-
-    #character_assets_settings .style-option:hover {
-        background-color: var(--black30) !important;
-    }
-
-    #character_assets_settings .style-preview {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        height: 80px !important;
-        margin-bottom: 10px !important;
-    }
-
-    #character_assets_settings .preview-image {
-        width: 60px !important;
-        height: 60px !important;
-        background-color: var(--grey70) !important;
-        background-image: linear-gradient(45deg, var(--grey70) 25%, var(--grey80) 25%, var(--grey80) 50%, var(--grey70) 50%, var(--grey70) 75%, var(--grey80) 75%, var(--grey80)) !important;
-        background-size: 20px 20px !important;
-    }
-
-    #character_assets_settings .preview-image.rounded-style {
-        border-radius: 1rem !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    #character_assets_settings .preview-image.border-style {
-        border: 3px solid var(--SmartThemeBorderColor, #ccc) !important;
-        border-radius: 0.5rem !important;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
-        padding: 5px !important;
-        background-color: var(--SmartThemeBlurTintColor, #fff) !important;
-    }
-
-    #character_assets_settings .preview-image.clean-style {
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2)) !important;
-    }
-
-    #character_assets_settings .preview-image.shadow-style {
-        border-radius: 0.75rem !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    #character_assets_settings .preview-image.polaroid-style {
-        background-color: #f8f8f8 !important;
-        padding: 5px 5px 15px 5px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-        transform: rotate(-2deg) !important;
-    }
-
-    #character_assets_settings .style-name {
-        font-weight: bold !important;
-        margin-bottom: 5px !important;
-    }
-
-    #character_assets_settings .style-desc {
-        font-size: 0.9em !important;
-        color: var(--grey70) !important;
-        margin-bottom: 10px !important;
-    }
-
-    #character_assets_settings .download-style-btn {
-        font-size: 0.9em !important;
-        padding: 3px 10px !important;
-    }
-
-    #character_assets_settings .download-all-container {
-        text-align: center !important;
-        padding-top: 10px !important;
-        border-top: 1px solid var(--slate-dark) !important;
-    }
-
-    @media (max-width: 768px) {
-        #character_assets_settings .style-options {
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
-        }
-    }
-</style>
-
-<!-- 드래그 앤 드롭 및 검색 기능을 위한 스크립트 -->
-<script>
-    // 페이지 로드 시 실행될 코드
-    $(document).ready(function() {
-        // 사용법 가이드 토글
-        $('#toggle_usage_guide').on('click', function() {
-            $('#usage_guide_content').slideToggle(200);
-            $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
-        });
-
-        // 스타일 선택기 토글
-        $('#toggle_style_selector').on('click', function() {
-            $('#style_selector_content').slideToggle(200);
-            $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
-        });
-
-        // 키워드 필터 기능
-        $('#keyword_filter').on('input', function() {
-            const filterValue = $(this).val().toLowerCase();
-            $('.keyword-group').each(function() {
-                const keywordName = $(this).find('.keyword-name').text().toLowerCase();
-                if (keywordName.includes(filterValue)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        });
-
-        // 필터 초기화 버튼
-        $('#clear_keyword_filter').on('click', function() {
-            $('#keyword_filter').val('');
-            $('.keyword-group').show();
-        });
-
-        // 키워드 그룹에 드래그 앤 드롭 기능 설정
-        function setupDragAndDrop() {
-            const keywordGroups = document.querySelectorAll('.keyword-group');
-
-            keywordGroups.forEach(group => {
-                group.setAttribute('draggable', true);
-
-                group.addEventListener('dragstart', function(e) {
-                    e.dataTransfer.setData('text/plain', this.dataset.keyword);
-                    this.classList.add('dragging');
-                });
-
-                group.addEventListener('dragend', function() {
-                    this.classList.remove('dragging');
-                });
-
-                group.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    this.classList.add('drag-over');
-                });
-
-                group.addEventListener('dragleave', function() {
-                    this.classList.remove('drag-over');
-                });
-
-                group.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    this.classList.remove('drag-over');
-
-                    const draggedKeyword = e.dataTransfer.getData('text/plain');
-                    const draggedElement = document.querySelector(`.keyword-group[data-keyword="${draggedKeyword}"]`);
-                    const dropTarget = this;
-
-                    if (draggedElement && dropTarget !== draggedElement) {
-                        const container = document.getElementById('character_assets_list');
-                        const afterElement = getAfterElement(container, e.clientY);
-
-                        if (afterElement) {
-                            container.insertBefore(draggedElement, afterElement);
-                        } else {
-                            container.appendChild(draggedElement);
-                        }
-
-                        // 여기에 키워드 순서 저장 로직 추가 (확장 개발자가 구현)
-                        saveKeywordOrder();
-                    }
-                });
-            });
-
-            function getAfterElement(container, y) {
-                const draggableElements = [...container.querySelectorAll('.keyword-group:not(.dragging)')];
-
-                return draggableElements.reduce((closest, child) => {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2;
-
-                    if (offset < 0 && offset > closest.offset) {
-                        return { offset: offset, element: child };
-                    } else {
-                        return closest;
-                    }
-                }, { offset: Number.NEGATIVE_INFINITY }).element;
-            }
-
-            function saveKeywordOrder() {
-                // 순서 저장 로직 (확장 개발자가 구현)
-                console.log('키워드 순서가 변경되었습니다');
-
-                // 이벤트 발생
-                const event = new CustomEvent('character-assets-order-changed');
-                document.dispatchEvent(event);
-            }
-        }
-
-        // 키워드 목록이 로드된 후 드래그 앤 드롭 설정
-        $(document).on('character-assets-loaded', function() {
-            setupDragAndDrop();
-        });
-
-        // 스타일 다운로드 버튼 이벤트
-        $('.download-style-btn').on('click', function() {
-            const styleId = $(this).data('style');
-            // 이벤트 발생
-            const event = new CustomEvent('download-regex-style', { detail: { styleId } });
-            document.dispatchEvent(event);
-        });
-
-        // 모든 스타일 다운로드 버튼 이벤트
-        $('#download_all_styles_btn').on('click', function() {
-            // 이벤트 발생
-            const event = new CustomEvent('download-all-regex-styles');
-            document.dispatchEvent(event);
-        });
-    });
-</script>

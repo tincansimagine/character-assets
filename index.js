@@ -869,10 +869,53 @@ async function fetchCharacterAssets(characterName) {
     }
 }
 
+async function postSpriteForm(url, formData) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: getRequestHeaders({ omitContentType: true }),
+        body: formData,
+        cache: 'no-cache',
+    });
+
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Request failed with status ${response.status}`);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    return contentType.includes('application/json') ? response.json() : {};
+}
+
+async function postSpriteJson(url, payload) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: getRequestHeaders(),
+        body: JSON.stringify(payload),
+        cache: 'no-cache',
+    });
+
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Request failed with status ${response.status}`);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    return contentType.includes('application/json') ? response.json() : {};
+}
+
+function collapseCharacterAssetsDrawer() {
+    const drawer = $('#character_assets_settings > .inline-drawer');
+    const content = drawer.children('.inline-drawer-content');
+    const icon = drawer.find('> .inline-drawer-header .inline-drawer-icon');
+
+    content.hide();
+    icon.removeClass('up fa-circle-chevron-up').addClass('down fa-circle-chevron-down');
+}
+
 /**
- * 에셋 파일명에서 키워드 추출
- * @param {string} fileName 파일명
- * @returns {string} 키워드
+ * Extracts an asset keyword from a file name.
+ * @param {string} fileName File name
+ * @returns {string} Keyword
  */
 function extractKeywordFromFileName(fileName) {
     // 확장자 제거
@@ -1366,16 +1409,10 @@ async function handleDeleteAsset(keyword, fileName) {
     const spriteName = fileName.split('.').slice(0, -1).join('.');
 
     try {
-        const response = await jQuery.ajax({
-            type: 'POST',
-            url: '/api/sprites/delete',
-            data: JSON.stringify({
-                name: effectiveName,
-                label: keyword,
-                spriteName: spriteName
-            }),
-            contentType: 'application/json',
-            cache: false
+        await postSpriteJson('/api/sprites/delete', {
+            name: effectiveName,
+            label: keyword,
+            spriteName: spriteName
         });
 
         showToast('success', `'${fileName}' 파일이 삭제되었습니다.`);
@@ -1718,15 +1755,7 @@ async function handleZipUpload(file) {
     const uploadToast = showToast('info', '업로드 중...', '처리 중입니다', { timeOut: 0, extendedTimeOut: 0 });
 
     try {
-        // jQuery.ajax 사용 및 headers 제거
-        const result = await jQuery.ajax({
-            type: 'POST',
-            url: '/api/sprites/upload-zip',
-            data: formData,
-            processData: false,
-            contentType: false,
-            cache: false
-        });
+        const result = await postSpriteForm('/api/sprites/upload-zip', formData);
 
         if (uploadToast) uploadToast.clear();
         showToast('success', `${result.count}개의 이미지가 업로드되었습니다.`, '업로드 성공');
@@ -1791,15 +1820,7 @@ async function handleImageUpload(file, label) {
     formData.append('spriteName', label);
 
     try {
-        // jQuery.ajax 사용 및 headers 제거
-        await jQuery.ajax({
-            type: 'POST',
-            url: '/api/sprites/upload',
-            data: formData,
-            processData: false,
-            contentType: false,
-            cache: false
-        });
+        await postSpriteForm('/api/sprites/upload', formData);
 
         // 기존 이미지 키워드 목록 가져오기
         const characterAssets = getCharacterAssets(String(this_chid));
@@ -2005,11 +2026,11 @@ function setupEventHandlers() {
                     const formData = new FormData();
                     formData.append('name', `${baseName}/${trimmed}`);
                     formData.append('label', asset.label);
-                    formData.append('file', file);
-                    await jQuery.ajax({ type: 'POST', url: '/api/sprites/upload', data: formData, processData: false, contentType: false, cache: false });
+                    formData.append('avatar', file);
+                    await postSpriteForm('/api/sprites/upload', formData);
 
                     const spriteName = fullName.split('.').slice(0, -1).join('.');
-                    await jQuery.ajax({ type: 'POST', url: '/api/sprites/delete', data: JSON.stringify({ name: `${baseName}/${current}`, label: asset.label, spriteName }), contentType: 'application/json', cache: false });
+                    await postSpriteJson('/api/sprites/delete', { name: `${baseName}/${current}`, label: asset.label, spriteName });
                 } catch (e) {
                     console.error(`[${MODULE_NAME}] Preset rename file move error:`, e);
                 }
@@ -2049,7 +2070,7 @@ function setupEventHandlers() {
             try {
                 const fullName = asset.path.split('/').pop().split('?')[0];
                 const spriteName = fullName.split('.').slice(0, -1).join('.');
-                await jQuery.ajax({ type: 'POST', url: '/api/sprites/delete', data: JSON.stringify({ name: `${baseName}/${current}`, label: asset.label, spriteName }), contentType: 'application/json', cache: false });
+                await postSpriteJson('/api/sprites/delete', { name: `${baseName}/${current}`, label: asset.label, spriteName });
             } catch (e) {
                 console.error(`[${MODULE_NAME}] Preset delete file error:`, e);
             }
@@ -2086,7 +2107,7 @@ function setupEventHandlers() {
                 formData.append('label', label);
                 formData.append('avatar', f);
                 formData.append('spriteName', label);
-                return jQuery.ajax({ type: 'POST', url: '/api/sprites/upload', data: formData, processData: false, contentType: false, cache: false });
+                return postSpriteForm('/api/sprites/upload', formData);
             });
             await Promise.all(promises);
             if (uploadToast) uploadToast.clear();
@@ -2109,7 +2130,7 @@ function setupEventHandlers() {
         formData.append('name', `_persona_${persona}`);
         formData.append('avatar', file);
         try {
-            const result = await jQuery.ajax({ type: 'POST', url: '/api/sprites/upload-zip', data: formData, processData: false, contentType: false, cache: false });
+            const result = await postSpriteForm('/api/sprites/upload-zip', formData);
             showToast('success', `페르소나 에셋 ${result.count}개 업로드 완료`);
             await refreshPersonaStatus();
             await refreshRendererAssetCache();
@@ -2544,16 +2565,10 @@ function setupEventHandlers() {
                     const fileName = fullFileNameWithQuery.split('?')[0];
                     const spriteName = fileName.split('.').slice(0, -1).join('.');
 
-                    deletePromises.push(jQuery.ajax({
-                        type: 'POST',
-                        url: '/api/sprites/delete',
-                        data: JSON.stringify({
-                            name: effectiveName,
-                            label: keyword,
-                            spriteName: spriteName
-                        }),
-                        contentType: 'application/json',
-                        cache: false
+                    deletePromises.push(postSpriteJson('/api/sprites/delete', {
+                        name: effectiveName,
+                        label: keyword,
+                        spriteName: spriteName
                     }));
                 });
             });
@@ -2702,6 +2717,7 @@ async function initializeExtension() {
     // HTML 로드 및 삽입
     const html = await $.get(`/scripts/extensions/third-party/${MODULE_NAME}/templates/settings.html`);
     $('#extensions_settings').append(html);
+    collapseCharacterAssetsDrawer();
 
     // 설정 패널에 이벤트 핸들러 연결
     setupEventHandlers();
@@ -3176,13 +3192,7 @@ async function openSmartRenamePopup() {
             const oldSpriteName = originalFileName.split('.').slice(0, -1).join('.');
             const newLabel = baseName;
 
-            await jQuery.ajax({
-                type: 'POST',
-                url: '/api/sprites/delete',
-                data: JSON.stringify({ name: characterName, label: asset.label, spriteName: oldSpriteName }),
-                contentType: 'application/json',
-                cache: false
-            });
+            await postSpriteJson('/api/sprites/delete', { name: characterName, label: asset.label, spriteName: oldSpriteName });
 
             const imgResponse = await fetch(asset.path);
             const blob = await imgResponse.blob();
@@ -3193,14 +3203,7 @@ async function openSmartRenamePopup() {
             formData.append('avatar', newFile);
             formData.append('spriteName', baseName);
 
-            await jQuery.ajax({
-                type: 'POST',
-                url: '/api/sprites/upload',
-                data: formData,
-                processData: false,
-                contentType: false,
-                cache: false
-            });
+            await postSpriteForm('/api/sprites/upload', formData);
 
             renamed++;
         } catch (err) {

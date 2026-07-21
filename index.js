@@ -3618,8 +3618,9 @@ function showPreviewImage(imgSrc, galleryAssets) {
         if (hasNav && e.key === 'ArrowRight') navigateTo(currentIndex + 1);
     });
 
+    // z-index는 style.css(32000)가 갤러리 모달(31000)보다 위에 오도록 관리한다.
+    // 인라인으로 낮은 값을 덮어쓰면 미리보기가 갤러리 뒤에 깔려 닫을 수 없게 된다.
     $('body').append(previewModal);
-    previewModal.css('z-index', '10000');
 
     if (hasNav) {
         previewModal.find('.asset-preview-prev').toggle(currentIndex > 0);

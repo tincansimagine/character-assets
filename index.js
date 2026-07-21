@@ -493,6 +493,14 @@ function initializeSettings() {
     if (typeof extension_settings[MODULE_NAME].renderer.randomAsset === 'undefined') {
         extension_settings[MODULE_NAME].renderer.randomAsset = false;
     }
+
+    if (typeof extension_settings[MODULE_NAME].convertToWebp === 'undefined') {
+        extension_settings[MODULE_NAME].convertToWebp = false;
+    }
+
+    if (typeof extension_settings[MODULE_NAME].confirmOverwrite === 'undefined') {
+        extension_settings[MODULE_NAME].confirmOverwrite = true;
+    }
 }
 
 /**
@@ -870,20 +878,42 @@ async function fetchCharacterAssets(characterName) {
 }
 
 async function postSpriteForm(url, formData) {
+    // getRequestHeaders({ omitContentType }) 미지원 ST 버전 호환:
+    // FormData 전송 시 Content-Type을 직접 제거해야 브라우저가 multipart boundary를 붙인다.
+    const headers = getRequestHeaders();
+    delete headers['Content-Type'];
+
     const response = await fetch(url, {
         method: 'POST',
-        headers: getRequestHeaders({ omitContentType: true }),
+        headers: headers,
         body: formData,
         cache: 'no-cache',
     });
 
     if (!response.ok) {
         const message = await response.text();
-        throw new Error(message || `Request failed with status ${response.status}`);
+        throw new Error(message || `HTTP ${response.status} 오류가 발생했습니다.`);
     }
 
     const contentType = response.headers.get('content-type') || '';
     return contentType.includes('application/json') ? response.json() : {};
+}
+
+/**
+ * fetch 기반 에러를 사용자 친화적 문구로 변환
+ */
+function describeError(error) {
+    const message = error?.message || error?.responseText || '알 수 없는 오류';
+    if (/CSRF/i.test(message)) {
+        return 'CSRF 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도해주세요.';
+    }
+    if (/HTTP 400/.test(message) || /Bad Request/i.test(message)) {
+        return '요청 형식 오류입니다. 파일명과 캐릭터 선택 상태를 확인해주세요.';
+    }
+    if (/HTTP 413|payload too large/i.test(message)) {
+        return '파일이 너무 큽니다.';
+    }
+    return message;
 }
 
 async function postSpriteJson(url, payload) {
@@ -1210,6 +1240,8 @@ async function loadCharacterAssets() {
             const fileItem = $(`
                 <div class="file-item${isDisabled ? ' file-disabled' : ''}">
                     <span class="file-name" title="${escapeHtml(file.fileName)}">${escapeHtml(file.fileName)}</span>
+                    <i class="fa-solid fa-tag copy-tag-button" data-filename="${escapeHtml(file.fileName)}" title="{{img::태그}} 복사"></i>
+                    <i class="fa-solid fa-pen rename-asset-button" data-keyword="${escapeHtml(keyword)}" data-filename="${escapeHtml(file.fileName)}" data-path="${escapeHtml(file.path)}" title="이름 변경"></i>
                     <i class="fa-solid ${isDisabled ? 'fa-eye-slash' : 'fa-eye'} toggle-asset-button" data-filename="${escapeHtml(file.fileName)}" title="${isDisabled ? '활성화' : '비활성화'}"></i>
                     <i class="fa-solid fa-trash delete-asset-button" data-keyword="${escapeHtml(keyword)}" data-filename="${escapeHtml(file.fileName)}" title="삭제"></i>
                 </div>
@@ -1217,6 +1249,34 @@ async function loadCharacterAssets() {
             fileListContainer.append(fileItem);
         });
         assetsListContainer.append(keywordGroup);
+    });
+
+    // {{img::태그}} 복사 이벤트 핸들러
+    assetsListContainer.off('click', '.copy-tag-button').on('click', '.copy-tag-button', async function() {
+        const fileName = $(this).data('filename');
+        const tag = `{{img::${fileName}}}`;
+        try {
+            await navigator.clipboard.writeText(tag);
+            showToast('success', `${tag} 복사됨`);
+        } catch (e) {
+            // 클립보드 API 실패 시 폴백 (http 환경 등)
+            const $temp = $('<textarea>').val(tag).appendTo('body').select();
+            document.execCommand('copy');
+            $temp.remove();
+            showToast('success', `${tag} 복사됨`);
+        }
+    });
+
+    // 개별 이름 변경 이벤트 핸들러
+    assetsListContainer.off('click', '.rename-asset-button').on('click', '.rename-asset-button', async function() {
+        if (isAssetLinkActive(characterId)) {
+            showToast('info', '에셋 링크 사용 중에는 변경할 수 없습니다.');
+            return;
+        }
+        const keyword = $(this).data('keyword');
+        const fileName = $(this).data('filename');
+        const assetPath = $(this).data('path');
+        await renameSingleAsset(characterId, keyword, fileName, assetPath);
     });
 
     // 에셋 온오프 토글 이벤트 핸들러
@@ -1421,8 +1481,66 @@ async function handleDeleteAsset(keyword, fileName) {
 
     } catch (error) {
         console.error(`[${MODULE_NAME}] Error deleting asset:`, error);
-        const errorText = error.responseText || '알 수 없는 오류';
-        showToast('error', `파일 삭제 중 오류 발생: ${errorText}`, '삭제 실패');
+        showToast('error', `파일 삭제 중 오류 발생: ${describeError(error)}`, '삭제 실패');
+    }
+}
+
+/**
+ * 개별 에셋 파일명 변경
+ * @param {string} characterId 캐릭터 폴더명
+ * @param {string} keyword 기존 키워드(label)
+ * @param {string} fileName 기존 파일명 (확장자 포함)
+ * @param {string} assetPath 기존 에셋 URL
+ */
+async function renameSingleAsset(characterId, keyword, fileName, assetPath) {
+    const dotIndex = fileName.lastIndexOf('.');
+    const ext = dotIndex > 0 ? fileName.substring(dotIndex) : '';
+    const currentBase = dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
+
+    const input = await callPopup(`'${fileName}'의 새 이름을 입력하세요. (확장자 제외)`, 'input', currentBase);
+    if (!input || !input.trim() || input.trim() === currentBase) return;
+
+    const newBase = input.trim().replace(/[/\\:*?"<>|]/g, '_');
+    const newFileName = newBase + ext;
+    const effectiveName = getEffectiveCharacterName(characterId);
+
+    // 중복 파일명 확인
+    const existing = await fetchCharacterAssets(characterId);
+    const collision = existing.some(a => {
+        const fn = a.path.split('/').pop().split('?')[0];
+        return fn.toLowerCase() === newFileName.toLowerCase();
+    });
+    if (collision) {
+        const overwrite = await callPopup(`'${newFileName}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?`, 'confirm', undefined, { okButton: '덮어쓰기' });
+        if (overwrite !== true) return;
+    }
+
+    try {
+        const imgResponse = await fetch(assetPath);
+        if (!imgResponse.ok) throw new Error('원본 파일을 읽을 수 없습니다.');
+        const blob = await imgResponse.blob();
+        const newFile = new File([blob], newFileName, { type: blob.type });
+
+        const formData = new FormData();
+        formData.append('name', effectiveName);
+        formData.append('label', newBase);
+        formData.append('avatar', newFile);
+        formData.append('spriteName', newBase);
+        await postSpriteForm('/api/sprites/upload', formData);
+
+        await postSpriteJson('/api/sprites/delete', {
+            name: effectiveName,
+            label: keyword,
+            spriteName: currentBase,
+        });
+
+        showToast('success', `'${fileName}' → '${newFileName}'(으)로 변경되었습니다.`);
+        await loadCharacterAssets();
+        await refreshImageKeywordsAuto();
+        await refreshRendererAssetCache();
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Rename asset error:`, error);
+        showToast('error', `이름 변경 실패: ${describeError(error)}`);
     }
 }
 
@@ -1464,6 +1582,8 @@ function updateInterface() {
     $('#character_assets_builtin_renderer_enabled').prop('checked', Boolean(rendererSettings.enabled));
     $('#character_assets_renderer_lazy').prop('checked', Boolean(rendererSettings.lazy));
     $('#character_assets_random_asset').prop('checked', Boolean(rendererSettings.randomAsset));
+    $('#character_assets_webp_convert').prop('checked', Boolean(extension_settings[MODULE_NAME].convertToWebp));
+    $('#character_assets_confirm_overwrite').prop('checked', extension_settings[MODULE_NAME].confirmOverwrite !== false);
 }
 
 // 페이지에 toastr 라이브러리가 로드되었는지 확인하는 헬퍼 함수
@@ -1793,9 +1913,60 @@ async function handleZipUpload(file) {
     } catch (error) {
         if (uploadToast) uploadToast.clear();
         console.error(`[${MODULE_NAME}] Error uploading ZIP:`, error);
-        const errorText = error.responseText || '알 수 없는 오류';
-        showToast('error', `업로드 중 오류가 발생했습니다. ${errorText}`, '업로드 실패');
+        showToast('error', `업로드 중 오류가 발생했습니다. ${describeError(error)}`, '업로드 실패');
     }
+}
+
+/**
+ * 설정이 켜져 있으면 PNG/JPEG 이미지를 WebP로 변환 (GIF/WebP는 그대로 유지)
+ * 변환 결과가 원본보다 크면 원본을 사용한다.
+ * @param {File} file 원본 파일
+ * @returns {Promise<File>} 변환된 파일 또는 원본
+ */
+async function maybeConvertToWebp(file) {
+    if (!extension_settings[MODULE_NAME].convertToWebp) return file;
+    if (!['image/png', 'image/jpeg'].includes(file.type)) return file;
+
+    try {
+        const bitmap = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext('2d').drawImage(bitmap, 0, 0);
+        bitmap.close();
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.9));
+        if (!blob || blob.size >= file.size) return file;
+
+        const newName = file.name.replace(/\.[^/.]+$/, '') + '.webp';
+        return new File([blob], newName, { type: 'image/webp' });
+    } catch (e) {
+        console.debug(`[${MODULE_NAME}] WebP 변환 실패, 원본 사용:`, e);
+        return file;
+    }
+}
+
+/**
+ * 업로드 예정 파일 중 이미 존재하는 파일명을 찾아 덮어쓰기 확인
+ * @param {string} characterId 캐릭터 폴더명
+ * @param {string[]} fileNames 업로드할 파일명 목록
+ * @returns {Promise<boolean>} 진행 여부
+ */
+async function confirmOverwriteIfNeeded(characterId, fileNames) {
+    if (!extension_settings[MODULE_NAME].confirmOverwrite) return true;
+
+    const existing = await fetchCharacterAssets(characterId);
+    const existingNames = new Set(existing.map(a => a.path.split('/').pop().split('?')[0].toLowerCase()));
+    const duplicates = fileNames.filter(fn => existingNames.has(fn.toLowerCase()));
+
+    if (duplicates.length === 0) return true;
+
+    const listPreview = duplicates.slice(0, 5).join(', ') + (duplicates.length > 5 ? ` 외 ${duplicates.length - 5}개` : '');
+    const confirmed = await callPopup(
+        `이미 존재하는 파일 ${duplicates.length}개를 덮어씁니다:\n${listPreview}\n\n계속하시겠습니까?`,
+        'confirm', undefined, { okButton: '덮어쓰기' },
+    );
+    return confirmed === true;
 }
 
 /**
@@ -1811,12 +1982,14 @@ async function handleImageUpload(file, label) {
         return false;
     }
 
+    const uploadFile = await maybeConvertToWebp(file);
+
     const characterId = character.avatar.replace(/\.[^/.]+$/, '');
     const effectiveName = getEffectiveCharacterName(characterId);
     const formData = new FormData();
     formData.append('name', effectiveName);
     formData.append('label', label);
-    formData.append('avatar', file);
+    formData.append('avatar', uploadFile);
     formData.append('spriteName', label);
 
     try {
@@ -1837,8 +2010,8 @@ async function handleImageUpload(file, label) {
 
     } catch (error) {
         console.error(`[${MODULE_NAME}] Image upload failed:`, error);
-        // 오류 토스트는 setupEventHandlers에서 처리
-        return false;
+        // 호출부 Promise.all에서 원인을 표시할 수 있도록 다시 던짐
+        throw error;
     }
 }
 
@@ -2168,6 +2341,17 @@ function setupEventHandlers() {
         scheduleRendererPass();
     });
 
+    // 업로드 옵션 토글
+    $('#character_assets_webp_convert').off('change').on('change', function() {
+        extension_settings[MODULE_NAME].convertToWebp = $(this).prop('checked');
+        saveSettingsDebounced();
+    });
+
+    $('#character_assets_confirm_overwrite').off('change').on('change', function() {
+        extension_settings[MODULE_NAME].confirmOverwrite = $(this).prop('checked');
+        saveSettingsDebounced();
+    });
+
     // 정규식 설정 변경
     $('#character_assets_regex_find').on('change', function() {
         const assets = getCharacterAssets(String(this_chid));
@@ -2393,7 +2577,7 @@ function setupEventHandlers() {
             return;
         }
 
-        const uploadPromises = [];
+        const validFiles = [];
         let invalidFiles = [];
 
         for (const file of files) {
@@ -2412,12 +2596,27 @@ function setupEventHandlers() {
                 continue;
             }
 
-            uploadPromises.push(handleImageUpload(file, label));
+            validFiles.push({ file, label });
         }
 
         if (invalidFiles.length > 0) {
             showToast('error', `지원되지 않는 파일 형식: ${invalidFiles.join(', ')}`, '잘못된 파일 형식');
         }
+
+        // 중복 파일명 덮어쓰기 확인
+        if (validFiles.length > 0) {
+            const character = getCurrentCharacter();
+            if (character) {
+                const characterId = character.avatar.replace(/\.[^/.]+$/, '');
+                const proceed = await confirmOverwriteIfNeeded(characterId, validFiles.map(v => v.file.name));
+                if (!proceed) {
+                    $(this).val('');
+                    return;
+                }
+            }
+        }
+
+        const uploadPromises = validFiles.map(v => handleImageUpload(v.file, v.label));
 
         if (uploadPromises.length > 0) {
             const uploadToast = showToast('info', `${uploadPromises.length}개의 이미지 업로드 중...`, '처리 중', { timeOut: 0, extendedTimeOut: 0 });
@@ -2430,7 +2629,7 @@ function setupEventHandlers() {
                 await refreshImageKeywordsAuto(); // 키워드 자동 갱신
             } catch (error) {
                 if (uploadToast) uploadToast.clear();
-                showToast('error', '일부 파일 업로드 중 오류가 발생했습니다.', '업로드 실패');
+                showToast('error', `일부 파일 업로드 중 오류가 발생했습니다: ${describeError(error)}`, '업로드 실패');
                 console.error('[CHARACTER-ASSETS] Upload error:', error);
                 await loadCharacterAssets();
                 await refreshImageKeywordsAuto(); // 키워드 자동 갱신
@@ -2502,6 +2701,11 @@ function setupEventHandlers() {
                 showToast('warning', '지원되는 이미지 파일이 없습니다.');
                 return;
             }
+
+            // 중복 파일명 덮어쓰기 확인
+            const dropCharacterId = character.avatar.replace(/\.[^/.]+$/, '');
+            const proceed = await confirmOverwriteIfNeeded(dropCharacterId, imageFiles.map(f => f.name));
+            if (!proceed) return;
 
             const uploadToast = showToast('info', `${imageFiles.length}개 파일 업로드 중...`, '드래그 앤 드롭', { timeOut: 0, extendedTimeOut: 0 });
             try {
@@ -2581,8 +2785,7 @@ function setupEventHandlers() {
                 $('#select_all_keywords').prop('checked', false); // 전체 선택 해제
             } catch (error) {
                 console.error(`[${MODULE_NAME}] Error deleting selected assets:`, error);
-                const errorText = error.responseText || '알 수 없는 오류';
-                showToast('error', `선택된 키워드 삭제 중 오류 발생: ${errorText}`, '삭제 실패');
+                showToast('error', `선택된 키워드 삭제 중 오류 발생: ${describeError(error)}`, '삭제 실패');
             }
         }
     });
@@ -2637,6 +2840,23 @@ function setupEventHandlers() {
         }, () => {
             showToast('error', '프롬프트 복사에 실패했습니다.');
         });
+    });
+
+    // 확장 설정 백업/복원
+    $('#export_settings_btn').off('click').on('click', function() {
+        exportExtensionSettings();
+    });
+
+    $('#import_settings_btn').off('click').on('click', function() {
+        $('#import_settings_input').trigger('click');
+    });
+
+    $('#import_settings_input').off('change').on('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            await importExtensionSettings(file);
+        }
+        $(this).val('');
     });
 
     // 갤러리 닫기 버튼 클릭
@@ -2844,6 +3064,64 @@ function uploadAssetCommand(args, url) {
         });
 
     return `키워드 "${label}"로 이미지 업로드를 시작합니다...`;
+}
+
+/**
+ * 확장 전체 설정 백업 (JSON 다운로드)
+ */
+function exportExtensionSettings() {
+    try {
+        const payload = {
+            type: 'character-assets-settings',
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            settings: extension_settings[MODULE_NAME],
+        };
+        const json = JSON.stringify(payload, null, 2);
+        const filename = `character-assets-settings_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+        download(json, filename, 'application/json');
+        showToast('success', '확장 설정이 백업되었습니다.');
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Error exporting settings:`, error);
+        showToast('error', '설정 백업 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 확장 전체 설정 복원 (JSON 업로드)
+ * @param {File} file 백업 JSON 파일
+ */
+async function importExtensionSettings(file) {
+    try {
+        const text = await getFileText(file);
+        const payload = JSON.parse(text);
+
+        if (payload?.type !== 'character-assets-settings' || !payload.settings) {
+            showToast('error', '올바른 설정 백업 파일이 아닙니다.');
+            return;
+        }
+
+        const confirmed = await callPopup(
+            '설정을 복원하면 현재 확장 설정(프리셋, 캐릭터별 설정, 렌더러 옵션)이 백업 내용으로 교체됩니다.\n계속하시겠습니까?',
+            'confirm', undefined, { okButton: '복원' },
+        );
+        if (confirmed !== true) return;
+
+        extension_settings[MODULE_NAME] = payload.settings;
+        initializeSettings();
+        saveSettingsDebounced();
+
+        updateInterface();
+        updatePresetUI();
+        await loadCharacterAssets();
+        await refreshImageKeywordsAuto();
+        await refreshRendererAssetCache();
+
+        showToast('success', '확장 설정이 복원되었습니다.');
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Error importing settings:`, error);
+        showToast('error', `설정 복원 실패: ${describeError(error)}`);
+    }
 }
 
 /**

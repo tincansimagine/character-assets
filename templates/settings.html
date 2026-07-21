@@ -1,7 +1,7 @@
 <div id="character_assets_settings" class="character-assets">
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
-            <b><i class="fa-solid fa-images"></i> 캐릭터 에셋 확장</b>
+            <b><i class="fa-solid fa-images"></i> 캐릭터 에셋 확장 <span class="character-assets__version">v1.2.3</span></b>
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
@@ -175,6 +175,17 @@
                         </div>
                     </div>
 
+                    <div class="character-assets__upload-options">
+                        <label class="checkbox_label" for="character_assets_webp_convert" title="PNG/JPEG를 WebP로 자동 변환해 저장 용량을 줄입니다. (GIF 제외)">
+                            <input type="checkbox" id="character_assets_webp_convert">
+                            <span>WebP 자동 변환</span>
+                        </label>
+                        <label class="checkbox_label" for="character_assets_confirm_overwrite" title="이미 존재하는 파일명 업로드 시 덮어쓰기 여부를 확인합니다.">
+                            <input type="checkbox" id="character_assets_confirm_overwrite">
+                            <span>덮어쓰기 확인</span>
+                        </label>
+                    </div>
+
                     <div class="character-assets__toolbar">
                         <div class="character-assets__search">
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -265,7 +276,7 @@
                     <div class="character-assets__section-head">
                         <div>
                             <h4>백업 &amp; 내보내기</h4>
-                            <p>현재 캐릭터의 에셋을 ZIP으로 다운로드합니다.</p>
+                            <p>에셋 ZIP, 확장 설정을 백업하고 복원합니다.</p>
                         </div>
                     </div>
                     <div class="character-assets__button-grid">
@@ -276,6 +287,15 @@
                         <div class="menu_button" id="copy_prompt_oneclick_btn" title="현재 이미지 출력 프롬프트를 클립보드에 복사합니다.">
                             <i class="fa-solid fa-clipboard"></i>
                             <span>프롬프트 복사</span>
+                        </div>
+                        <input type="file" id="import_settings_input" accept=".json" style="display: none;">
+                        <div class="menu_button" id="export_settings_btn" title="확장 전체 설정(프리셋, 캐릭터별 설정, 렌더러 옵션)을 JSON으로 내보냅니다.">
+                            <i class="fa-solid fa-file-export"></i>
+                            <span>설정 백업</span>
+                        </div>
+                        <div class="menu_button" id="import_settings_btn" title="백업한 JSON에서 확장 설정을 복원합니다.">
+                            <i class="fa-solid fa-file-import"></i>
+                            <span>설정 복원</span>
                         </div>
                     </div>
                 </div>

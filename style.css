@@ -17,6 +17,42 @@
     gap: 8px;
 }
 
+/* ===== Version badge ===== */
+.character-assets__version {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: var(--ca-card, rgba(255, 255, 255, 0.08));
+    border: 1px solid var(--ca-border, #444);
+    font-size: 0.7em;
+    font-weight: 400;
+    color: var(--ca-muted, #999);
+    vertical-align: middle;
+}
+
+/* ===== Upload option toggles ===== */
+.character-assets__upload-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    background: var(--ca-card);
+    border: 1px solid var(--ca-border);
+}
+
+.character-assets__upload-options .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    font-size: 0.84em;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
 /* ===== Status bar ===== */
 .character-assets__status {
     display: flex;
@@ -90,14 +126,14 @@
 }
 
 .character-assets__tab:hover {
-    background: var(--ca-accent);
-    color: var(--SmartThemeBlurTintColor, #fff);
+    background: color-mix(in srgb, var(--ca-accent) 30%, var(--ca-card));
 }
 
 .character-assets__tab.is-active {
     background: var(--ca-accent);
     color: var(--SmartThemeBlurTintColor, #fff);
     font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* ===== Panels ===== */
@@ -369,22 +405,30 @@
 }
 
 .toggle-asset-button,
-.delete-asset-button {
+.delete-asset-button,
+.copy-tag-button,
+.rename-asset-button {
     flex-shrink: 0;
     cursor: pointer;
     font-size: 0.85em;
-    opacity: 0.6;
-    transition: opacity 0.15s, color 0.15s;
+    opacity: 0.55;
+    padding: 3px;
+    border-radius: 4px;
+    transition: opacity 0.15s, color 0.15s, background 0.15s;
 }
 
-.toggle-asset-button:hover {
+.toggle-asset-button:hover,
+.copy-tag-button:hover,
+.rename-asset-button:hover {
     opacity: 1;
     color: var(--ca-accent);
+    background: rgba(255, 255, 255, 0.07);
 }
 
 .delete-asset-button:hover {
     opacity: 1;
     color: var(--ca-danger);
+    background: rgba(255, 255, 255, 0.07);
 }
 
 /* 비활성화된 에셋 */

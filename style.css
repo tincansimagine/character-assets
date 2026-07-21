@@ -744,15 +744,32 @@
     color: var(--ca-muted);
 }
 
-/* ===== Full-size preview overlay ===== */
+/* ===== Full-size preview overlay =====
+   <dialog>.showModal()로 top-layer에 띄운다.
+   dialog UA 기본 스타일(흰 배경, 자동 마진, fit-content)을 전부 재정의 */
 .asset-preview-modal {
     position: fixed;
     z-index: 32000;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.92);
+    background: rgba(0, 0, 0, 0.92);
+    color: #fff;
+    overflow: hidden;
+}
+
+.asset-preview-modal::backdrop {
+    background: transparent;
 }
 
 .asset-preview-modal-content { position: relative; max-width: 92vw; max-height: 92vh; }
@@ -760,14 +777,16 @@
 .asset-preview-close {
     position: absolute;
     top: 8px; right: 8px;
-    width: 28px; height: 28px;
+    width: 34px; height: 34px;
     border-radius: 50%;
     color: #fff;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.35);
     cursor: pointer;
-    font-size: 20px;
-    line-height: 28px;
+    font-size: 22px;
+    line-height: 32px;
     text-align: center;
+    z-index: 3;
 }
 
 .asset-preview-image {

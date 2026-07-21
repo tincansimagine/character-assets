@@ -3574,8 +3574,10 @@ function showPreviewImage(imgSrc, galleryAssets) {
 
     const hasNav = assetList.length > 1 && currentIndex >= 0;
 
+    // <dialog> + showModal(): top-layer에 뜨므로 ST가 html에 걸어둔
+    // -webkit-transform 때문에 position:fixed가 문서 상단으로 밀리는 문제(모바일)를 피한다.
     const previewModal = $(`
-        <div class="asset-preview-modal">
+        <dialog class="asset-preview-modal">
             <div class="asset-preview-modal-content">
                 <span class="asset-preview-close">&times;</span>
                 ${hasNav ? '<div class="asset-preview-prev"><i class="fa-solid fa-chevron-left"></i></div>' : ''}
@@ -3583,11 +3585,13 @@ function showPreviewImage(imgSrc, galleryAssets) {
                 ${hasNav ? '<div class="asset-preview-next"><i class="fa-solid fa-chevron-right"></i></div>' : ''}
                 ${hasNav ? `<div class="asset-preview-counter">${currentIndex + 1} / ${assetList.length}</div>` : ''}
             </div>
-        </div>
+        </dialog>
     `);
 
     const closeModal = (e) => {
         if (e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+        const dlg = previewModal[0];
+        if (dlg && typeof dlg.close === 'function' && dlg.open) dlg.close();
         previewModal.remove();
         $(document).off('keydown.preview');
         return false;
@@ -3596,7 +3600,7 @@ function showPreviewImage(imgSrc, galleryAssets) {
     previewModal.on('mousedown touchstart', function(e) {
         if (e.target === this) closeModal(e);
     });
-    previewModal.find('.asset-preview-close').on('mousedown touchstart', closeModal);
+    previewModal.find('.asset-preview-close').on('mousedown touchstart click', closeModal);
     previewModal.find('.asset-preview-image, .asset-preview-modal-content').on('mousedown touchstart click', function(e) {
         e.stopPropagation(); e.stopImmediatePropagation();
     });
@@ -3618,9 +3622,14 @@ function showPreviewImage(imgSrc, galleryAssets) {
         if (hasNav && e.key === 'ArrowRight') navigateTo(currentIndex + 1);
     });
 
-    // z-index는 style.css(32000)가 갤러리 모달(31000)보다 위에 오도록 관리한다.
-    // 인라인으로 낮은 값을 덮어쓰면 미리보기가 갤러리 뒤에 깔려 닫을 수 없게 된다.
     $('body').append(previewModal);
+
+    const dlg = previewModal[0];
+    if (typeof dlg.showModal === 'function') {
+        dlg.showModal();
+        // dialog의 기본 close(ESC 등) 시에도 DOM 정리
+        dlg.addEventListener('close', () => closeModal());
+    }
 
     if (hasNav) {
         previewModal.find('.asset-preview-prev').toggle(currentIndex > 0);

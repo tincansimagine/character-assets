@@ -20,6 +20,17 @@
     --ca-r: 8px;
 }
 
+/* 테마의 블러 틴트가 반투명이면 탭-패널 연결부에 선이 비쳐 보이므로
+   알파를 제거한 불투명 색으로 패널 배경을 만든다. */
+@supports (color: rgb(from white r g b)) {
+    #character_assets_settings.character-assets,
+    .asset-modal,
+    .asset-preview-modal,
+    .smart-rename-popup {
+        --ca-panel: rgb(from var(--SmartThemeBlurTintColor, #1a1a1a) r g b);
+    }
+}
+
 /* ===== Drawer content layout ===== */
 #character_assets_settings .inline-drawer-content {
     display: flex;
@@ -631,13 +642,28 @@
     font-size: 0.85em;
 }
 
-/* ===== Gallery modal ===== */
+/* ===== Gallery modal =====
+   <dialog>.showModal()로 top-layer에 뜬다. UA 기본 스타일 재정의 */
 .asset-modal {
     position: fixed;
     z-index: 31000;
     inset: 0;
-    background: rgba(0,0,0,0.72);
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: rgba(0, 0, 0, 0.72);
+    color: var(--ca-text);
     overflow: auto;
+}
+
+.asset-modal::backdrop {
+    background: transparent;
 }
 
 .asset-modal-content {
@@ -645,7 +671,7 @@
     margin: 16px auto;
     border: 1px solid var(--ca-border);
     border-radius: 10px;
-    background: var(--SmartThemeBlurTintColor, #1a1a1a);
+    background: var(--ca-panel, #1a1a1a);
     box-shadow: 0 10px 36px rgba(0,0,0,0.4);
 }
 
@@ -687,7 +713,7 @@
     text-align: center;
     padding: 4px 2px;
     font-size: 0.9em;
-    background: var(--SmartThemeBlurTintColor, #222);
+    background: var(--ca-panel, #222);
     color: var(--SmartThemeBodyColor, #eee);
     border: 1px solid var(--ca-border);
     border-radius: 5px;
@@ -778,14 +804,19 @@
     position: absolute;
     top: 8px; right: 8px;
     width: 34px; height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     border-radius: 50%;
     color: #fff;
     background: rgba(0, 0, 0, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.35);
     cursor: pointer;
     font-size: 22px;
-    line-height: 32px;
-    text-align: center;
+    line-height: 1;
+    /* × 글리프가 살짝 위로 치우쳐 보이는 것 보정 */
+    padding-bottom: 2px;
     z-index: 3;
 }
 

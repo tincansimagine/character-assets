@@ -2862,13 +2862,13 @@ function setupEventHandlers() {
     // 갤러리 닫기 버튼 클릭
     $('.asset-modal-close').off('click').on('click', function(e) {
         e.stopPropagation(); // 이벤트 전파 방지
-        $('#asset_gallery_modal').hide();
+        closeGalleryModal();
     });
 
     // 갤러리 배경 클릭 시 닫기
     $('#asset_gallery_modal').off('click').on('click', function(e) {
         if (e.target === this) {
-            $(this).hide();
+            closeGalleryModal();
         }
     });
 
@@ -3246,6 +3246,27 @@ async function importPresets(file) {
 /**
  * 갤러리 모달 열기
  */
+/** 갤러리 모달을 top-layer <dialog>로 연다. (미지원 브라우저는 일반 표시로 폴백) */
+function openGalleryModal() {
+    const dlg = document.getElementById('asset_gallery_modal');
+    if (!dlg) return;
+    if (typeof dlg.showModal === 'function') {
+        if (!dlg.open) dlg.showModal();
+    } else {
+        $(dlg).show();
+    }
+}
+
+function closeGalleryModal() {
+    const dlg = document.getElementById('asset_gallery_modal');
+    if (!dlg) return;
+    if (typeof dlg.close === 'function' && dlg.open) {
+        dlg.close();
+    } else {
+        $(dlg).hide();
+    }
+}
+
 async function openGallery() {
     const character = getCurrentCharacter();
     if (!character) {
@@ -3261,8 +3282,8 @@ async function openGallery() {
         // 로딩 메시지 표시
         galleryContainer.html('<div class="loading-message">에셋 로딩 중...</div>');
 
-        // 모달 표시
-        $('#asset_gallery_modal').show();
+        // 모달 표시 (top-layer dialog: 모바일에서 fixed가 밀리는 문제 없음)
+        openGalleryModal();
 
         // 캐릭터 에셋 불러오기
         const characterName = character.avatar.replace(/\.[^/.]+$/, '');

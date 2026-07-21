@@ -2,6 +2,8 @@
 #character_assets_settings.character-assets {
     --ca-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor, #1a1a1a) 90%, transparent);
     --ca-card: color-mix(in srgb, var(--SmartThemeBlurTintColor, #1a1a1a) 75%, transparent);
+    /* 탭-패널 연결부에서 보더가 비치지 않도록 불투명 배경 */
+    --ca-panel: var(--SmartThemeBlurTintColor, #1a1a1a);
     --ca-border: var(--SmartThemeBorderColor, #444);
     --ca-text: var(--SmartThemeBodyColor, #e0e0e0);
     --ca-muted: var(--SmartThemeQuoteColor, #999);
@@ -83,24 +85,44 @@
 
 .character-assets__status-actions {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
 .character-assets__status-actions .menu_button {
     white-space: nowrap;
-    padding: 4px 8px;
+    padding: 5px 11px;
     font-size: 0.82em;
     margin: 0;
 }
 
-/* ===== Tabs ===== */
+/* ===== Icon-text spacing in all buttons ===== */
+#character_assets_settings .menu_button,
+#asset_gallery_modal .menu_button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+#character_assets_settings .menu_button i,
+#asset_gallery_modal .menu_button i {
+    margin: 0;
+}
+
+/* ===== Tabs (notebook style) ===== */
 .character-assets__tabs {
     display: flex;
-    gap: 4px;
+    gap: 6px;
+    padding: 0 6px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    /* 드로어 flex gap(8px) + 패널 상단 보더(1px)를 상쇄해 활성 탭이 패널에 붙도록 */
+    margin-bottom: -9px;
+    position: relative;
+    z-index: 1;
 }
 
 .character-assets__tabs::-webkit-scrollbar {
@@ -111,14 +133,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 7px;
     flex: 1 0 auto;
     min-width: 0;
-    padding: 6px 10px;
+    padding: 8px 14px;
     border: 1px solid var(--ca-border);
-    border-radius: var(--ca-r);
+    border-radius: var(--ca-r) var(--ca-r) 0 0;
     background: var(--ca-card);
-    color: var(--ca-text);
+    color: var(--ca-muted);
     font-size: 0.88em;
     white-space: nowrap;
     cursor: pointer;
@@ -126,14 +148,18 @@
 }
 
 .character-assets__tab:hover {
-    background: color-mix(in srgb, var(--ca-accent) 30%, var(--ca-card));
+    background: color-mix(in srgb, var(--ca-accent) 25%, var(--ca-card));
+    color: var(--ca-text);
 }
 
-.character-assets__tab.is-active {
-    background: var(--ca-accent);
-    color: var(--SmartThemeBlurTintColor, #fff);
+/* 활성 탭: 패널과 같은 배경 + 하단 보더 제거로 패널과 이어진 노트 탭 느낌 */
+.character-assets__tab.is-active,
+.character-assets__tab.is-active:hover {
+    background: var(--ca-panel, var(--ca-bg));
+    border-bottom-color: transparent;
+    border-top: 2px solid var(--ca-accent);
+    color: var(--ca-text);
     font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* ===== Panels ===== */
@@ -143,6 +169,15 @@
 
 .character-assets__panel.is-active {
     display: block;
+    padding: 12px 10px 10px;
+    border: 1px solid var(--ca-border);
+    border-radius: var(--ca-r);
+    background: var(--ca-panel, var(--ca-bg));
+}
+
+.character-assets__panel > .character-assets__section:last-child,
+.character-assets__panel > *:last-child {
+    margin-bottom: 0;
 }
 
 /* ===== Section cards ===== */
@@ -173,6 +208,10 @@
     font-size: 1em;
 }
 
+.character-assets__section-head h4 i {
+    margin-right: 5px;
+}
+
 .character-assets__section-head p {
     margin: 0;
     font-size: 0.82em;
@@ -182,14 +221,14 @@
 /* ===== Compact action groups (buttons beside headers) ===== */
 .character-assets__compact-actions {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
     flex-wrap: wrap;
 }
 
 .character-assets__compact-actions .menu_button {
     white-space: nowrap;
-    padding: 4px 8px;
+    padding: 5px 11px;
     font-size: 0.82em;
     margin: 0;
 }
@@ -235,7 +274,7 @@
 .character-assets__button-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
     margin-bottom: 6px;
 }
 
@@ -243,7 +282,7 @@
     flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
-    padding: 4px 8px;
+    padding: 5px 11px;
     font-size: 0.82em;
     margin: 0;
     justify-content: center;
@@ -305,13 +344,13 @@
 .character-assets__toolbar-actions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
 .character-assets__toolbar-actions .menu_button {
     white-space: nowrap;
-    padding: 4px 8px;
+    padding: 5px 11px;
     font-size: 0.82em;
     margin: 0;
 }
@@ -356,7 +395,7 @@
 .keyword-header {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     padding: 6px 8px;
 }
 
@@ -388,7 +427,7 @@
 .file-item {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     min-width: 0;
     padding: 3px 5px;
     border-radius: 5px;
@@ -578,7 +617,7 @@
 
 .character-assets__footer-action .menu_button {
     white-space: nowrap;
-    padding: 4px 12px;
+    padding: 6px 14px;
     font-size: 0.85em;
 }
 

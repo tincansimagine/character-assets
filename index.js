@@ -1724,15 +1724,21 @@ async function refreshRendererAssetCache() {
 function resolveAssetUrl(assetName) {
     const trimmedName = String(assetName || '').trim();
     const key = normalizeAssetKey(trimmedName);
+    // 확장자를 뗀 키: WebP 자동 변환 등으로 실제 저장 확장자가 태그와 달라져도 매칭되도록
+    const dotIdx = key.lastIndexOf('.');
+    const baseKey = dotIdx > 0 ? key.substring(0, dotIdx) : '';
 
     if (Boolean(getRendererSettings().randomAsset) && rendererRandomGroups.size > 0) {
-        const group = rendererRandomGroups.get(key);
+        const group = rendererRandomGroups.get(key) || (baseKey && rendererRandomGroups.get(baseKey));
         if (group && group.length > 0) {
             return group[Math.floor(Math.random() * group.length)];
         }
     }
 
-    return rendererAssetCache.get(key) || rendererPersonaCache.get(key);
+    return rendererAssetCache.get(key)
+        || rendererPersonaCache.get(key)
+        || (baseKey && (rendererAssetCache.get(baseKey) || rendererPersonaCache.get(baseKey)))
+        || undefined;
 }
 
 function renderMessageImages(messageElement) {

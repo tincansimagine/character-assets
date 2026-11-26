@@ -48,7 +48,7 @@
 /* 반투명 테마에서도 모달/메뉴 배경이 비치지 않도록 알파를 뺀 색을 만든다 */
 @supports (color: rgb(from white r g b)) {
     .ca-scope {
-        --ca-surface-solid: rgb(from var(--SmartThemeBlurTintColor, #171717) r g b);
+        --ca-surface-solid: rgb(from var(--SmartThemeBlurTintColor, #171717) r g b / 1);
     }
 }
 
@@ -715,9 +715,7 @@
     padding: 12px 14px;
     border: 1px solid var(--ca-line);
     border-radius: var(--ca-r-lg);
-    background:
-        radial-gradient(120% 140% at 0% 0%, var(--ca-accent-soft) 0%, transparent 55%),
-        var(--ca-card);
+    background: var(--ca-card);
 }
 
 .ca-scope .ca-hero__avatar {
@@ -1001,9 +999,7 @@
     padding: 16px 14px 14px;
     border: 1.5px dashed var(--ca-accent-line);
     border-radius: var(--ca-r-lg);
-    background:
-        linear-gradient(180deg, var(--ca-accent-softer), transparent 85%),
-        var(--ca-card);
+    background: var(--ca-card);
     text-align: center;
     transition: background var(--ca-fast), border-color var(--ca-fast), transform var(--ca-fast);
 }
@@ -1153,28 +1149,53 @@
 }
 
 .ca-scope .ca-search {
-    position: relative;
     display: flex;
     flex: 1 1 auto;
     align-items: center;
+    gap: 9px;
     min-width: 0;
+    min-height: 40px;
+    padding: 0 6px 0 14px;
+    border: 1px solid var(--ca-line-strong);
+    border-radius: var(--ca-pill);
+    background: var(--ca-card-strong);
+    transition: border-color var(--ca-fast), box-shadow var(--ca-fast);
+}
+
+.ca-scope .ca-search:focus-within {
+    border-color: var(--ca-accent);
+    box-shadow: 0 0 0 3px var(--ca-accent-soft);
 }
 
 .ca-scope .ca-search > i {
-    position: absolute;
-    left: 13px;
-    color: var(--ca-faint);
+    flex-shrink: 0;
+    color: var(--ca-muted);
     font-size: 0.85em;
     pointer-events: none;
 }
 
-.ca-scope .ca-search input {
-    width: 100%;
-    min-height: 38px;
-    margin: 0;
-    padding: 6px 36px 6px 34px;
-    border-color: var(--ca-line-strong);
-    border-radius: var(--ca-pill);
+/* 테마가 입력칸 여백·배경을 덮어써도 돋보기와 겹치지 않도록 칸 자체는 투명하게 */
+.ca-scope .ca-search input,
+.ca-scope .ca-search input.text_pole {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+    height: auto !important;
+    min-height: 34px;
+    margin: 0 !important;
+    padding: 4px 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: var(--ca-text);
+    text-indent: 0 !important;
+}
+
+.ca-scope .ca-search input::placeholder {
+    color: var(--ca-faint);
+    opacity: 1;
 }
 
 .ca-scope .ca-search input::-webkit-search-cancel-button {
@@ -1184,9 +1205,8 @@
 .ca-scope .ca-search__clear {
     -webkit-appearance: none;
     appearance: none;
-    position: absolute;
-    right: 5px;
     display: grid;
+    flex-shrink: 0;
     place-items: center;
     width: 28px;
     height: 28px;
@@ -1194,7 +1214,7 @@
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: var(--ca-card-strong);
+    background: var(--ca-hover);
     color: var(--ca-text);
     font-size: 0.8em;
     cursor: pointer;
@@ -1625,9 +1645,8 @@
 .ca-scope .ca-skeleton {
     border-radius: 14px;
     aspect-ratio: 3 / 4;
-    background: linear-gradient(100deg, var(--ca-card) 30%, var(--ca-card-strong) 50%, var(--ca-card) 70%);
-    background-size: 300% 100%;
-    animation: ca-shimmer 1.3s ease-in-out infinite;
+    background: var(--ca-card-strong);
+    animation: ca-pulse 1.2s ease-in-out infinite alternate;
 }
 
 .ca-scope .ca-grid.is-list .ca-skeleton {
@@ -1635,9 +1654,9 @@
     height: 64px;
 }
 
-@keyframes ca-shimmer {
-    from { background-position: 100% 0; }
-    to { background-position: 0 0; }
+@keyframes ca-pulse {
+    from { opacity: 0.45; }
+    to { opacity: 1; }
 }
 
 /* 그룹 멤버 */
@@ -1878,7 +1897,8 @@
     overflow: hidden;
     border: 1px solid var(--ca-line);
     border-radius: var(--ca-r);
-    background: var(--SmartThemeBotMesBlurTintColor, var(--ca-card));
+    background: var(--ca-surface-solid);
+    color: var(--ca-text);
     font-size: 0.88em;
     line-height: 1.65;
 }
@@ -2685,7 +2705,7 @@ dialog.ca-lightbox::backdrop {
     align-items: center;
     gap: 8px;
     padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
-    background: linear-gradient(180deg, rgb(0 0 0 / 0.55), transparent);
+    background: rgb(0 0 0 / 0.5);
 }
 
 .ca-lightbox__title {

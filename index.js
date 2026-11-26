@@ -3460,7 +3460,7 @@ async function updateLightboxMeta() {
    ========================================================= */
 
 const PREVIEW_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7c6d6"/><stop offset="1" stop-color="#b9a7ee"/></linearGradient></defs><rect width="300" height="400" fill="url(#g)"/><circle cx="150" cy="160" r="56" fill="#fff" fill-opacity=".55"/><rect x="70" y="240" width="160" height="90" rx="45" fill="#fff" fill-opacity=".45"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><rect width="300" height="400" fill="#efc7d4"/><circle cx="150" cy="160" r="56" fill="#fff" fill-opacity=".7"/><rect x="70" y="240" width="160" height="90" rx="45" fill="#fff" fill-opacity=".6"/></svg>',
 );
 
 function previewSampleAsset() {

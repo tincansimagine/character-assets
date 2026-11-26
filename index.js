@@ -120,14 +120,14 @@ const RENDER_STYLES = [
     { id: 'plain', name: '그대로', desc: '꾸밈 없이' },
     { id: 'ink', name: '가는 선', desc: '여백과 선 한 줄' },
     { id: 'print', name: '인화 사진', desc: '흰 인화지 테두리' },
-    { id: 'polaroid', name: '폴라로이드', desc: '아래 여백 · 살짝 기울임' },
+    { id: 'polaroid', name: '폴라로이드', desc: '넓은 아래 여백, 약간 기울임' },
     { id: 'tape', name: '마스킹테이프', desc: '테이프로 붙인 사진' },
     { id: 'corner', name: '사진 모서리', desc: '앨범에 끼운 모습' },
     { id: 'stamp', name: '우표', desc: '톱니 가장자리' },
     { id: 'film', name: '필름', desc: '구멍 뚫린 필름 띠' },
     { id: 'shadow', name: '떠 있는', desc: '부드러운 그림자' },
-    { id: 'float-left', name: '글 왼쪽', desc: '글이 오른쪽으로 감싸요' },
-    { id: 'float-right', name: '글 오른쪽', desc: '글이 왼쪽으로 감싸요' },
+    { id: 'float-left', name: '글 왼쪽', desc: '이미지 왼쪽, 글은 오른쪽' },
+    { id: 'float-right', name: '글 오른쪽', desc: '이미지 오른쪽, 글은 왼쪽' },
 ];
 
 const DEFAULT_RENDER_STYLE = 'ink';
@@ -383,7 +383,7 @@ const ACCENTS = [
 ];
 
 const MACRO_DOCS = [
-    { macro: '{{img_inprompt}}', desc: '이미지 지침 전체가 이 자리에 들어가요.', chip: false },
+    { macro: '{{img_inprompt}}', desc: '이미지 지침 전체가 이 자리에 들어갑니다.', chip: false },
     { macro: '{{img_keywords_grouped}}', desc: '묶음 키워드 목록. 예: angry_[1, 2], happy', chip: true },
     { macro: '{{img_keywords_autogen}}', desc: '켜진 파일명 목록 (확장자 포함, 자동 갱신)', chip: true },
     { macro: '{{img_keywords}}', desc: '켜진 키워드 목록 (확장자 없이)', chip: true },
@@ -1061,16 +1061,16 @@ async function withRetry(task, retries = 2) {
 function describeError(error) {
     const message = error?.message || error?.responseText || '알 수 없는 오류';
     if (/CSRF/i.test(message) || error?.status === 403) {
-        return 'CSRF 토큰이 만료되었어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.';
+        return 'CSRF 토큰이 만료되었습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.';
     }
     if (error?.status === 400 || /Bad Request/i.test(message)) {
-        return '요청 형식 오류예요. 파일명과 캐릭터 선택 상태를 확인해 주세요.';
+        return '요청 형식 오류입니다. 파일명과 캐릭터 선택 상태를 확인해 주세요.';
     }
     if (error?.status === 413 || /payload too large/i.test(message)) {
-        return '파일이 너무 커요.';
+        return '파일이 너무 큽니다.';
     }
     if (error instanceof TypeError) {
-        return '서버에 연결하지 못했어요. 네트워크 상태를 확인해 주세요.';
+        return '서버에 연결하지 못했습니다. 네트워크 상태를 확인해 주세요.';
     }
     return message;
 }
@@ -1095,7 +1095,7 @@ function uploadBlobAs(folder, blob, base, ext) {
 
 async function fetchAssetBlob(asset) {
     const response = await fetch(asset.path);
-    if (!response.ok) throw httpError(response.status, '원본 파일을 읽을 수 없어요.');
+    if (!response.ok) throw httpError(response.status, '원본 파일을 읽을 수 없습니다.');
     return response.blob();
 }
 
@@ -1563,7 +1563,7 @@ function buildMissingHtml(tag, raw) {
     const mode = getRendererSettings().missing;
     if (mode === 'raw') return raw;
     const hidden = mode === 'hide' ? ' hidden' : '';
-    return `<span class="ca-asset-missing" data-ca-tag="${escapeHtml(tag)}" title="이 이름의 에셋을 찾지 못했어요"${hidden}><i class="fa-solid fa-image" aria-hidden="true"></i>${escapeHtml(tag)}</span>`;
+    return `<span class="ca-asset-missing" data-ca-tag="${escapeHtml(tag)}" title="이 이름의 에셋을 찾지 못했습니다"${hidden}><i class="fa-solid fa-image" aria-hidden="true"></i>${escapeHtml(tag)}</span>`;
 }
 
 function renderTag(rawName, rawMatch) {
@@ -1809,7 +1809,7 @@ async function runQueue(items, worker, { label, concurrency = UPLOAD_CONCURRENCY
 
     await Promise.all(Array.from({ length: Math.max(1, Math.min(concurrency, items.length)) }, lane));
     const cancelled = job.cancelled;
-    progressEnd(cancelled ? '취소했어요' : (failed ? `완료 · ${failed}개 실패` : '완료했어요'));
+    progressEnd(cancelled ? '취소했습니다' : (failed ? `완료 · ${failed}개 실패` : '완료했습니다'));
     return { done, failed, errors, cancelled, succeeded: done - failed };
 }
 
@@ -1863,8 +1863,8 @@ async function confirmOverwriteIfNeeded(target, fileNames) {
     const preview = duplicates.slice(0, 6).map(name => `<code>${escapeHtml(name)}</code>`).join(' ');
     const more = duplicates.length > 6 ? ` 외 ${duplicates.length - 6}개` : '';
     return askConfirm(
-        `<h3><i class="fa-solid fa-copy"></i> 같은 이름이 있어요</h3>
-         <p>${duplicates.length}개 파일을 덮어써요. 계속할까요?</p>
+        `<h3><i class="fa-solid fa-copy"></i> 같은 이름이 있습니다</h3>
+         <p>${duplicates.length}개 파일을 덮어씁니다. 계속하시겠습니까?</p>
          <div class="ca-chips">${preview}${more}</div>`,
         { okButton: '덮어쓰기' },
     );
@@ -1877,7 +1877,7 @@ function characterTarget(owner) {
 async function personaTarget() {
     const name = store.persona.name || await getPersonaName();
     if (!name) {
-        showToast('error', '페르소나가 설정되어 있지 않아요.');
+        showToast('error', '페르소나가 설정되어 있지 않습니다.');
         return null;
     }
     return { folder: `_persona_${name}`, ownerId: PERSONA_OWNER, title: '페르소나' };
@@ -1891,7 +1891,7 @@ function pickUploadTarget(anchor) {
         const owner = getSingleOwner();
         if (!owner) return Promise.resolve(null);
         if (isAssetLinkActive(owner.id)) {
-            showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없어요. 링크된 캐릭터에서 올려 주세요.');
+            showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없습니다. 링크된 캐릭터에서 올려 주세요.');
             return Promise.resolve(null);
         }
         return Promise.resolve(characterTarget(owner));
@@ -1899,7 +1899,7 @@ function pickUploadTarget(anchor) {
     if (store.mode === 'group') {
         const owners = Array.from(store.owners.values()).filter(owner => !isAssetLinkActive(owner.id));
         if (owners.length === 0) {
-            showToast('info', '올릴 수 있는 멤버가 없어요.');
+            showToast('info', '올릴 수 있는 멤버가 없습니다.');
             return Promise.resolve(null);
         }
         return new Promise(resolve => {
@@ -1907,7 +1907,7 @@ function pickUploadTarget(anchor) {
                 icon: 'fa-user',
                 label: owner.name,
                 action: () => resolve(characterTarget(owner)),
-            })), { title: '어느 멤버에게 올릴까요?', onClose: () => resolve(null) });
+            })), { title: '올릴 멤버 선택', onClose: () => resolve(null) });
         });
     }
     showToast('info', '캐릭터를 먼저 선택해 주세요.');
@@ -1927,7 +1927,7 @@ async function uploadImageFiles(fileList, target) {
         }
     }
     if (invalid.length) {
-        showToast('warning', `지원하지 않는 파일은 건너뛰었어요: ${invalid.slice(0, 5).join(', ')}${invalid.length > 5 ? ' …' : ''}`);
+        showToast('warning', `지원하지 않는 파일은 건너뛰었습니다: ${invalid.slice(0, 5).join(', ')}${invalid.length > 5 ? ' …' : ''}`);
     }
     if (valid.length === 0) return;
 
@@ -1946,9 +1946,9 @@ async function uploadImageFiles(fileList, target) {
     }, { label: `${target.title}에 올리는 중…` });
 
     if (result.failed) {
-        showToast('error', `${result.succeeded}개 올렸고 ${result.failed}개는 실패했어요. ${describeError(result.errors[0]?.error)}`, '업로드 일부 실패');
+        showToast('error', `${result.succeeded}개 올렸고 ${result.failed}개는 실패했습니다. ${describeError(result.errors[0]?.error)}`, '업로드 일부 실패');
     } else if (!result.cancelled) {
-        showToast('success', `${result.succeeded}개 이미지를 올렸어요.`);
+        showToast('success', `${result.succeeded}개 이미지를 올렸습니다.`);
     }
     await reloadAll();
 }
@@ -1956,7 +1956,7 @@ async function uploadImageFiles(fileList, target) {
 async function uploadZipFile(file, target) {
     if (!target || !ensureNoJob()) return;
     if (!isZipFile(file)) {
-        showToast('error', 'ZIP 파일만 올릴 수 있어요.');
+        showToast('error', 'ZIP 파일만 올릴 수 있습니다.');
         return;
     }
 
@@ -1978,7 +1978,7 @@ async function uploadZipFile(file, target) {
                 return ALLOWED_EXTENSIONS.includes(splitExt(name).ext);
             });
             if (entries.length === 0) {
-                showToast('warning', 'ZIP 안에서 이미지를 찾지 못했어요.');
+                showToast('warning', 'ZIP 안에서 이미지를 찾지 못했습니다.');
                 return;
             }
             const names = entries.map(entry => entry.name.split('/').pop());
@@ -2000,9 +2000,9 @@ async function uploadZipFile(file, target) {
                     await withRetry(() => postSpriteForm('/api/sprites/upload', formData));
                 }, { label: `ZIP 풀어서 올리는 중… (WebP 변환)` });
                 if (result.failed) {
-                    showToast('error', `${result.succeeded}개 올렸고 ${result.failed}개는 실패했어요.`, '업로드 일부 실패');
+                    showToast('error', `${result.succeeded}개 올렸고 ${result.failed}개는 실패했습니다.`, '업로드 일부 실패');
                 } else if (!result.cancelled) {
-                    showToast('success', `${result.succeeded}개 이미지를 올렸어요.`);
+                    showToast('success', `${result.succeeded}개 이미지를 올렸습니다.`);
                 }
                 await reloadAll();
                 return;
@@ -2017,12 +2017,12 @@ async function uploadZipFile(file, target) {
         formData.append('name', target.folder);
         formData.append('avatar', file);
         const result = await withRetry(() => postSpriteForm('/api/sprites/upload-zip', formData), 1);
-        progressEnd('완료했어요');
-        showToast('success', `${result.count ?? 0}개 이미지를 올렸어요.`, 'ZIP 업로드');
+        progressEnd('완료했습니다');
+        showToast('success', `${result.count ?? 0}개 이미지를 올렸습니다.`, 'ZIP 업로드');
     } catch (error) {
-        progressEnd('실패했어요');
+        progressEnd('실패했습니다');
         console.error(`[${MODULE_NAME}] Error uploading ZIP:`, error);
-        showToast('error', `ZIP 업로드 중 오류가 났어요. ${describeError(error)}`, '업로드 실패');
+        showToast('error', `ZIP 업로드 중 오류가 났습니다. ${describeError(error)}`, '업로드 실패');
     }
     await reloadAll();
 }
@@ -2037,7 +2037,7 @@ async function handleDroppedFiles(fileList, target) {
     }
     const images = files.filter(isImageFile);
     if (images.length === 0) {
-        showToast('warning', '올릴 수 있는 이미지가 없어요.');
+        showToast('warning', '올릴 수 있는 이미지가 없습니다.');
         return;
     }
     await uploadImageFiles(images, target);
@@ -2068,16 +2068,16 @@ async function uploadFromUrl(target, url, label) {
     try {
         response = await fetch(url);
     } catch (error) {
-        showToast('error', '이 주소는 브라우저에서 바로 받을 수 없어요. 이미지를 저장한 뒤 올려 주세요.', 'URL 업로드');
+        showToast('error', '이 주소는 브라우저에서 바로 받을 수 없습니다. 이미지를 저장한 뒤 올려 주세요.', 'URL 업로드');
         return false;
     }
     if (!response.ok) {
-        showToast('error', `이미지를 받지 못했어요. (HTTP ${response.status})`, 'URL 업로드');
+        showToast('error', `이미지를 받지 못했습니다. (HTTP ${response.status})`, 'URL 업로드');
         return false;
     }
     const blob = await response.blob();
     if (!ALLOWED_MIME.includes(blob.type)) {
-        showToast('error', 'PNG, WebP, GIF, JPG 이미지만 올릴 수 있어요.', 'URL 업로드');
+        showToast('error', 'PNG, WebP, GIF, JPG 이미지만 올릴 수 있습니다.', 'URL 업로드');
         return false;
     }
     const base = sanitizeBaseName(label) || 'image';
@@ -2097,7 +2097,7 @@ async function openUrlUploadDialog(anchor) {
                 <input type="url" id="ca_url_input" class="text_pole" placeholder="https://…" autocomplete="off">
             </div>
             <div class="ca-field">
-                <label class="ca-label" for="ca_url_name"><span>이름</span><small>비워 두면 주소의 파일명을 써요.</small></label>
+                <label class="ca-label" for="ca_url_name"><span>이름</span><small>비워 두면 주소의 파일명을 사용합니다.</small></label>
                 <input type="text" id="ca_url_name" class="text_pole" autocomplete="off">
             </div>
         </div>`);
@@ -2165,13 +2165,13 @@ function isLocked(asset) {
 
 async function editAliases(asset) {
     if (!asset || asset.ownerId === PERSONA_OWNER) {
-        showToast('info', '페르소나 에셋에는 별칭을 쓸 수 없어요.');
+        showToast('info', '페르소나 에셋에는 별칭을 쓸 수 없습니다.');
         return;
     }
     const current = getAliasesFor(asset).join(', ');
     const input = await askInput(
         `<h3><i class="fa-solid fa-at"></i> 별칭</h3>
-         <p><code>${escapeHtml(asset.fileName)}</code>을(를) 다른 이름으로도 찾을 수 있게 해요. 쉼표로 여러 개 적을 수 있어요.<br>예: <code>미소, smile, 웃음</code></p>`,
+         <p><code>${escapeHtml(asset.fileName)}</code>을(를) 다른 이름으로도 찾을 수 있게 합니다. 쉼표로 여러 개 적을 수 있습니다.<br>예: <code>미소, smile, 웃음</code></p>`,
         current,
         { okButton: '저장', placeholder: '별칭1, 별칭2' },
     );
@@ -2182,7 +2182,7 @@ async function editAliases(asset) {
     else delete data.aliases[asset.fileName];
     saveSettingsDebounced();
     afterLocalChange();
-    showToast('success', list.length ? `별칭 ${list.length}개를 저장했어요.` : '별칭을 지웠어요.');
+    showToast('success', list.length ? `별칭 ${list.length}개를 저장했습니다.` : '별칭을 지웠습니다.');
 }
 
 function addAlias(asset, alias) {
@@ -2210,11 +2210,11 @@ function migrateFileRecords(ownerId, oldName, newName) {
 async function renameSingleAsset(asset) {
     if (!asset || !ensureNoJob()) return;
     if (isLocked(asset)) {
-        showToast('info', '에셋 링크를 쓰는 중에는 이름을 바꿀 수 없어요.');
+        showToast('info', '에셋 링크를 쓰는 중에는 이름을 바꿀 수 없습니다.');
         return;
     }
     const input = await askInput(
-        `<h3><i class="fa-solid fa-pen"></i> 이름 바꾸기</h3><p><code>${escapeHtml(asset.fileName)}</code>의 새 이름을 적어 주세요. 확장자(.${escapeHtml(asset.ext)})는 그대로 둬요.</p>`,
+        `<h3><i class="fa-solid fa-pen"></i> 이름 바꾸기</h3><p><code>${escapeHtml(asset.fileName)}</code>의 새 이름을 적어 주세요. 확장자(.${escapeHtml(asset.ext)})는 그대로 둡니다.</p>`,
         asset.base,
         { okButton: '바꾸기' },
     );
@@ -2224,7 +2224,7 @@ async function renameSingleAsset(asset) {
 
     const siblings = getTargetAssets({ ownerId: asset.ownerId }).filter(item => item.key !== asset.key);
     if (siblings.some(item => item.base.toLowerCase() === newBase.toLowerCase())) {
-        const overwrite = await askConfirm(`<h3>같은 이름이 있어요</h3><p><code>${escapeHtml(newBase)}</code> 파일을 덮어써요. 계속할까요?</p>`, { okButton: '덮어쓰기' });
+        const overwrite = await askConfirm(`<h3>같은 이름이 있습니다</h3><p><code>${escapeHtml(newBase)}</code> 파일을 덮어씁니다. 계속하시겠습니까?</p>`, { okButton: '덮어쓰기' });
         if (!overwrite) return;
     }
 
@@ -2235,7 +2235,7 @@ async function renameSingleAsset(asset) {
         showToast('success', `${asset.fileName} → ${newBase}.${asset.ext}`);
     } catch (error) {
         console.error(`[${MODULE_NAME}] Rename asset error:`, error);
-        showToast('error', `이름을 바꾸지 못했어요: ${describeError(error)}`);
+        showToast('error', `이름을 바꾸지 못했습니다: ${describeError(error)}`);
     }
     await reloadAll();
 }
@@ -2244,14 +2244,14 @@ async function confirmDeleteAssets(assets) {
     const list = assets.filter(Boolean);
     if (list.length === 0 || !ensureNoJob()) return;
     if (list.some(isLocked)) {
-        showToast('info', '에셋 링크를 쓰는 중에는 지울 수 없어요.');
+        showToast('info', '에셋 링크를 쓰는 중에는 지울 수 없습니다.');
         return;
     }
     const preview = list.slice(0, 8).map(asset => `<code>${escapeHtml(asset.fileName)}</code>`).join(' ');
     const more = list.length > 8 ? ` 외 ${list.length - 8}개` : '';
     const ok = await askConfirm(
         `<h3><i class="fa-solid fa-trash-can"></i> ${list.length}개 지우기</h3>
-         <p>지운 파일은 되돌릴 수 없어요.</p>
+         <p>지운 파일은 되돌릴 수 없습니다.</p>
          <div class="ca-chips">${preview}${more}</div>`,
         { okButton: '삭제' },
     );
@@ -2269,9 +2269,9 @@ async function confirmDeleteAssets(assets) {
     listState.selected.clear();
     galleryState.selected.clear();
     if (result.failed) {
-        showToast('error', `${result.failed}개는 지우지 못했어요. ${describeError(result.errors[0]?.error)}`, '삭제 일부 실패');
+        showToast('error', `${result.failed}개는 지우지 못했습니다. ${describeError(result.errors[0]?.error)}`, '삭제 일부 실패');
     } else {
-        showToast('success', `${result.succeeded}개를 지웠어요.`);
+        showToast('success', `${result.succeeded}개를 지웠습니다.`);
     }
     await reloadAll();
 }
@@ -2301,13 +2301,13 @@ function tagFor(asset) {
 async function copyTag(asset) {
     const tag = tagFor(asset);
     const ok = await copyText(tag);
-    showToast(ok ? 'success' : 'error', ok ? `${tag} 복사했어요.` : '복사하지 못했어요.');
+    showToast(ok ? 'success' : 'error', ok ? `${tag} 복사했습니다.` : '복사하지 못했습니다.');
 }
 
 function insertTagIntoChat(asset) {
     const textarea = document.getElementById('send_textarea');
     if (!(textarea instanceof HTMLTextAreaElement)) {
-        showToast('error', '채팅 입력창을 찾지 못했어요.');
+        showToast('error', '채팅 입력창을 찾지 못했습니다.');
         return;
     }
     const tag = tagFor(asset);
@@ -2320,7 +2320,7 @@ function insertTagIntoChat(asset) {
     const caret = before.length + glue.length + tag.length;
     textarea.setSelectionRange(caret, caret);
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
-    showToast('success', `채팅창에 ${tag} 넣었어요.`);
+    showToast('success', `채팅창에 ${tag} 넣었습니다.`);
 }
 
 function downloadAsset(asset) {
@@ -2568,7 +2568,7 @@ function renderAssetList() {
     listState.visibleKeys = [];
 
     if (store.mode === 'none') {
-        list.innerHTML = emptyHtml('fa-user-plus', '캐릭터를 선택해 주세요', '<p>채팅을 열면 그 캐릭터의 에셋을 여기서 관리할 수 있어요.</p>');
+        list.innerHTML = emptyHtml('fa-user-plus', '캐릭터를 선택해 주세요', '<p>채팅을 열면 그 캐릭터의 에셋을 여기서 관리할 수 있습니다.</p>');
         updateBulkbar();
         return;
     }
@@ -2600,7 +2600,7 @@ function renderAssetList() {
                     <span class="ca-member__count">${owner.assets.length}개${isAssetLinkActive(owner.id) ? ' · 링크' : ''}</span>
                     <i class="fa-solid fa-chevron-down ca-chevron" aria-hidden="true"></i>
                 </button>
-                ${open ? `<div class="ca-member__body">${cards.length ? cards.map(cardHtml).join('') : emptyHtml('fa-image', '에셋이 없어요', '')}</div>` : ''}
+                ${open ? `<div class="ca-member__body">${cards.length ? cards.map(cardHtml).join('') : emptyHtml('fa-image', '에셋이 없습니다', '')}</div>` : ''}
             </section>`;
         }
     } else {
@@ -2610,9 +2610,9 @@ function renderAssetList() {
 
     if (shownCards === 0 && store.mode === 'single') {
         if (all.length === 0) {
-            html = emptyHtml('fa-images', '아직 에셋이 없어요', '<p>위에서 이미지나 ZIP을 올려 보세요.<br>파일명이 AI가 쓸 키워드가 돼요. 예: <code>joy.png</code>, <code>angry_1.webp</code></p>');
+            html = emptyHtml('fa-images', '아직 에셋이 없습니다', '<p>위에서 이미지나 ZIP을 올려 주세요.<br>파일명이 AI가 쓸 키워드가 됩니다. 예: <code>joy.png</code>, <code>angry_1.webp</code></p>');
         } else {
-            html = emptyHtml('fa-magnifying-glass', '조건에 맞는 에셋이 없어요', '<p>검색어나 필터를 바꿔 보세요.</p>');
+            html = emptyHtml('fa-magnifying-glass', '조건에 맞는 에셋이 없습니다', '<p>검색어나 필터를 바꿔 주세요.</p>');
         }
     }
 
@@ -2660,11 +2660,11 @@ function openAssetsMoreMenu(anchor) {
     const hasAssets = getOwnerAssets().length > 0;
     openMenu(anchor, [
         { icon: 'fa-table-cells-large', label: '갤러리로 보기', action: () => openGallery() },
-        { icon: 'fa-arrows-rotate', label: '새로고침', action: async () => { await reloadAll(); showToast('success', '목록을 새로 불러왔어요.'); } },
+        { icon: 'fa-arrows-rotate', label: '새로고침', action: async () => { await reloadAll(); showToast('success', '목록을 새로 불러왔습니다.'); } },
         '-',
         { icon: 'fa-eye', label: '전부 켜기', disabled: !hasAssets, action: () => setAssetsDisabled(getOwnerAssets(), false) },
         { icon: 'fa-eye-slash', label: '전부 끄기', disabled: !hasAssets, action: () => setAssetsDisabled(getOwnerAssets(), true) },
-        { icon: 'fa-copy', label: '키워드 목록 복사', disabled: !hasAssets, action: async () => { const ok = await copyText(autoGeneratedKeywords); showToast(ok ? 'success' : 'error', ok ? '켜진 파일명 목록을 복사했어요.' : '복사하지 못했어요.'); } },
+        { icon: 'fa-copy', label: '키워드 목록 복사', disabled: !hasAssets, action: async () => { const ok = await copyText(autoGeneratedKeywords); showToast(ok ? 'success' : 'error', ok ? '켜진 파일명 목록을 복사했습니다.' : '복사하지 못했습니다.'); } },
         '-',
         { icon: 'fa-broom', label: '이름 정돈', disabled: !owner || locked || !hasAssets, action: () => openSmartRenamePopup() },
         { icon: 'fa-file-zipper', label: '에셋 ZIP 받기', disabled: !hasAssets, action: () => exportAssetsAsZip() },
@@ -2696,7 +2696,7 @@ function renderHero() {
     if (store.mode === 'none') {
         setAvatar(avatar, '<i class="fa-solid fa-user"></i>');
         $name.text('캐릭터를 선택해 주세요');
-        $meta.text('채팅을 열면 에셋 현황이 여기에 보여요.');
+        $meta.text('채팅을 열면 에셋 현황이 여기에 표시됩니다.');
         $chips.empty();
         return;
     }
@@ -2713,7 +2713,7 @@ function renderHero() {
     if (store.mode === 'group') {
         setAvatar(avatar, '<i class="fa-solid fa-users"></i>');
         $name.text(getGroupName());
-        $meta.text(`그룹 멤버 ${store.owners.size}명의 에셋을 함께 써요.`);
+        $meta.text(`그룹 멤버 ${store.owners.size}명의 에셋을 함께 사용합니다.`);
     } else {
         const owner = getSingleOwner();
         const character = getCurrentCharacter();
@@ -2806,7 +2806,7 @@ function populateAssetLinkSelect() {
 function updateAssetLinkInfo(linkedName) {
     const $info = $('#asset_link_info');
     if (linkedName) {
-        $info.html(`<i class="fa-solid fa-link"></i> <strong>${escapeHtml(getOwnerName(linkedName))}</strong>의 에셋을 같이 쓰는 중이에요. 이 상태에선 올리기·삭제가 잠겨요.`);
+        $info.html(`<i class="fa-solid fa-link"></i> <strong>${escapeHtml(getOwnerName(linkedName))}</strong>의 에셋을 같이 쓰는 중입니다. 이 상태에서는 올리기·삭제가 잠깁니다.`);
     } else {
         $info.text('');
     }
@@ -2826,7 +2826,7 @@ function populateAssetPresetSelect() {
 function updateAssetPresetInfo(presetName) {
     const $info = $('#asset_preset_info');
     if (presetName) {
-        $info.html(`<i class="fa-solid fa-layer-group"></i> 지금 <strong>${escapeHtml(presetName)}</strong> 버전을 쓰고 있어요.`);
+        $info.html(`<i class="fa-solid fa-layer-group"></i> 지금 <strong>${escapeHtml(presetName)}</strong> 버전을 쓰고 있습니다.`);
     } else {
         $info.text('');
     }
@@ -2836,7 +2836,7 @@ function renderPersonaStatus() {
     const $status = $('#persona_assets_status');
     const persona = store.persona;
     if (!persona.name) {
-        $status.html('<i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>페르소나가 설정되어 있지 않아요.</span>');
+        $status.html('<i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>페르소나가 설정되어 있지 않습니다.</span>');
         $('#persona_assets_gallery_btn').addClass('disabled');
         return;
     }
@@ -2912,12 +2912,12 @@ async function onAssetLinkChanged(value) {
 async function addAssetVersion() {
     const id = getCurrentCharId();
     if (!id) return;
-    const name = await askInput('<h3><i class="fa-solid fa-layer-group"></i> 새 에셋 버전</h3><p>하위 폴더가 만들어지고, 그 안에 따로 에셋을 올릴 수 있어요.</p>', '', { okButton: '만들기' });
+    const name = await askInput('<h3><i class="fa-solid fa-layer-group"></i> 새 에셋 버전</h3><p>하위 폴더가 만들어지고, 그 안에 따로 에셋을 올릴 수 있습니다.</p>', '', { okButton: '만들기' });
     if (!name || !name.trim()) return;
     const trimmed = sanitizeBaseName(name);
     const data = getCharData(id);
     if (data.assetPresets.includes(trimmed)) {
-        showToast('warning', `'${trimmed}' 버전이 이미 있어요.`);
+        showToast('warning', `'${trimmed}' 버전이 이미 있습니다.`);
         return;
     }
     data.assetPresets.push(trimmed);
@@ -2925,7 +2925,7 @@ async function addAssetVersion() {
     saveSettingsDebounced();
     populateAssetPresetSelect();
     await reloadAll();
-    showToast('success', `'${trimmed}' 버전을 만들었어요. 에셋을 올려 주세요.`);
+    showToast('success', `'${trimmed}' 버전을 만들었습니다. 에셋을 올려 주세요.`);
 }
 
 async function renameAssetVersion() {
@@ -2934,24 +2934,24 @@ async function renameAssetVersion() {
     const data = getCharData(id);
     const current = data.activeAssetPreset;
     if (!current) {
-        showToast('info', '기본 버전은 이름을 바꿀 수 없어요.');
+        showToast('info', '기본 버전은 이름을 바꿀 수 없습니다.');
         return;
     }
     const input = await askInput(`<h3><i class="fa-solid fa-pen"></i> 버전 이름 바꾸기</h3><p>'${escapeHtml(current)}' 버전의 새 이름을 적어 주세요.</p>`, current, { okButton: '바꾸기' });
     if (!input || !input.trim() || input.trim() === current) return;
     const trimmed = sanitizeBaseName(input);
     if (data.assetPresets.includes(trimmed)) {
-        showToast('warning', `'${trimmed}' 버전이 이미 있어요.`);
+        showToast('warning', `'${trimmed}' 버전이 이미 있습니다.`);
         return;
     }
 
     const baseName = data.linkedCharacter || id;
     const assets = getSingleOwner()?.assets || [];
     if (assets.length > 0) {
-        const ok = await askConfirm(`<h3>버전 이름 바꾸기</h3><p>'${escapeHtml(current)}' → '${escapeHtml(trimmed)}'<br>파일 ${assets.length}개를 새 폴더로 옮겨요. 계속할까요?</p>`, { okButton: '바꾸기' });
+        const ok = await askConfirm(`<h3>버전 이름 바꾸기</h3><p>'${escapeHtml(current)}' → '${escapeHtml(trimmed)}'<br>파일 ${assets.length}개를 새 폴더로 옮깁니다. 계속하시겠습니까?</p>`, { okButton: '바꾸기' });
         if (!ok) return;
         const result = await runQueue(assets, asset => moveAssetFile(asset, asset.base, `${baseName}/${trimmed}`), { label: '버전 폴더 옮기는 중…' });
-        if (result.failed) showToast('error', `${result.failed}개 파일은 옮기지 못했어요.`);
+        if (result.failed) showToast('error', `${result.failed}개 파일은 옮기지 못했습니다.`);
     }
 
     const index = data.assetPresets.indexOf(current);
@@ -2960,7 +2960,7 @@ async function renameAssetVersion() {
     saveSettingsDebounced();
     populateAssetPresetSelect();
     await reloadAll();
-    showToast('success', `'${current}' → '${trimmed}'(으)로 바꿨어요.`);
+    showToast('success', `'${current}' → '${trimmed}'(으)로 바꿨습니다.`);
 }
 
 async function deleteAssetVersion() {
@@ -2969,11 +2969,11 @@ async function deleteAssetVersion() {
     const data = getCharData(id);
     const current = data.activeAssetPreset;
     if (!current) {
-        showToast('info', '기본 버전은 지울 수 없어요.');
+        showToast('info', '기본 버전은 지울 수 없습니다.');
         return;
     }
     const assets = getSingleOwner()?.assets || [];
-    const ok = await askConfirm(`<h3><i class="fa-solid fa-trash-can"></i> '${escapeHtml(current)}' 버전 지우기</h3><p>이 버전에 들어 있는 파일 ${assets.length}개가 모두 지워져요.</p>`, { okButton: '삭제' });
+    const ok = await askConfirm(`<h3><i class="fa-solid fa-trash-can"></i> '${escapeHtml(current)}' 버전 지우기</h3><p>이 버전에 들어 있는 파일 ${assets.length}개가 모두 삭제됩니다.</p>`, { okButton: '삭제' });
     if (!ok) return;
     if (assets.length) await runQueue(assets, deleteAssetFile, { label: '버전 지우는 중…', concurrency: 4 });
     const index = data.assetPresets.indexOf(current);
@@ -2982,7 +2982,7 @@ async function deleteAssetVersion() {
     saveSettingsDebounced();
     populateAssetPresetSelect();
     await reloadAll();
-    showToast('success', `'${current}' 버전을 지웠어요.`);
+    showToast('success', `'${current}' 버전을 지웠습니다.`);
 }
 
 /* =========================================================
@@ -2991,7 +2991,7 @@ async function deleteAssetVersion() {
 
 const SMART_RENAME_OPTIONS = [
     { id: 'spaceToUnderscore', label: '공백 → 언더바(_)', hint: '파일명 공백을 언더바로', default: true },
-    { id: 'removeSpecial', label: '특수문자 지우기', hint: '영문·숫자·한글·_·- 만 남겨요', default: true },
+    { id: 'removeSpecial', label: '특수문자 지우기', hint: '영문·숫자·한글·_·- 만 남깁니다', default: true },
     { id: 'dotToUnderscore', label: '점(.) → 언더바(_)', hint: 'name.1 → name_1 (확장자 제외)', default: true },
     { id: 'cleanUnderscores', label: '언더바 정리', hint: '겹친 언더바, 앞뒤 언더바 지우기', default: true },
     { id: 'lowercase', label: '소문자로', hint: '영문을 모두 소문자로', default: false },
@@ -3033,23 +3033,23 @@ function planSmartRename(assets, opts) {
 async function openSmartRenamePopup() {
     const owner = getSingleOwner();
     if (!owner) {
-        showToast('info', '캐릭터 하나를 선택했을 때만 쓸 수 있어요.');
+        showToast('info', '캐릭터 하나를 선택했을 때만 쓸 수 있습니다.');
         return;
     }
     if (isAssetLinkActive(owner.id)) {
-        showToast('info', '에셋 링크를 쓰는 중에는 정돈할 수 없어요.');
+        showToast('info', '에셋 링크를 쓰는 중에는 정돈할 수 없습니다.');
         return;
     }
     if (!ensureNoJob()) return;
     if (owner.assets.length === 0) {
-        showToast('info', '정돈할 에셋이 없어요.');
+        showToast('info', '정돈할 에셋이 없습니다.');
         return;
     }
 
     const $content = $(`
         <div>
             <h3><i class="fa-solid fa-broom"></i> 이름 정돈</h3>
-            <p>고른 규칙대로 파일명을 한 번에 바꿔요. 바뀔 이름을 아래에서 먼저 확인할 수 있어요.</p>
+            <p>고른 규칙대로 파일명을 한 번에 바꿉니다. 바뀔 이름을 아래에서 먼저 확인할 수 있습니다.</p>
             <div class="ca-switch-list">
                 ${SMART_RENAME_OPTIONS.map(opt => `
                     <label class="ca-switch ca-switch--block">
@@ -3067,14 +3067,14 @@ async function openSmartRenamePopup() {
         const plan = planSmartRename(owner.assets, readOptions($content));
         const $list = $content.find('.ca-rename-list');
         if (plan.length === 0) {
-            $list.html('<li>바뀌는 파일이 없어요.</li>');
+            $list.html('<li>바뀌는 파일이 없습니다.</li>');
         } else {
             $list.html(plan.slice(0, 200).map(item => `
                 <li class="${item.conflict ? 'is-conflict' : ''}">
                     <span class="from">${escapeHtml(item.asset.fileName)}</span>
                     <i class="fa-solid fa-arrow-right ca-rename-arrow" aria-hidden="true"></i>
                     <span class="to">${escapeHtml(item.next)}.${escapeHtml(item.asset.ext)}</span>
-                    ${item.conflict ? '<small>· 이름이 겹쳐서 건너뛰어요</small>' : ''}
+                    ${item.conflict ? '<small>· 이름이 겹쳐서 건너뜁니다</small>' : ''}
                 </li>`).join('') + (plan.length > 200 ? `<li>… 외 ${plan.length - 200}개</li>` : ''));
         }
         const conflicts = plan.filter(item => item.conflict).length;
@@ -3087,7 +3087,7 @@ async function openSmartRenamePopup() {
     if (!ok) return;
     const plan = planSmartRename(owner.assets, readOptions(root.length ? root : $content)).filter(item => !item.conflict);
     if (plan.length === 0) {
-        showToast('info', '바꿀 파일이 없어요.');
+        showToast('info', '바꿀 파일이 없습니다.');
         return;
     }
 
@@ -3108,12 +3108,12 @@ async function exportAssetsAsZip(assetsOverride, nameOverride) {
     if (!ensureNoJob()) return;
     const assets = assetsOverride || getOwnerAssets();
     if (assets.length === 0) {
-        showToast('info', '내보낼 에셋이 없어요.');
+        showToast('info', '내보낼 에셋이 없습니다.');
         return;
     }
     const JSZip = await loadJSZip();
     if (!JSZip) {
-        showToast('error', 'ZIP 도구를 불러오지 못했어요.');
+        showToast('error', 'ZIP 도구를 불러오지 못했습니다.');
         return;
     }
     const zip = new JSZip();
@@ -3136,10 +3136,10 @@ async function exportAssetsAsZip(assetsOverride, nameOverride) {
         link.click();
         link.remove();
         setTimeout(() => URL.revokeObjectURL(url), 5000);
-        showToast('success', `${result.succeeded}개 에셋을 ZIP으로 받았어요.`);
+        showToast('success', `${result.succeeded}개 에셋을 ZIP으로 받았습니다.`);
     } catch (error) {
         console.error(`[${MODULE_NAME}] ZIP export error:`, error);
-        showToast('error', 'ZIP을 만드는 중 오류가 났어요.');
+        showToast('error', 'ZIP을 만드는 중 오류가 났습니다.');
     }
 }
 
@@ -3238,8 +3238,8 @@ function renderGallery() {
 
     if (items.length === 0) {
         container.innerHTML = assets.length
-            ? emptyHtml('fa-magnifying-glass', '검색 결과가 없어요', '')
-            : emptyHtml('fa-images', '에셋이 없어요', '<p>여기로 이미지를 끌어다 놓으면 바로 올라가요.</p>');
+            ? emptyHtml('fa-magnifying-glass', '검색 결과가 없습니다', '')
+            : emptyHtml('fa-images', '에셋이 없습니다', '<p>여기로 이미지를 끌어다 놓으면 바로 올라갑니다.</p>');
     } else {
         const showOwner = galleryState.source === 'all';
         container.innerHTML = items.map((asset, index) => {
@@ -3618,7 +3618,7 @@ async function onPresetSelected(presetId) {
     if (presetId === getCurrentPresetId()) return;
     if (isPromptDirty()) {
         const choice = await askChoice(
-            '<h3><i class="fa-solid fa-circle-exclamation"></i> 저장하지 않은 내용이 있어요</h3><p>지금 프리셋에 고친 내용을 저장하고 넘어갈까요?</p>',
+            '<h3><i class="fa-solid fa-circle-exclamation"></i> 저장하지 않은 내용이 있습니다</h3><p>지금 프리셋에 고친 내용을 저장하고 넘어가시겠습니까?</p>',
             [{ text: '저장 후 이동', value: 'save' }, { text: '버리고 이동', value: 'discard' }],
         );
         if (choice === null) {
@@ -3639,11 +3639,11 @@ function saveCurrentPromptToPreset(notify = true) {
     saveSettingsDebounced();
     updatePromptDirty();
     updatePromptInjection();
-    if (notify) showToast('success', `"${preset.name}" 프리셋에 저장했어요.`);
+    if (notify) showToast('success', `"${preset.name}" 프리셋에 저장했습니다.`);
 }
 
 async function createPreset() {
-    const name = await askInput('<h3><i class="fa-solid fa-plus"></i> 새 프리셋</h3><p>지금 편집기 내용으로 새 프리셋을 만들어요.</p>', '', { okButton: '만들기' });
+    const name = await askInput('<h3><i class="fa-solid fa-plus"></i> 새 프리셋</h3><p>지금 편집기 내용으로 새 프리셋을 만듭니다.</p>', '', { okButton: '만들기' });
     if (!name || !name.trim()) return;
     let uniqueName = name.trim();
     let counter = 1;
@@ -3654,26 +3654,26 @@ async function createPreset() {
     saveSettingsDebounced();
     updatePresetUI();
     updatePromptDirty();
-    showToast('success', `"${uniqueName}" 프리셋을 만들었어요.`);
+    showToast('success', `"${uniqueName}" 프리셋을 만들었습니다.`);
 }
 
 async function renameCurrentPreset() {
     const preset = getCurrentPreset();
     if (!preset) return;
     if (preset.name === DEFAULT_PRESET_NAME) {
-        showToast('info', '기본 프리셋은 이름을 바꿀 수 없어요.');
+        showToast('info', '기본 프리셋은 이름을 바꿀 수 없습니다.');
         return;
     }
     const newName = await askInput(`<h3><i class="fa-solid fa-pen"></i> 프리셋 이름 바꾸기</h3><p>"${escapeHtml(preset.name)}"의 새 이름을 적어 주세요.</p>`, preset.name, { okButton: '바꾸기' });
     if (!newName || !newName.trim() || newName.trim() === preset.name) return;
     if (getPresetByName(newName.trim())) {
-        showToast('error', `"${newName.trim()}" 프리셋이 이미 있어요.`);
+        showToast('error', `"${newName.trim()}" 프리셋이 이미 있습니다.`);
         return;
     }
     preset.name = newName.trim();
     saveSettingsDebounced();
     updatePresetUI();
-    showToast('success', `이름을 "${preset.name}"(으)로 바꿨어요.`);
+    showToast('success', `이름을 "${preset.name}"(으)로 바꿨습니다.`);
 }
 
 async function deleteCurrentPreset() {
@@ -3681,32 +3681,32 @@ async function deleteCurrentPreset() {
     const preset = getCurrentPreset();
     if (!preset) return;
     if (preset.name === DEFAULT_PRESET_NAME) {
-        showToast('info', '기본 프리셋은 지울 수 없어요.');
+        showToast('info', '기본 프리셋은 지울 수 없습니다.');
         return;
     }
     if (presets.length <= 1) {
-        showToast('info', '마지막 프리셋은 지울 수 없어요.');
+        showToast('info', '마지막 프리셋은 지울 수 없습니다.');
         return;
     }
-    const ok = await askConfirm(`<h3><i class="fa-solid fa-trash-can"></i> 프리셋 지우기</h3><p>"${escapeHtml(preset.name)}" 프리셋을 지울까요?</p>`, { okButton: '삭제' });
+    const ok = await askConfirm(`<h3><i class="fa-solid fa-trash-can"></i> 프리셋 지우기</h3><p>"${escapeHtml(preset.name)}" 프리셋을 삭제하시겠습니까?</p>`, { okButton: '삭제' });
     if (!ok) return;
     presets.splice(presets.indexOf(preset), 1);
     const fallback = presets.find(p => p.name === DEFAULT_PRESET_NAME) || presets[0];
     settings().currentPresetId = fallback.id;
     updatePresetUI();
     setPromptText(fallback.prompt);
-    showToast('success', `"${preset.name}" 프리셋을 지웠어요.`);
+    showToast('success', `"${preset.name}" 프리셋을 지웠습니다.`);
 }
 
 function exportPresets() {
     const preset = getCurrentPreset();
     if (!preset) {
-        showToast('warning', '내보낼 프리셋이 없어요.');
+        showToast('warning', '내보낼 프리셋이 없습니다.');
         return;
     }
     const json = JSON.stringify([preset], null, 2);
     download(json, `character-assets-preset_${preset.name}_${new Date().toISOString().replace(/[:.]/g, '-')}.json`, 'application/json');
-    showToast('success', `"${preset.name}" 프리셋을 내보냈어요.`);
+    showToast('success', `"${preset.name}" 프리셋을 내보냈습니다.`);
 }
 
 async function importPresets(file) {
@@ -3715,19 +3715,19 @@ async function importPresets(file) {
         try {
             imported = JSON.parse(await getFileText(file));
         } catch {
-            showToast('error', 'JSON 형식이 올바르지 않아요.', '불러오기 실패');
+            showToast('error', 'JSON 형식이 올바르지 않습니다.', '불러오기 실패');
             return;
         }
         if (!Array.isArray(imported)) imported = [imported];
         const valid = imported.filter(p => p && typeof p === 'object' && typeof p.name === 'string' && p.name && typeof p.prompt === 'string' && p.prompt)
             .map(p => ({ id: typeof p.id === 'string' && p.id ? p.id : uuidv4(), name: p.name, prompt: p.prompt }));
         if (valid.length === 0) {
-            showToast('error', '쓸 수 있는 프리셋이 없어요.', '불러오기 실패');
+            showToast('error', '쓸 수 있는 프리셋이 없습니다.', '불러오기 실패');
             return;
         }
 
         const choice = await askChoice(
-            `<h3><i class="fa-solid fa-file-import"></i> 프리셋 ${valid.length}개 불러오기</h3><p>지금 목록에 더할까요, 아니면 통째로 바꿀까요?</p>`,
+            `<h3><i class="fa-solid fa-file-import"></i> 프리셋 ${valid.length}개 불러오기</h3><p>기존 목록에 추가하거나 전체를 교체할 수 있습니다.</p>`,
             [{ text: '추가', value: 'add' }, { text: '덮어쓰기', value: 'replace' }],
         );
         if (choice === null) return;
@@ -3754,10 +3754,10 @@ async function importPresets(file) {
         saveSettingsDebounced();
         updatePresetUI();
         setPromptText(getCurrentPreset()?.prompt ?? settings().imagePrompt);
-        showToast('success', `프리셋 ${valid.length}개를 불러왔어요.`);
+        showToast('success', `프리셋 ${valid.length}개를 불러왔습니다.`);
     } catch (error) {
         console.error(`[${MODULE_NAME}] Error importing presets:`, error);
-        showToast('error', '프리셋을 불러오는 중 오류가 났어요.');
+        showToast('error', '프리셋을 불러오는 중 오류가 났습니다.');
     }
 }
 
@@ -3775,7 +3775,7 @@ async function previewPrompt() {
     const raw = String($('#character_assets_image_prompt').val() ?? '');
     let resolved = raw;
     try { resolved = substituteParams(raw); } catch { /* 그대로 */ }
-    await showInfo(`<h3><i class="fa-solid fa-eye"></i> 실제로 들어가는 내용</h3><p>매크로를 지금 캐릭터 기준으로 바꿔서 보여 드려요.</p><pre class="ca-prompt-preview">${escapeHtml(resolved)}</pre>`, { wide: true });
+    await showInfo(`<h3><i class="fa-solid fa-eye"></i> 실제로 들어가는 내용</h3><p>매크로를 지금 캐릭터 기준으로 바꿔서 보여 드립니다.</p><pre class="ca-prompt-preview">${escapeHtml(resolved)}</pre>`, { wide: true });
 }
 
 function replaceKeywordsPlaceholder() {
@@ -3785,28 +3785,28 @@ function replaceKeywordsPlaceholder() {
         return;
     }
     if (owner.assets.length === 0) {
-        showToast('warning', '이 캐릭터에 올린 에셋이 없어요.');
+        showToast('warning', '이 캐릭터에 올린 에셋이 없습니다.');
         return;
     }
     const textarea = $('#character_assets_image_prompt');
     const current = String(textarea.val() ?? '');
     if (!current.includes('{{img_keywords}}')) {
-        showToast('info', '지금 지침에 {{img_keywords}}가 없어요.');
+        showToast('info', '지금 지침에 {{img_keywords}}가 없습니다.');
         return;
     }
     setPromptText(current.replace(/\{\{img_keywords\}\}/g, owner.assets.map(asset => asset.fileName).join(', ')));
-    showToast('success', '{{img_keywords}}를 실제 파일명 목록으로 바꿨어요.');
+    showToast('success', '{{img_keywords}}를 실제 파일명 목록으로 바꿨습니다.');
 }
 
 function openPromptMoreMenu(anchor) {
     openMenu(anchor, [
-        { icon: 'fa-copy', label: '지침 복사', action: async () => { const ok = await copyText(String($('#character_assets_image_prompt').val() ?? '')); showToast(ok ? 'success' : 'error', ok ? '이미지 지침을 복사했어요.' : '복사하지 못했어요.'); } },
+        { icon: 'fa-copy', label: '지침 복사', action: async () => { const ok = await copyText(String($('#character_assets_image_prompt').val() ?? '')); showToast(ok ? 'success' : 'error', ok ? '이미지 지침을 복사했습니다.' : '복사하지 못했습니다.'); } },
         { icon: 'fa-file-export', label: '프리셋 내보내기', action: exportPresets },
         { icon: 'fa-file-import', label: '프리셋 불러오기', action: () => $('#import_presets_input').trigger('click') },
         '-',
         { icon: 'fa-wand-magic-sparkles', label: '{{img_keywords}}를 실제 목록으로', action: replaceKeywordsPlaceholder },
         { icon: 'fa-rotate-left', label: '기본 지침 내용으로', action: async () => {
-            const ok = await askConfirm('<h3>기본 지침으로 바꾸기</h3><p>편집기 내용을 처음 제공된 기본 지침으로 바꿔요. 저장 전까지는 프리셋에 반영되지 않아요.</p>', { okButton: '바꾸기' });
+            const ok = await askConfirm('<h3>기본 지침으로 바꾸기</h3><p>편집기 내용을 처음 제공된 기본 지침으로 바꿉니다. 저장 전까지는 프리셋에 반영되지 않습니다.</p>', { okButton: '바꾸기' });
             if (ok) setPromptText(DEFAULT_IMAGE_PROMPT);
         } },
     ], { title: '이미지 지침' });
@@ -3868,7 +3868,7 @@ function runChatCheck() {
     </div>`;
 
     if (total === 0) {
-        html += '<p class="ca-note">이 채팅에는 아직 <code>{{img::}}</code> 태그가 없어요.</p>';
+        html += '<p class="ca-note">이 채팅에는 아직 <code>{{img::}}</code> 태그가 없습니다.</p>';
     }
 
     if (missing.size) {
@@ -3877,12 +3877,12 @@ function runChatCheck() {
             const suggestions = suggestAssets(name);
             html += `<li class="ca-check__item"><code>${escapeHtml(name)}</code><small>${count}회</small>
                 ${suggestions.map(asset => `<button type="button" class="ca-chip-btn" data-check-alias="${escapeHtml(name)}" data-key="${escapeHtml(asset.key)}" title="${escapeHtml(name)}을(를) ${escapeHtml(asset.fileName)}의 별칭으로 등록"><i class="fa-solid fa-link" aria-hidden="true"></i>${escapeHtml(asset.fileName)}</button>`).join('')}
-                ${suggestions.length ? '' : '<small>비슷한 에셋이 없어요</small>'}
+                ${suggestions.length ? '' : '<small>비슷한 에셋이 없습니다</small>'}
             </li>`;
         });
-        html += '</ul><p class="ca-note">후보를 누르면 그 이름을 별칭으로 등록해서 다음부터 바로 찾아요.</p>';
+        html += '</ul><p class="ca-note">후보를 누르면 그 이름을 별칭으로 등록해서 다음부터 바로 찾습니다.</p>';
     } else if (total > 0) {
-        html += '<div class="ca-check__ok"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>모든 태그가 에셋과 잘 연결돼 있어요.</div>';
+        html += '<div class="ca-check__ok"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>모든 태그가 에셋과 잘 연결돼 있습니다.</div>';
     }
 
     if (top.length) {
@@ -3908,12 +3908,12 @@ async function cleanupSettings() {
     }
 
     if (orphans.length === 0 && staleRefs === 0) {
-        showToast('info', '정리할 설정이 없어요. 깔끔해요!');
+        showToast('info', '정리할 설정이 없습니다.');
         return;
     }
     const ok = await askConfirm(
         `<h3><i class="fa-solid fa-wand-sparkles"></i> 남은 설정 정리</h3>
-         <p>지워진 캐릭터 설정 ${orphans.length}개, 없는 파일 기록 ${staleRefs}개를 정리할까요?<br>이미지 파일은 건드리지 않아요.</p>`,
+         <p>지워진 캐릭터 설정 ${orphans.length}개, 없는 파일 기록 ${staleRefs}개를 정리하시겠습니까?<br>이미지 파일은 건드리지 않습니다.</p>`,
         { okButton: '정리' },
     );
     if (!ok) return;
@@ -3925,7 +3925,7 @@ async function cleanupSettings() {
         Object.keys(data.aliases).forEach(name => { if (!names.has(name)) delete data.aliases[name]; });
     }
     saveSettingsDebounced();
-    showToast('success', '설정을 정리했어요.');
+    showToast('success', '설정을 정리했습니다.');
     afterLocalChange();
 }
 
@@ -3937,7 +3937,7 @@ async function resetCurrentCharacterSettings() {
     }
     const ok = await askConfirm(
         `<h3><i class="fa-solid fa-eraser"></i> 이 캐릭터 설정 초기화</h3>
-         <p><b>${escapeHtml(getOwnerName(id))}</b>의 꺼짐·별칭·에셋 링크·버전 목록을 처음 상태로 돌려요.<br>이미지 파일은 지우지 않아요.</p>`,
+         <p><b>${escapeHtml(getOwnerName(id))}</b>의 꺼짐·별칭·에셋 링크·버전 목록을 처음 상태로 되돌립니다.<br>이미지 파일은 지우지 않습니다.</p>`,
         { okButton: '초기화' },
     );
     if (!ok) return;
@@ -3946,7 +3946,7 @@ async function resetCurrentCharacterSettings() {
     populateAssetLinkSelect();
     populateAssetPresetSelect();
     await reloadAll();
-    showToast('success', '초기화했어요.');
+    showToast('success', '초기화했습니다.');
 }
 
 function buildAccentSwatches() {
@@ -3992,10 +3992,10 @@ function exportExtensionSettings() {
             settings: settings(),
         };
         download(JSON.stringify(payload, null, 2), `character-assets-settings_${new Date().toISOString().replace(/[:.]/g, '-')}.json`, 'application/json');
-        showToast('success', '확장 설정을 백업했어요.');
+        showToast('success', '확장 설정을 백업했습니다.');
     } catch (error) {
         console.error(`[${MODULE_NAME}] Error exporting settings:`, error);
-        showToast('error', '설정을 백업하는 중 오류가 났어요.');
+        showToast('error', '설정을 백업하는 중 오류가 났습니다.');
     }
 }
 
@@ -4003,10 +4003,10 @@ async function importExtensionSettings(file) {
     try {
         const payload = JSON.parse(await getFileText(file));
         if (payload?.type !== 'character-assets-settings' || !payload.settings || typeof payload.settings !== 'object') {
-            showToast('error', '이 확장의 설정 백업 파일이 아니에요.');
+            showToast('error', '이 확장의 설정 백업 파일이 아닙니다.');
             return;
         }
-        const ok = await askConfirm('<h3><i class="fa-solid fa-file-import"></i> 설정 복원</h3><p>지금 설정(프리셋, 캐릭터별 설정, 표시 옵션)이 백업 내용으로 바뀌어요. 계속할까요?</p>', { okButton: '복원' });
+        const ok = await askConfirm('<h3><i class="fa-solid fa-file-import"></i> 설정 복원</h3><p>지금 설정(프리셋, 캐릭터별 설정, 표시 옵션)이 백업 내용으로 바뀝니다. 계속하시겠습니까?</p>', { okButton: '복원' });
         if (!ok) return;
         extension_settings[MODULE_NAME] = payload.settings;
         initializeSettings();
@@ -4015,10 +4015,10 @@ async function importExtensionSettings(file) {
         applyAppearance();
         setupBuiltinRenderer();
         await onContextChanged();
-        showToast('success', '설정을 복원했어요.');
+        showToast('success', '설정을 복원했습니다.');
     } catch (error) {
         console.error(`[${MODULE_NAME}] Error importing settings:`, error);
-        showToast('error', `설정을 복원하지 못했어요: ${describeError(error)}`);
+        showToast('error', `설정을 복원하지 못했습니다: ${describeError(error)}`);
     }
 }
 
@@ -4045,17 +4045,17 @@ function regexDataFor(template) {
 function downloadImageStyleRegex(styleId) {
     const template = getRegexTemplate(styleId);
     if (!template) {
-        showToast('error', '스타일을 찾지 못했어요.');
+        showToast('error', '스타일을 찾지 못했습니다.');
         return;
     }
     download(JSON.stringify(regexDataFor(template), null, 4), `character-assets-regex-${styleId}.json`, 'application/json');
-    showToast('success', `"${template.name}" 정규식을 받았어요.`);
+    showToast('success', `"${template.name}" 정규식을 받았습니다.`);
 }
 
 function downloadAllImageStyleRegex() {
     const templates = RENDER_STYLES.map(style => getRegexTemplate(style.id));
     download(JSON.stringify(templates.map(regexDataFor), null, 4), 'character-assets-regex-all-styles.json', 'application/json');
-    showToast('success', '모든 스타일 정규식을 받았어요.');
+    showToast('success', '모든 스타일 정규식을 받았습니다.');
 }
 
 /* =========================================================
@@ -4209,7 +4209,7 @@ function setupEventHandlers() {
         $(this).find('i').addClass('fa-spin');
         await reloadAll();
         $(this).find('i').removeClass('fa-spin');
-        showToast('success', '에셋 목록을 새로 불러왔어요.');
+        showToast('success', '에셋 목록을 새로 불러왔습니다.');
     });
     $('#ca_open_gallery_btn').on('click', () => openGallery());
 
@@ -4230,14 +4230,14 @@ function setupEventHandlers() {
             syncRenderControls();
             setupBuiltinRenderer();
             renderSetup();
-            showToast('success', '내장 렌더러를 켰어요.');
+            showToast('success', '내장 렌더러를 켰습니다.');
         } else if (action === 'prompt') {
             getInjectSettings().enabled = true;
             saveSettingsDebounced();
             syncInjectControls();
             updatePromptInjection();
             renderAll();
-            showToast('success', '프롬프트 자동 삽입을 켰어요.');
+            showToast('success', '프롬프트 자동 삽입을 켰습니다.');
         } else if (action === 'prompt-manual') {
             getUiSettings().promptLinked = true;
             saveSettingsDebounced();
@@ -4267,7 +4267,7 @@ function setupEventHandlers() {
     // ----- 업로드 -----
     const startPicker = async (anchor, inputId) => {
         if ($(anchor).hasClass('disabled')) {
-            showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없어요.');
+            showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없습니다.');
             return;
         }
         const target = await pickUploadTarget(anchor);
@@ -4423,7 +4423,7 @@ function setupEventHandlers() {
         setupBuiltinRenderer();
         renderSetup();
         updateRegexConflict();
-        showToast(isBuiltinRendererEnabled() ? 'success' : 'info', isBuiltinRendererEnabled() ? '내장 렌더러를 켰어요.' : '내장 렌더러를 껐어요.');
+        showToast(isBuiltinRendererEnabled() ? 'success' : 'info', isBuiltinRendererEnabled() ? '내장 렌더러를 켰습니다.' : '내장 렌더러를 껐습니다.');
     });
     const setStyle = (style) => {
         getRendererSettings().style = style;
@@ -4536,7 +4536,7 @@ function setupEventHandlers() {
         const asset = store.byKey.get(this.dataset.key);
         if (!asset) return;
         addAlias(asset, this.dataset.checkAlias);
-        showToast('success', `'${this.dataset.checkAlias}' → ${asset.fileName} 로 연결했어요.`);
+        showToast('success', `'${this.dataset.checkAlias}' → ${asset.fileName} 로 연결했습니다.`);
         runChatCheck();
     });
 
@@ -4574,7 +4574,7 @@ function setupEventHandlers() {
     $('#export_assets_zip_btn').on('click', () => exportAssetsAsZip());
     $('#smart_rename_btn').on('click', function () {
         if ($(this).hasClass('disabled')) {
-            showToast('info', '에셋 링크를 쓰는 중에는 정돈할 수 없어요.');
+            showToast('info', '에셋 링크를 쓰는 중에는 정돈할 수 없습니다.');
             return;
         }
         openSmartRenamePopup();
@@ -4676,7 +4676,7 @@ function setupGalleryHandlers() {
 
     const target = () => {
         const value = galleryTarget();
-        if (!value) showToast('info', galleryState.source === 'all' ? '멤버를 하나 고른 뒤 올려 주세요.' : '이 에셋 폴더에는 올릴 수 없어요.');
+        if (!value) showToast('info', galleryState.source === 'all' ? '멤버를 하나 고른 뒤 올려 주세요.' : '이 에셋 폴더에는 올릴 수 없습니다.');
         return Promise.resolve(value);
     };
     setupDropZone(container, target);
@@ -4781,7 +4781,7 @@ async function uploadAssetCommand(args, url) {
         return '';
     }
     if (isAssetLinkActive(target.ownerId)) {
-        showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없어요.');
+        showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없습니다.');
         return '';
     }
     const label = String(args?.label || '').trim();
@@ -4797,9 +4797,9 @@ async function refreshImageKeywordsCommand() {
     await reloadAll();
     const keywordString = autoGeneratedKeywords;
     if (keywordString) {
-        showToast('success', `이미지 키워드를 갱신했어요: ${keywordString.substring(0, 100)}${keywordString.length > 100 ? '...' : ''}`);
+        showToast('success', `이미지 키워드를 갱신했습니다: ${keywordString.substring(0, 100)}${keywordString.length > 100 ? '...' : ''}`);
     } else {
-        showToast('info', '이미지 키워드가 비어 있어요.');
+        showToast('info', '이미지 키워드가 비어 있습니다.');
     }
     return '';
 }
@@ -4849,7 +4849,7 @@ function registerSlashCommands() {
         aliases: ['에셋목록'],
         callback: () => autoGeneratedKeywords,
         returns: '켜진 에셋 파일명 목록 (쉼표 구분)',
-        helpString: '켜진 에셋 파일명 목록을 돌려줍니다. 다른 명령어로 넘겨서 쓸 수 있어요.',
+        helpString: '켜진 에셋 파일명 목록을 돌려줍니다. 다른 명령어로 넘겨서 쓸 수 있습니다.',
     }));
 }
 
@@ -4859,7 +4859,7 @@ function addWandMenuItem() {
     const item = document.createElement('div');
     item.id = 'ca_wand_gallery';
     item.className = 'list-group-item flex-container flexGap5';
-    item.title = '현재 캐릭터의 에셋을 보고 채팅창에 넣어요.';
+    item.title = '현재 캐릭터의 에셋을 보고 채팅창에 넣습니다.';
     item.innerHTML = '<div class="fa-solid fa-images extensionsMenuExtensionButton"></div><span>에셋 갤러리</span>';
     item.addEventListener('click', () => openGallery());
     menu.appendChild(item);

@@ -18,7 +18,7 @@
                 </div>
                 <div class="ca-hero__info">
                     <div class="ca-hero__name" id="ca_hero_name">캐릭터를 선택해 주세요</div>
-                    <div class="ca-hero__meta" id="ca_hero_meta">채팅을 열면 에셋 현황이 여기에 보여요.</div>
+                    <div class="ca-hero__meta" id="ca_hero_meta">채팅을 열면 에셋 현황이 여기에 표시됩니다.</div>
                     <div class="ca-hero__chips" id="ca_hero_chips"></div>
                 </div>
                 <div class="ca-hero__actions">
@@ -43,7 +43,7 @@
                         <span class="ca-step__dot" aria-hidden="true"></span>
                         <div class="ca-step__text">
                             <b>에셋 올리기</b>
-                            <small>파일명이 그대로 키워드가 돼요.</small>
+                            <small>파일명이 그대로 키워드가 됩니다.</small>
                         </div>
                         <div class="ca-step__actions">
                             <button type="button" class="ca-chip-btn" data-setup-action="assets">올리기</button>
@@ -53,7 +53,7 @@
                         <span class="ca-step__dot" aria-hidden="true"></span>
                         <div class="ca-step__text">
                             <b>채팅에 이미지 표시</b>
-                            <small>내장 렌더러를 켜면 Regex 없이 바로 보여요.</small>
+                            <small>내장 렌더러를 켜면 Regex 없이 바로 표시됩니다.</small>
                         </div>
                         <div class="ca-step__actions">
                             <button type="button" class="ca-chip-btn" data-setup-action="render">켜기</button>
@@ -63,11 +63,11 @@
                         <span class="ca-step__dot" aria-hidden="true"></span>
                         <div class="ca-step__text">
                             <b>프롬프트 연결</b>
-                            <small>자동 삽입을 켜거나, 매크로를 프롬프트에 직접 넣어요.</small>
+                            <small>자동 삽입을 켜거나, 매크로를 프롬프트에 직접 넣습니다.</small>
                         </div>
                         <div class="ca-step__actions">
                             <button type="button" class="ca-chip-btn" data-setup-action="prompt">자동 삽입 켜기</button>
-                            <button type="button" class="ca-link-btn" data-setup-action="prompt-manual">직접 넣었어요</button>
+                            <button type="button" class="ca-link-btn" data-setup-action="prompt-manual">직접 넣었음</button>
                         </div>
                     </li>
                 </ol>
@@ -103,7 +103,7 @@
                         <div class="ca-field">
                             <label class="ca-label" for="asset_link_select">
                                 <span><i class="fa-solid fa-link" aria-hidden="true"></i> 에셋 링크</span>
-                                <small>다른 캐릭터 폴더를 함께 써요. 같은 캐릭터의 한/영 카드처럼 중복 저장을 피할 때 좋아요.</small>
+                                <small>다른 캐릭터 폴더를 함께 사용합니다. 같은 캐릭터의 한/영 카드처럼 중복 저장을 피할 때 좋습니다.</small>
                             </label>
                             <div class="ca-row">
                                 <select id="asset_link_select" class="text_pole">
@@ -119,7 +119,7 @@
                         <div class="ca-field">
                             <label class="ca-label" for="asset_preset_select">
                                 <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> 에셋 버전</span>
-                                <small>상황별로 폴더를 나눠 두고 바꿔 끼워요. (예: 기본 / BL / 공통)</small>
+                                <small>상황별로 폴더를 나눠 두고 바꿔 끼웁니다. (예: 기본 / BL / 공통)</small>
                             </label>
                             <div class="ca-row">
                                 <select id="asset_preset_select" class="text_pole">
@@ -147,7 +147,7 @@
                         <span class="ca-drop__text">
                             <strong class="ca-only-pointer">이미지를 끌어다 놓거나 붙여넣기</strong>
                             <strong class="ca-only-touch">이미지를 골라 올려 주세요</strong>
-                            <small>PNG · WebP · GIF · JPG · ZIP &nbsp;|&nbsp; 파일명이 키워드가 돼요</small>
+                            <small>PNG · WebP · GIF · JPG · ZIP &nbsp;|&nbsp; 파일명이 키워드가 됩니다</small>
                         </span>
                     </div>
                     <div class="ca-drop__actions">
@@ -244,19 +244,19 @@
                         <span class="ca-switch__track" aria-hidden="true"></span>
                         <span class="ca-switch__text">
                             <strong>내장 렌더러로 이미지 표시</strong>
-                            <small><code>{{img::파일명.ext}}</code> 태그를 Regex 없이 바로 이미지로 바꿔요.</small>
+                            <small><code>{{img::파일명.ext}}</code> 태그를 Regex 없이 바로 이미지로 바꿉니다.</small>
                         </span>
                     </label>
                     <div class="ca-alert ca-alert--warn" id="ca_regex_conflict" role="note" hidden>
                         <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                        <span>Regex 확장에도 <code>{{img::}}</code> 변환 스크립트가 켜져 있어요. 이미지가 두 번 보일 수 있으니 한쪽만 써 주세요.</span>
+                        <span>Regex 확장에도 <code>{{img::}}</code> 변환 스크립트가 켜져 있습니다. 이미지가 두 번 보일 수 있으니 한쪽만 써 주세요.</span>
                     </div>
                 </div>
 
                 <div class="ca-card" id="ca_render_style_card">
                     <div class="ca-card__head">
                         <h4>표시 스타일</h4>
-                        <p>채팅에 들어갈 이미지 모양을 골라요. 아래 미리보기에 바로 반영돼요.</p>
+                        <p>채팅에 들어갈 이미지 모양을 고릅니다. 아래 미리보기에 바로 반영됩니다.</p>
                     </div>
                     <div class="ca-style-grid" id="ca_style_grid" role="radiogroup" aria-label="이미지 표시 스타일"></div>
 
@@ -279,33 +279,33 @@
                         <label class="ca-switch ca-switch--block">
                             <input type="checkbox" id="ca_render_zoom">
                             <span class="ca-switch__track" aria-hidden="true"></span>
-                            <span class="ca-switch__text"><strong>눌러서 크게 보기</strong><small>채팅 속 이미지를 누르면 원본 크기로 열려요.</small></span>
+                            <span class="ca-switch__text"><strong>눌러서 크게 보기</strong><small>채팅 속 이미지를 누르면 원본 크기로 열립니다.</small></span>
                         </label>
                         <label class="ca-switch ca-switch--block">
                             <input type="checkbox" id="ca_render_caption">
                             <span class="ca-switch__track" aria-hidden="true"></span>
-                            <span class="ca-switch__text"><strong>이미지 아래 이름 표시</strong><small>어떤 에셋이 나왔는지 작게 적어 줘요.</small></span>
+                            <span class="ca-switch__text"><strong>이미지 아래 이름 표시</strong><small>어떤 에셋이 나왔는지 작게 적어 줍니다.</small></span>
                         </label>
                         <label class="ca-switch ca-switch--block">
                             <input type="checkbox" id="ca_render_smart">
                             <span class="ca-switch__track" aria-hidden="true"></span>
-                            <span class="ca-switch__text"><strong>비슷한 이름 자동 연결</strong><small>AI가 <code>joy</code>, <code>기쁨</code>, <code>Happy.png</code>처럼 조금 다르게 써도 가장 가까운 에셋을 찾아요.</small></span>
+                            <span class="ca-switch__text"><strong>비슷한 이름 자동 연결</strong><small>AI가 <code>joy</code>, <code>기쁨</code>, <code>Happy.png</code>처럼 조금 다르게 써도 가장 가까운 에셋을 찾습니다.</small></span>
                         </label>
                         <label class="ca-switch ca-switch--block">
                             <input type="checkbox" id="character_assets_random_asset">
                             <span class="ca-switch__track" aria-hidden="true"></span>
-                            <span class="ca-switch__text"><strong>랜덤 에셋</strong><small><code>angry_1</code>, <code>angry_2</code>처럼 묶인 파일이 있으면 AI에겐 <code>angry</code>만 알려 주고, 표시할 때 그중 하나를 골라요.</small></span>
+                            <span class="ca-switch__text"><strong>랜덤 에셋</strong><small><code>angry_1</code>, <code>angry_2</code>처럼 묶인 파일이 있으면 AI에겐 <code>angry</code>만 알려 주고, 표시할 때 그중 하나를 고릅니다.</small></span>
                         </label>
                         <label class="ca-switch ca-switch--block">
                             <input type="checkbox" id="character_assets_renderer_lazy">
                             <span class="ca-switch__track" aria-hidden="true"></span>
-                            <span class="ca-switch__text"><strong>지연 로딩</strong><small>화면에 보이는 메시지만 처리해서 긴 채팅도 가볍게 스크롤돼요.</small></span>
+                            <span class="ca-switch__text"><strong>지연 로딩</strong><small>화면에 보이는 메시지만 처리해서 긴 채팅도 가볍게 스크롤됩니다.</small></span>
                         </label>
                     </div>
                     <div class="ca-field">
                         <label class="ca-label" for="ca_render_missing">
                             <span>못 찾은 태그</span>
-                            <small>목록에 없는 이름을 AI가 썼을 때 어떻게 보여 줄지 정해요.</small>
+                            <small>목록에 없는 이름을 AI가 썼을 때 어떻게 보여 줄지 정합니다.</small>
                         </label>
                         <select id="ca_render_missing" class="text_pole">
                             <option value="chip">작은 안내 표시</option>
@@ -324,7 +324,7 @@
                         <span class="ca-switch__track" aria-hidden="true"></span>
                         <span class="ca-switch__text">
                             <strong>프롬프트 자동 삽입</strong>
-                            <small>켜 두면 <code>{{img_inprompt}}</code>를 따로 넣지 않아도 에셋이 있는 캐릭터와 대화할 때 지침이 들어가요. 이미 직접 넣어 두셨다면 중복되니 하나만 쓰세요.</small>
+                            <small>켜 두면 <code>{{img_inprompt}}</code>를 따로 넣지 않아도 에셋이 있는 캐릭터와 대화할 때 지침이 들어갑니다. 이미 직접 넣어 두셨다면 중복되니 하나만 쓰세요.</small>
                         </span>
                     </label>
                     <div class="ca-inject" id="ca_inject_options">
@@ -354,7 +354,7 @@
                 <div class="ca-card">
                     <div class="ca-card__head">
                         <h4>이미지 지침</h4>
-                        <p>AI가 대화 흐름에 맞는 에셋 태그를 고르도록 알려 주는 글이에요.</p>
+                        <p>AI가 대화 흐름에 맞는 에셋 태그를 고르도록 알려 주는 글입니다.</p>
                     </div>
 
                     <div class="ca-row">
@@ -383,10 +383,10 @@
                         <span class="ca-editor-foot__stats" id="ca_prompt_stats">0자</span>
                         <span class="ca-dirty" id="ca_prompt_dirty" hidden><i class="fa-solid fa-circle" aria-hidden="true"></i> 저장 안 됨</span>
                         <div class="ca-editor-foot__actions">
-                            <div class="menu_button ca-btn ca-btn--ghost" id="ca_prompt_revert_btn" role="button" tabindex="0" title="프리셋에 저장된 내용으로 되돌려요.">
+                            <div class="menu_button ca-btn ca-btn--ghost" id="ca_prompt_revert_btn" role="button" tabindex="0" title="프리셋에 저장된 내용으로 되돌립니다.">
                                 <i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>되돌리기</span>
                             </div>
-                            <div class="menu_button ca-btn ca-btn--ghost" id="ca_prompt_preview_btn" role="button" tabindex="0" title="매크로가 실제로 어떻게 바뀌는지 봐요.">
+                            <div class="menu_button ca-btn ca-btn--ghost" id="ca_prompt_preview_btn" role="button" tabindex="0" title="매크로가 실제로 어떻게 바뀌는지 확인합니다.">
                                 <i class="fa-solid fa-eye" aria-hidden="true"></i><span>미리보기</span>
                             </div>
                             <div class="menu_button ca-btn ca-btn--primary" id="save_preset_btn" role="button" tabindex="0">
@@ -404,7 +404,7 @@
                     <div class="ca-card__head ca-card__head--row">
                         <div>
                             <h4><i class="fa-solid fa-stethoscope" aria-hidden="true"></i> 채팅 점검</h4>
-                            <p>지금 채팅에 나온 태그를 훑어서 못 찾은 이름과 자주 쓰인 에셋을 알려 드려요.</p>
+                            <p>지금 채팅에 나온 태그를 훑어서 못 찾은 이름과 자주 쓰인 에셋을 알려 드립니다.</p>
                         </div>
                         <div class="menu_button ca-btn" id="ca_chat_check_btn" role="button" tabindex="0">
                             <i class="fa-solid fa-magnifying-glass-chart" aria-hidden="true"></i><span>점검하기</span>
@@ -416,7 +416,7 @@
                 <div class="ca-card">
                     <div class="ca-card__head">
                         <h4><i class="fa-solid fa-user-astronaut" aria-hidden="true"></i> 페르소나 에셋</h4>
-                        <p>캐릭터 에셋에 없는 이름은 여기서 한 번 더 찾아요. 모든 캐릭터와 같이 쓸 이미지를 넣어 두세요.</p>
+                        <p>캐릭터 에셋에 없는 이름은 여기서 한 번 더 찾습니다. 모든 캐릭터와 같이 쓸 이미지를 넣어 두세요.</p>
                     </div>
                     <div class="ca-persona" id="persona_assets_status">페르소나 정보를 불러오는 중…</div>
                     <div class="ca-btn-row">
@@ -437,7 +437,7 @@
                 <div class="ca-card">
                     <div class="ca-card__head">
                         <h4><i class="fa-solid fa-box-archive" aria-hidden="true"></i> 백업 &amp; 정리</h4>
-                        <p>에셋 파일과 확장 설정을 내려받거나 되돌려요.</p>
+                        <p>에셋 파일과 확장 설정을 내려받거나 되돌립니다.</p>
                     </div>
                     <div class="ca-btn-row">
                         <div class="menu_button ca-btn" id="export_assets_zip_btn" role="button" tabindex="0">
@@ -453,10 +453,10 @@
                             <i class="fa-solid fa-file-import" aria-hidden="true"></i><span>설정 복원</span>
                         </div>
                         <input type="file" id="import_settings_input" accept=".json,application/json" hidden>
-                        <div class="menu_button ca-btn" id="ca_cleanup_btn" role="button" tabindex="0" title="지워진 캐릭터·파일에 남아 있는 설정을 정리해요.">
+                        <div class="menu_button ca-btn" id="ca_cleanup_btn" role="button" tabindex="0" title="지워진 캐릭터·파일에 남아 있는 설정을 정리합니다.">
                             <i class="fa-solid fa-wand-sparkles" aria-hidden="true"></i><span>남은 설정 정리</span>
                         </div>
-                        <div class="menu_button ca-btn ca-btn--danger" id="ca_reset_char_btn" role="button" tabindex="0" title="현재 캐릭터의 꺼짐·별칭·링크·버전 설정을 초기화해요. 파일은 지우지 않아요.">
+                        <div class="menu_button ca-btn ca-btn--danger" id="ca_reset_char_btn" role="button" tabindex="0" title="현재 캐릭터의 꺼짐·별칭·링크·버전 설정을 초기화합니다. 파일은 지우지 않습니다.">
                             <i class="fa-solid fa-eraser" aria-hidden="true"></i><span>이 캐릭터 설정 초기화</span>
                         </div>
                     </div>
@@ -465,14 +465,14 @@
                 <div class="ca-card">
                     <div class="ca-card__head">
                         <h4><i class="fa-solid fa-palette" aria-hidden="true"></i> 화면</h4>
-                        <p>확장 패널의 포인트 색이에요. 나머지 색은 쓰고 계신 테마를 따라가요.</p>
+                        <p>확장 패널의 포인트 색입니다. 나머지 색은 쓰고 계신 테마를 따라갑니다.</p>
                     </div>
                     <div class="ca-swatches" id="ca_accent_swatches" role="radiogroup" aria-label="포인트 색"></div>
                 </div>
 
                 <details class="ca-card ca-fold">
                     <summary><i class="fa-solid fa-code" aria-hidden="true"></i><span>Regex 스타일 받기</span><i class="fa-solid fa-chevron-down ca-chevron" aria-hidden="true"></i></summary>
-                    <p class="ca-note">Regex 확장으로 계속 쓰시는 분들을 위한 호환 기능이에요. 내장 렌더러를 쓰신다면 필요 없어요.</p>
+                    <p class="ca-note">Regex 확장으로 계속 쓰시는 분들을 위한 호환 기능입니다. 내장 렌더러를 쓰신다면 필요 없습니다.</p>
                     <div class="ca-regex-grid" id="ca_regex_style_grid"></div>
                     <div class="ca-btn-row ca-btn-row--center">
                         <div class="menu_button ca-btn" id="download_all_styles_btn" role="button" tabindex="0">
@@ -484,10 +484,10 @@
                 <details class="ca-card ca-fold">
                     <summary><i class="fa-solid fa-circle-question" aria-hidden="true"></i><span>사용법 &amp; 매크로</span><i class="fa-solid fa-chevron-down ca-chevron" aria-hidden="true"></i></summary>
                     <ol class="ca-guide">
-                        <li><b>에셋</b> 탭에서 이미지나 ZIP을 올려요. 파일명이 키워드예요. (<code>joy.png</code>, <code>angry_1.webp</code>)</li>
-                        <li><b>표시</b> 탭에서 내장 렌더러를 켜요.</li>
-                        <li><b>프롬프트</b> 탭에서 자동 삽입을 켜거나, 캐릭터 설명·작가 노트에 <code>{{img_inprompt}}</code>를 넣어요.</li>
-                        <li>AI가 <code>{{img::파일명.ext}}</code>로 답하면 이미지가 나와요.</li>
+                        <li><b>에셋</b> 탭에서 이미지나 ZIP을 올립니다. 파일명이 키워드입니다. (<code>joy.png</code>, <code>angry_1.webp</code>)</li>
+                        <li><b>표시</b> 탭에서 내장 렌더러를 켭니다.</li>
+                        <li><b>프롬프트</b> 탭에서 자동 삽입을 켜거나, 캐릭터 설명·작가 노트에 <code>{{img_inprompt}}</code>를 넣습니다.</li>
+                        <li>AI가 <code>{{img::파일명.ext}}</code>로 답하면 이미지가 나옵니다.</li>
                     </ol>
                     <div class="ca-macro-table" id="ca_macro_table"></div>
                 </details>

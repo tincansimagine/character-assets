@@ -864,6 +864,7 @@ function defaultCharacterData() {
         disabledAssets: [],
         aliases: {},
         linkedCharacter: '',
+        linkKeepOwn: false,
         activeAssetPreset: '',
         assetPresets: [],
         regexFind: DEFAULT_REGEX_FIND,
@@ -884,6 +885,7 @@ function initializeCharacterAssets(characterId) {
     if (!Array.isArray(data.disabledAssets)) data.disabledAssets = [];
     if (!data.aliases || typeof data.aliases !== 'object' || Array.isArray(data.aliases)) data.aliases = {};
     if (typeof data.linkedCharacter !== 'string') data.linkedCharacter = '';
+    if (typeof data.linkKeepOwn !== 'boolean') data.linkKeepOwn = false;
     if (typeof data.activeAssetPreset !== 'string') data.activeAssetPreset = '';
     if (!Array.isArray(data.assetPresets)) data.assetPresets = [];
     if (!data.regexOptions) data.regexOptions = { userInput: false, aiOutput: true, runOnEdit: true, onlyFormatDisplay: true };
@@ -974,6 +976,24 @@ function getEffectiveCharacterName(characterName) {
 
 function isAssetLinkActive(characterId) {
     return String(getCharData(characterId).linkedCharacter || '').trim().length > 0;
+}
+
+/** 링크 + "이 캐릭터 에셋도 같이 쓰기": 이 캐릭터 폴더와 링크 폴더를 함께 쓴다. */
+function isLinkMerged(characterId) {
+    return isAssetLinkActive(characterId) && getCharData(characterId).linkKeepOwn === true;
+}
+
+/** 이 캐릭터에 올리기·이름 정돈을 못 하는 상태 (링크 폴더만 쓰는 경우) */
+function isUploadLocked(characterId) {
+    return isAssetLinkActive(characterId) && !isLinkMerged(characterId);
+}
+
+/** 지금 버전(또는 기본) 폴더에 실제로 들어 있는 파일. 다른 폴더 파일에 가려진 것도 포함한다. */
+async function fetchVersionFolderAssets(characterId, version) {
+    const data = getCharData(characterId);
+    const folder = `${data.linkedCharacter || characterId}/${version}`;
+    const raw = await fetchFolderAssets(folder);
+    return raw.map(item => makeAsset(item, characterId, folder));
 }
 
 async function getPersonaModule() {
@@ -1175,6 +1195,8 @@ function makeAsset(raw, ownerId, folder) {
         card: extractBaseKeyword(label),
         mtime: mtimeFromPath(raw.path),
         disabled: false,
+        // 링크된 다른 캐릭터 폴더의 파일인지 (여기서는 지우거나 이름을 바꿀 수 없음)
+        fromLink: false,
     };
 }
 
@@ -1200,17 +1222,32 @@ async function refreshStore() {
     const [ownerList, persona] = await Promise.all([
         Promise.all(ids.map(async (id) => {
             const data = getCharData(id);
-            const folder = getEffectiveCharacterName(id);
-            const raw = await fetchFolderAssets(folder);
+            const linked = isAssetLinkActive(id);
+            const merged = isLinkMerged(id);
+            const sourceFolder = getEffectiveCharacterName(id);
+            const [ownRaw, sourceRaw] = await Promise.all([
+                merged ? fetchFolderAssets(id) : Promise.resolve([]),
+                fetchFolderAssets(sourceFolder),
+            ]);
+            // 같이 쓰기: 이 캐릭터 폴더 파일이 먼저, 이름(확장자 무관)이 겹치는 링크 파일은 가린다
+            const ownAssets = ownRaw.map(item => makeAsset(item, id, id));
+            const ownNames = new Set(ownAssets.map(asset => asset.base.toLowerCase()));
+            const sourceAssets = sourceRaw
+                .map(item => makeAsset(item, id, sourceFolder))
+                .filter(asset => !ownNames.has(asset.base.toLowerCase()));
+            sourceAssets.forEach(asset => { asset.fromLink = linked; });
             const character = findCharacterById(id);
             return {
                 id,
                 name: character?.name || id,
                 avatar: character?.avatar || '',
-                folder,
+                // 올리기 대상 폴더
+                folder: merged ? id : sourceFolder,
+                linkFolder: linked ? sourceFolder : '',
+                merged,
                 linked: data.linkedCharacter || '',
                 version: data.activeAssetPreset || '',
-                assets: raw.map(item => makeAsset(item, id, folder)),
+                assets: [...ownAssets, ...sourceAssets],
             };
         })),
         loadPersonaAssets(),
@@ -1856,7 +1893,8 @@ function getTargetAssets(target) {
 /** 같은 이름(확장자 무관)이 이미 있으면 덮어쓸지 묻는다 */
 async function confirmOverwriteIfNeeded(target, fileNames) {
     if (!settings().confirmOverwrite) return true;
-    const existing = new Set(getTargetAssets(target).map(asset => asset.base.toLowerCase()));
+    // 같은 폴더 안에서만 덮어쓰기가 일어난다 (링크 폴더 파일은 가려질 뿐 지워지지 않음)
+    const existing = new Set(getTargetAssets(target).filter(asset => asset.folder === target.folder).map(asset => asset.base.toLowerCase()));
     const duplicates = fileNames.filter(name => existing.has(splitExt(name).base.toLowerCase()));
     if (duplicates.length === 0) return true;
 
@@ -1890,14 +1928,14 @@ function pickUploadTarget(anchor) {
     if (store.mode === 'single') {
         const owner = getSingleOwner();
         if (!owner) return Promise.resolve(null);
-        if (isAssetLinkActive(owner.id)) {
-            showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없습니다. 링크된 캐릭터에서 올려 주세요.');
+        if (isUploadLocked(owner.id)) {
+            showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없습니다. 링크된 캐릭터에서 올리거나, 에셋 폴더에서 \'이 캐릭터 에셋도 같이 쓰기\'를 켜 주세요.');
             return Promise.resolve(null);
         }
         return Promise.resolve(characterTarget(owner));
     }
     if (store.mode === 'group') {
-        const owners = Array.from(store.owners.values()).filter(owner => !isAssetLinkActive(owner.id));
+        const owners = Array.from(store.owners.values()).filter(owner => !isUploadLocked(owner.id));
         if (owners.length === 0) {
             showToast('info', '올릴 수 있는 멤버가 없습니다.');
             return Promise.resolve(null);
@@ -2160,7 +2198,7 @@ function toggleAsset(asset) {
 }
 
 function isLocked(asset) {
-    return asset.ownerId !== PERSONA_OWNER && isAssetLinkActive(asset.ownerId);
+    return asset.ownerId !== PERSONA_OWNER && asset.fromLink === true;
 }
 
 async function editAliases(asset) {
@@ -2210,7 +2248,7 @@ function migrateFileRecords(ownerId, oldName, newName) {
 async function renameSingleAsset(asset) {
     if (!asset || !ensureNoJob()) return;
     if (isLocked(asset)) {
-        showToast('info', '에셋 링크를 쓰는 중에는 이름을 바꿀 수 없습니다.');
+        showToast('info', '링크된 캐릭터의 파일은 여기서 이름을 바꿀 수 없습니다. 원래 캐릭터에서 바꿔 주세요.');
         return;
     }
     const input = await askInput(
@@ -2222,7 +2260,7 @@ async function renameSingleAsset(asset) {
     const newBase = sanitizeBaseName(input);
     if (!newBase || newBase === asset.base) return;
 
-    const siblings = getTargetAssets({ ownerId: asset.ownerId }).filter(item => item.key !== asset.key);
+    const siblings = getTargetAssets({ ownerId: asset.ownerId }).filter(item => item.key !== asset.key && item.folder === asset.folder);
     if (siblings.some(item => item.base.toLowerCase() === newBase.toLowerCase())) {
         const overwrite = await askConfirm(`<h3>같은 이름이 있습니다</h3><p><code>${escapeHtml(newBase)}</code> 파일을 덮어씁니다. 계속하시겠습니까?</p>`, { okButton: '덮어쓰기' });
         if (!overwrite) return;
@@ -2244,7 +2282,7 @@ async function confirmDeleteAssets(assets) {
     const list = assets.filter(Boolean);
     if (list.length === 0 || !ensureNoJob()) return;
     if (list.some(isLocked)) {
-        showToast('info', '에셋 링크를 쓰는 중에는 지울 수 없습니다.');
+        showToast('info', '링크된 캐릭터의 파일은 여기서 지울 수 없습니다. 원래 캐릭터에서 지워 주세요.');
         return;
     }
     const preview = list.slice(0, 8).map(asset => `<code>${escapeHtml(asset.fileName)}</code>`).join(' ');
@@ -2498,9 +2536,14 @@ function fileRowHtml(asset) {
         ? `<span class="ca-file__alias" title="별칭: ${escapeHtml(aliases.join(', '))}">@${aliases.length}</span>`
         : '';
     const state = asset.disabled ? '꺼짐 · 눌러서 켜기' : '켜짐 · 눌러서 끄기';
+    // 같이 쓰기 중일 때만 어느 파일이 링크에서 온 것인지 표시한다
+    const owner = store.owners.get(asset.ownerId);
+    const linkBadge = asset.fromLink && owner?.merged
+        ? `<span class="ca-file__alias" title="${escapeHtml(getOwnerName(owner.linked))}의 파일 (링크)"><i class="fa-solid fa-link" aria-hidden="true"></i></span>`
+        : '';
     return `<li class="ca-file${asset.disabled ? ' is-off' : ''}" data-key="${escapeHtml(asset.key)}">
         <span class="ca-file__name" title="${escapeHtml(asset.fileName)}">${escapeHtml(asset.fileName)}</span>
-        ${aliasBadge}
+        ${linkBadge}${aliasBadge}
         <button type="button" class="ca-mini-btn" data-action="toggle" aria-pressed="${asset.disabled ? 'false' : 'true'}" aria-label="${escapeHtml(asset.fileName)} 사용" title="${state}"><i class="fa-solid ${asset.disabled ? 'fa-eye-slash' : 'fa-eye'}" aria-hidden="true"></i></button>
         <button type="button" class="ca-mini-btn" data-action="menu" aria-haspopup="menu" aria-label="${escapeHtml(asset.fileName)} 메뉴" title="더보기"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button>
     </li>`;
@@ -2656,7 +2699,7 @@ function toggleCardSelection(cardId, force) {
 
 function openAssetsMoreMenu(anchor) {
     const owner = getSingleOwner();
-    const locked = owner ? isAssetLinkActive(owner.id) : true;
+    const locked = owner ? isUploadLocked(owner.id) : true;
     const hasAssets = getOwnerAssets().length > 0;
     openMenu(anchor, [
         { icon: 'fa-table-cells-large', label: '갤러리로 보기', action: () => openGallery() },
@@ -2719,8 +2762,8 @@ function renderHero() {
         const character = getCurrentCharacter();
         setAvatar(avatar, character?.avatar ? `<img src="${escapeHtml(thumbnailUrl('avatar', character.avatar))}" alt="">` : '<i class="fa-solid fa-user"></i>');
         $name.text(character?.name || owner?.name || '');
-        $meta.text(`에셋 폴더 · ${owner?.folder || ''}`);
-        if (owner?.linked) chips.push(`<span class="ca-chip ca-chip--accent"><i class="fa-solid fa-link" aria-hidden="true"></i>${escapeHtml(getOwnerName(owner.linked))} 링크</span>`);
+        $meta.text(`에셋 폴더 · ${owner?.merged ? `${owner.folder} + ${owner.linkFolder}` : (owner?.folder || '')}`);
+        if (owner?.linked) chips.push(`<span class="ca-chip ca-chip--accent"><i class="fa-solid fa-link" aria-hidden="true"></i>${escapeHtml(getOwnerName(owner.linked))} 링크${owner.merged ? ' · 같이 쓰기' : ''}</span>`);
         if (owner?.version) chips.push(`<span class="ca-chip"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>${escapeHtml(owner.version)}</span>`);
     }
     if (getInjectSettings().enabled) chips.push('<span class="ca-chip"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>자동 삽입</span>');
@@ -2763,11 +2806,11 @@ function renderSourceInfo() {
     const id = getCharId(character);
     const data = getCharData(id);
     const parts = [];
-    if (data.linkedCharacter) parts.push(`${getOwnerName(data.linkedCharacter)} 링크`);
+    if (data.linkedCharacter) parts.push(`${getOwnerName(data.linkedCharacter)} 링크${isLinkMerged(id) ? ' + 이 캐릭터' : ''}`);
     if (data.activeAssetPreset) parts.push(`버전 ${data.activeAssetPreset}`);
     $('#ca_source_value').text(parts.length ? parts.join(' · ') : '기본 폴더').toggleClass('is-active', parts.length > 0);
 
-    const locked = isAssetLinkActive(id);
+    const locked = isUploadLocked(id);
     $('#ca_dropzone').toggleClass('is-locked', locked);
     $('#character_assets_upload_image_btn, #character_assets_upload_zip_btn, #ca_upload_url_btn, #smart_rename_btn')
         .toggleClass('disabled', locked)
@@ -2805,11 +2848,18 @@ function populateAssetLinkSelect() {
 
 function updateAssetLinkInfo(linkedName) {
     const $info = $('#asset_link_info');
-    if (linkedName) {
-        $info.html(`<i class="fa-solid fa-link"></i> <strong>${escapeHtml(getOwnerName(linkedName))}</strong>의 에셋을 같이 쓰는 중입니다. 이 상태에서는 올리기·삭제가 잠깁니다.`);
-    } else {
+    const id = getCurrentCharId();
+    const keepOwn = Boolean(id && linkedName && getCharData(id).linkKeepOwn);
+    $('#asset_link_keep_own_row').prop('hidden', !linkedName);
+    $('#asset_link_keep_own').prop('checked', keepOwn);
+    if (!linkedName) {
         $info.text('');
+        return;
     }
+    const name = `<strong>${escapeHtml(getOwnerName(linkedName))}</strong>`;
+    $info.html(keepOwn
+        ? `<i class="fa-solid fa-link"></i> 이 캐릭터 에셋과 ${name}의 에셋을 함께 쓰는 중입니다. 새로 올리는 파일은 이 캐릭터 폴더에 들어가고, 이름이 겹치면 이 캐릭터 파일이 먼저 나옵니다. ${name}의 파일은 여기서 지우거나 이름을 바꿀 수 없습니다.`
+        : `<i class="fa-solid fa-link"></i> 이 캐릭터 폴더 대신 ${name}의 에셋을 쓰는 중입니다. 이 상태에서는 올리기·삭제가 잠깁니다.`);
 }
 
 function populateAssetPresetSelect() {
@@ -2909,6 +2959,15 @@ async function onAssetLinkChanged(value) {
     await reloadAll();
 }
 
+async function onAssetLinkKeepOwnChanged(on) {
+    const id = getCurrentCharId();
+    if (!id) return;
+    getCharData(id).linkKeepOwn = Boolean(on);
+    saveSettingsDebounced();
+    updateAssetLinkInfo(getCharData(id).linkedCharacter);
+    await reloadAll();
+}
+
 async function addAssetVersion() {
     const id = getCurrentCharId();
     if (!id) return;
@@ -2946,7 +3005,8 @@ async function renameAssetVersion() {
     }
 
     const baseName = data.linkedCharacter || id;
-    const assets = getSingleOwner()?.assets || [];
+    // 목록이 아니라 버전 폴더를 직접 읽는다 (같이 쓰기 중인 이 캐릭터 파일이 섞이지 않게)
+    const assets = await fetchVersionFolderAssets(id, current);
     if (assets.length > 0) {
         const ok = await askConfirm(`<h3>버전 이름 바꾸기</h3><p>'${escapeHtml(current)}' → '${escapeHtml(trimmed)}'<br>파일 ${assets.length}개를 새 폴더로 옮깁니다. 계속하시겠습니까?</p>`, { okButton: '바꾸기' });
         if (!ok) return;
@@ -2972,7 +3032,7 @@ async function deleteAssetVersion() {
         showToast('info', '기본 버전은 지울 수 없습니다.');
         return;
     }
-    const assets = getSingleOwner()?.assets || [];
+    const assets = await fetchVersionFolderAssets(id, current);
     const ok = await askConfirm(`<h3><i class="fa-solid fa-trash-can"></i> '${escapeHtml(current)}' 버전 지우기</h3><p>이 버전에 들어 있는 파일 ${assets.length}개가 모두 삭제됩니다.</p>`, { okButton: '삭제' });
     if (!ok) return;
     if (assets.length) await runQueue(assets, deleteAssetFile, { label: '버전 지우는 중…', concurrency: 4 });
@@ -3036,12 +3096,14 @@ async function openSmartRenamePopup() {
         showToast('info', '캐릭터 하나를 선택했을 때만 쓸 수 있습니다.');
         return;
     }
-    if (isAssetLinkActive(owner.id)) {
+    if (isUploadLocked(owner.id)) {
         showToast('info', '에셋 링크를 쓰는 중에는 정돈할 수 없습니다.');
         return;
     }
     if (!ensureNoJob()) return;
-    if (owner.assets.length === 0) {
+    // 같이 쓰기 중이면 이 캐릭터 폴더 파일만 정돈한다
+    const ownAssets = owner.assets.filter(asset => !isLocked(asset));
+    if (ownAssets.length === 0) {
         showToast('info', '정돈할 에셋이 없습니다.');
         return;
     }
@@ -3064,7 +3126,7 @@ async function openSmartRenamePopup() {
 
     const readOptions = (root) => Object.fromEntries(SMART_RENAME_OPTIONS.map(opt => [opt.id, root.find(`[data-opt="${opt.id}"]`).prop('checked')]));
     const updatePreview = () => {
-        const plan = planSmartRename(owner.assets, readOptions($content));
+        const plan = planSmartRename(ownAssets, readOptions($content));
         const $list = $content.find('.ca-rename-list');
         if (plan.length === 0) {
             $list.html('<li>바뀌는 파일이 없습니다.</li>');
@@ -3085,7 +3147,7 @@ async function openSmartRenamePopup() {
 
     const { ok, root } = await confirmWithContent($content, { okButton: '적용', wide: true });
     if (!ok) return;
-    const plan = planSmartRename(owner.assets, readOptions(root.length ? root : $content)).filter(item => !item.conflict);
+    const plan = planSmartRename(ownAssets, readOptions(root.length ? root : $content)).filter(item => !item.conflict);
     if (plan.length === 0) {
         showToast('info', '바꿀 파일이 없습니다.');
         return;
@@ -3177,7 +3239,7 @@ function galleryAssets() {
 function galleryTarget() {
     if (galleryState.source === PERSONA_OWNER) return store.persona.folder ? { folder: store.persona.folder, ownerId: PERSONA_OWNER, title: '페르소나' } : null;
     const owner = store.owners.get(galleryState.source);
-    if (!owner || isAssetLinkActive(owner.id)) return null;
+    if (!owner || isUploadLocked(owner.id)) return null;
     return characterTarget(owner);
 }
 
@@ -4247,6 +4309,7 @@ function setupEventHandlers() {
 
     // ----- 에셋 폴더 -----
     $('#asset_link_select').on('change', function () { onAssetLinkChanged(String($(this).val() || '')); });
+    $('#asset_link_keep_own').on('change', function () { onAssetLinkKeepOwnChanged($(this).prop('checked')); });
     $('#asset_link_clear_btn').on('click', () => {
         $('#asset_link_select').val('');
         onAssetLinkChanged('');
@@ -4780,7 +4843,7 @@ async function uploadAssetCommand(args, url) {
         showToast('error', '캐릭터 하나를 선택한 상태에서 써 주세요.');
         return '';
     }
-    if (isAssetLinkActive(target.ownerId)) {
+    if (isUploadLocked(target.ownerId)) {
         showToast('info', '에셋 링크를 쓰는 중에는 올릴 수 없습니다.');
         return '';
     }

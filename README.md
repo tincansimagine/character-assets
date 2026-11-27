@@ -131,6 +131,7 @@ If a name still does not match, open **도구 → 채팅 점검** (Tools → Cha
 | 채팅 점검 · 점검하기 | Chat check · Run check |
 | 페르소나 에셋 | Persona assets |
 | 에셋 폴더 · 에셋 링크 · 에셋 버전 | Asset folder · Asset link · Asset version |
+| 이 캐릭터 에셋도 같이 쓰기 | Also use this character's own assets (with an asset link) |
 | 백업 & 정리 · 이름 정돈 · 남은 설정 정리 | Backup & cleanup · Tidy names · Clean leftover settings |
 | 설정 백업 / 설정 복원 · 에셋 ZIP 받기 | Back up / restore settings · Download assets as ZIP |
 | 이 캐릭터 설정 초기화 | Reset this character's settings (files are kept) |
@@ -143,7 +144,7 @@ If a name still does not match, open **도구 → 채팅 점검** (Tools → Cha
 - **Images appear twice** — the built-in renderer and a Regex script are both converting tags. Keep only one. The Display tab warns you when both are on.
 - **Instructions are sent twice** — auto-insert is on and `{{img_inprompt}}` is also in the prompt. Remove one.
 - **Upload fails** — the page has usually been open long enough for its security token to expire. Reload and try again. The error notice shows the cause.
-- **Cannot upload while linked** — an asset link shares another character's folder, so uploads and deletes are locked. Upload from the original character.
+- **Linked character's images replace this character's own** — by default an asset link uses the other character's folder *instead of* this one, and uploads are locked. Turn on **이 캐릭터 에셋도 같이 쓰기** (Also use this character's own assets) under **에셋 폴더** (Asset folder) to use both folders together. New uploads then go to this character's folder, and when names clash this character's file wins. Files from the linked character can only be renamed or deleted from that character.
 - **Too many tokens** — turn off assets you are not using (eye icon). The files are not deleted.
 - Not every model writes tags perfectly. Keep fuzzy name matching on and most near-misses are handled for you.
 
@@ -250,7 +251,7 @@ AI가 `{{img::joy.png}}`로 답하면 그 자리에 이미지가 나옵니다.
 - **이미지가 두 번씩 나옵니다** — 내장 렌더러와 Regex 변환을 같이 쓰는 경우입니다. 하나만 켜 두세요. 겹치면 표시 탭에 경고가 나옵니다.
 - **지침이 두 번 들어갑니다** — 자동 삽입을 켠 채 `{{img_inprompt}}`도 직접 넣은 경우입니다. 하나만 남기세요.
 - **업로드가 실패합니다** — 페이지를 오래 켜 둬서 보안 토큰이 만료된 경우가 대부분입니다. 새로고침 후 다시 시도하세요. 실패 원인은 알림에 함께 나옵니다.
-- **에셋 링크 중에는 업로드가 안 됩니다** — 다른 캐릭터의 폴더를 같이 쓰는 중이라 그쪽 파일을 보호하려고 잠급니다. 원래 캐릭터에서 올려 주세요.
+- **링크하면 원래 캐릭터 에셋이 안 보입니다 / 업로드가 안 됩니다** — 에셋 링크는 기본적으로 이 캐릭터 폴더 *대신* 링크한 캐릭터 폴더를 씁니다. **에셋 폴더**에서 **이 캐릭터 에셋도 같이 쓰기**를 켜면 두 캐릭터 에셋이 함께 나오고, 새로 올리는 파일은 이 캐릭터 폴더에 들어갑니다. 이름이 겹치면 이 캐릭터 파일이 먼저 나오고, 링크한 캐릭터의 파일은 그 캐릭터에서만 지우거나 이름을 바꿀 수 있습니다.
 - **그룹 채팅도 되나요?** — 됩니다. 모든 멤버의 에셋을 함께 불러오고, 올릴 때 대상 멤버를 고릅니다.
 - 모든 AI 모델이 태그를 정확히 쓰지는 않습니다. **비슷한 이름 자동 연결**을 켜 두면 대부분 알아서 찾아 줍니다.
 
